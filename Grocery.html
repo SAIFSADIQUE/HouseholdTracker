@@ -1,0 +1,2448 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-palette="signature">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Grocery Tracker</title>
+
+<!-- ══════════ FAVICON ══════════ -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="alternate icon" href="favicon.svg">
+
+<!-- ══════════ FONTS ══════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- ══════════ SHARED STYLESHEET ══════════ -->
+<link rel="stylesheet" href="styles.css"/>
+
+<style>
+  /* Grocery-specific overrides — all base styles come from styles.css */
+  .cat-chip-list { display:flex; flex-wrap:wrap; gap:6px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LOGIN OVERLAY
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="login-overlay" id="login-overlay" style="display:none">
+  <div class="login-blob b1"></div>
+  <div class="login-blob b2"></div>
+  <div class="login-blob b3"></div>
+  <div class="login-box">
+    <div class="login-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="26" height="26" fill="none">
+        <path d="M14 12h20M14 20h20M14 12c0 8 3 12 10 16l-10 8M24 28h10"
+              stroke="currentColor" stroke-width="2.6"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>Grocery Tracker</h1>
+    <p>Enter your password to continue.</p>
+    <input type="password" id="login-pass" class="fc2"
+           placeholder="••••" maxlength="20" inputmode="numeric"
+           autocomplete="off"/>
+    <button class="btn bp" type="button">Unlock</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LOADING OVERLAY
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <p id="loading-msg">Connecting to Firebase…</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     OFFLINE BAR
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="offline-bar" id="offline-bar">
+  ⚠️ You are offline — changes will sync automatically when reconnected
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SYNC BANNER
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="sync-banner">
+  <div class="sg">
+    <div class="si">
+      <span class="dot dot-yellow" id="sync-dot"></span>
+      <span id="sync-status">Connecting…</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     APP SHELL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark" aria-hidden="true">🛒</div>
+      <span class="brand-name">Grocery Tracker</span>
+    </div>
+
+    <nav class="side-nav" id="side-nav">
+
+      <!-- ══ Cross-links ══ -->
+      <div class="side-group-label">Apps</div>
+      <a class="tb" href="index.html">
+        <span>🏠</span>
+        <span class="tb-lbl">Household Tracker</span>
+      </a>
+      <a class="tb" href="Birthday.html">
+        <span>🎂</span>
+        <span class="tb-lbl">Birthday Tracker</span>
+      </a>
+      <a class="tb active" href="Grocery.html">
+        <span>🛒</span>
+        <span class="tb-lbl">Grocery Tracker</span>
+      </a>
+
+      <!-- ══ Overview ══ -->
+      <div class="side-group-label">Overview</div>
+      <button class="tb" data-tab="dashboard" data-title="Grocery Dashboard" type="button">
+        <span>📊</span><span class="tb-lbl">Dashboard</span>
+      </button>
+
+      <!-- ══ Entry ══ -->
+      <div class="side-group-label">Entry</div>
+      <button class="tb" data-tab="add" data-title="Add Purchase" type="button">
+        <span>➕</span><span class="tb-lbl">Add Purchase</span>
+      </button>
+      <button class="tb" data-tab="records" data-title="All Purchases" type="button">
+        <span>📋</span><span class="tb-lbl">All Purchases</span>
+      </button>
+      <button class="tb" data-tab="list" data-title="Shopping List" type="button">
+        <span>✅</span><span class="tb-lbl">Shopping List</span>
+      </button>
+
+      <!-- ══ Analysis ══ -->
+      <div class="side-group-label">Analysis</div>
+      <button class="tb" data-tab="price" data-title="Price Compare" type="button">
+        <span>📈</span><span class="tb-lbl">Price Compare</span>
+      </button>
+      <button class="tb" data-tab="monthly" data-title="Monthly Expenditure" type="button">
+        <span>🗓️</span><span class="tb-lbl">Monthly Report</span>
+      </button>
+      <button class="tb" data-tab="items" data-title="Item Insights & Refill" type="button">
+        <span>🧺</span><span class="tb-lbl">Item Insights</span>
+      </button>
+
+      <!-- ══ Account ══ -->
+      <div class="side-group-label">Account</div>
+      <button class="tb" data-tab="settings" data-title="Settings" type="button">
+        <span>⚙️</span><span class="tb-lbl">Settings</span>
+      </button>
+      <button class="tb" type="button"
+              onclick="window.__householdLogout && window.__householdLogout('manual')">
+        <span>🚪</span><span class="tb-lbl">Logout</span>
+      </button>
+
+    </nav>
+  </aside>
+
+  <!-- ═══════════ APP CONTENT ═══════════ -->
+  <div class="app-content">
+
+    <!-- ══ TOPBAR ══ -->
+    <header class="topbar">
+      <h2 class="topbar-title" id="topbar-title">Grocery Dashboard</h2>
+      <div class="topbar-actions">
+        <button class="ib" id="btn-add-top" type="button">
+          ➕ <span class="ib-lbl">Add</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══════════ MAIN ═══════════ -->
+    <main class="main" id="main-content">
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: DASHBOARD
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-dashboard" class="tp active">
+
+        <!-- ══ STAT CARDS ══ -->
+        <div class="grid g4 mb" id="dash-cards"></div>
+
+        <!-- ══ Bars + Top items ══ -->
+        <div class="grid g2">
+          <div class="pnl">
+            <h3>Last 6 Months Expenditure</h3>
+            <div id="dash-bars"></div>
+          </div>
+          <div class="pnl">
+            <h3>Top Items This Month</h3>
+            <div id="dash-top"></div>
+          </div>
+        </div>
+
+        <!-- ══ Category + Online/Offline ══ -->
+        <div class="grid g2">
+          <div class="pnl">
+            <h3>Spend by Category (This Month)</h3>
+            <div id="dash-cat"></div>
+          </div>
+          <div class="pnl">
+            <h3>Online vs Offline (This Month)</h3>
+            <div id="dash-med"></div>
+          </div>
+        </div>
+
+        <!-- ══ Due for refill ══ -->
+        <div class="pnl">
+          <h3>⏰ Due for Refill</h3>
+          <div id="dash-due"></div>
+        </div>
+
+        <!-- ══ Recent purchases ══ -->
+        <div class="tc">
+          <div class="th2">
+            <h3>Recent Purchases</h3>
+            <span class="rb" id="recent-count">0</span>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Rate</th>
+                  <th>Amount</th>
+                  <th>Bought From</th>
+                </tr>
+              </thead>
+              <tbody id="recent-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: ADD PURCHASE
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-add" class="tp">
+
+        <div class="pnl">
+          <h3>➕ New Grocery Purchase</h3>
+          <div id="add-info"></div>
+
+          <div class="grid g3">
+            <div class="fg2">
+              <label>Item Name *</label>
+              <input class="fc2" id="f-name" list="itemlist"
+                     placeholder="Start typing… e.g. Turmeric Powder"
+                     autocomplete="off"/>
+            </div>
+            <div class="fg2">
+              <label>Category *</label>
+              <select class="fc2" id="f-cat"></select>
+            </div>
+            <div class="fg2">
+              <label>Purchased On *</label>
+              <input type="date" class="fc2" id="f-date"/>
+            </div>
+            <div class="fg2">
+              <label>Quantity *</label>
+              <input type="number" class="fc2" id="f-qty"
+                     min="0" step="any" placeholder="1"/>
+            </div>
+            <div class="fg2">
+              <label>Unit *</label>
+              <select class="fc2" id="f-unit"></select>
+            </div>
+            <div class="fg2">
+              <label>Rate (₹ per unit)</label>
+              <input type="number" class="fc2" id="f-rate"
+                     min="0" step="any" placeholder="0.00"/>
+            </div>
+            <div class="fg2">
+              <label>Amount Paid (₹) *</label>
+              <input type="number" class="fc2" id="f-amount"
+                     min="0" step="any" placeholder="0.00"/>
+            </div>
+            <div class="fg2">
+              <label>Medium of Shopping *</label>
+              <select class="fc2" id="f-medium">
+                <option>Online</option>
+                <option>Offline</option>
+              </select>
+            </div>
+            <div class="fg2">
+              <label>Platform / Store *</label>
+              <select class="fc2" id="f-source"></select>
+            </div>
+            <div class="fg2">
+              <label>Store / Seller name (optional)</label>
+              <input class="fc2" id="f-store"
+                     placeholder="e.g. Baguiati Bazar, Reliance Smart"/>
+            </div>
+            <div class="fg2">
+              <label>Note (optional)</label>
+              <input class="fc2" id="f-note"
+                     placeholder="Offer, brand, pack size…"/>
+            </div>
+          </div>
+
+          <div class="ba" style="margin-top:6px">
+            <button class="btn bp" id="btn-save" type="button">💾 Save Purchase</button>
+            <button class="btn bg2" id="btn-clear" type="button">↺ Clear</button>
+            <button class="btn bo" id="btn-save2" type="button">💾 Save &amp; Add Another</button>
+          </div>
+        </div>
+
+        <div class="pnl">
+          <h3>⚡ Quick Pick — Frequently Bought</h3>
+          <div class="chips" id="quick-chips"></div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: ALL PURCHASES
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-records" class="tp">
+
+        <div class="pnl">
+          <h3>🔎 Filter Purchases</h3>
+          <div class="grid g3">
+            <div class="fg2">
+              <label>Search item / store / note</label>
+              <input class="fc2" id="q" placeholder="Search…"/>
+            </div>
+            <div class="fg2">
+              <label>Category</label>
+              <select class="fc2" id="fl-cat"></select>
+            </div>
+            <div class="fg2">
+              <label>Medium</label>
+              <select class="fc2" id="fl-med">
+                <option value="">All</option>
+                <option>Online</option>
+                <option>Offline</option>
+              </select>
+            </div>
+            <div class="fg2">
+              <label>Platform / Store</label>
+              <select class="fc2" id="fl-src"></select>
+            </div>
+            <div class="fg2">
+              <label>From date</label>
+              <input type="date" class="fc2" id="fl-from"/>
+            </div>
+            <div class="fg2">
+              <label>To date</label>
+              <input type="date" class="fc2" id="fl-to"/>
+            </div>
+            <div class="fg2">
+              <label>Sort by</label>
+              <select class="fc2" id="fl-sort">
+                <option value="dnew">Date — newest first</option>
+                <option value="dold">Date — oldest first</option>
+                <option value="ahigh">Amount — high to low</option>
+                <option value="alow">Amount — low to high</option>
+                <option value="name">Item name A–Z</option>
+              </select>
+            </div>
+          </div>
+          <div class="ba">
+            <button class="btn bg2 bsm" id="btn-clearf" type="button">Reset filters</button>
+            <button class="btn bo bsm" id="btn-expf" type="button">⬇ Export filtered CSV</button>
+          </div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>Purchase Records</h3>
+            <span class="rb" id="rec-sum">—</span>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Qty</th>
+                  <th>Rate</th>
+                  <th>Amount</th>
+                  <th>Medium</th>
+                  <th>Bought From</th>
+                  <th>Prev. Buy</th>
+                  <th>Gap</th>
+                  <th>Note</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="rec-body"></tbody>
+            </table>
+          </div>
+          <div class="pag">
+            <span class="pi" id="pg-info"></span>
+            <div class="pb2" id="pg-btns"></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: SHOPPING LIST
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-list" class="tp">
+
+        <div class="pnl">
+          <h3>✅ Next Shopping List</h3>
+          <div class="grid g3">
+            <div class="fg2">
+              <label>Item</label>
+              <input class="fc2" id="l-name" list="itemlist"
+                     placeholder="Add to list…"/>
+            </div>
+            <div class="fg2">
+              <label>Qty note</label>
+              <input class="fc2" id="l-qty" placeholder="e.g. 2 kg, 1 pack"/>
+            </div>
+            <div class="fg2" style="justify-content:flex-end">
+              <button class="btn bp" id="btn-addlist" type="button">➕ Add to list</button>
+            </div>
+          </div>
+          <div id="list-body"></div>
+          <div class="ba" style="margin-top:12px">
+            <button class="btn bo bsm" id="btn-autolist" type="button">🪄 Auto-add due items</button>
+            <button class="btn bg2 bsm" id="btn-clrdone" type="button">Clear ticked</button>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: PRICE COMPARE
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-price" class="tp">
+
+        <div class="pnl">
+          <h3>📈 Compare an Item's Price — Last 6 Months</h3>
+          <div class="grid g2">
+            <div class="fg2">
+              <label>Pick a purchased item</label>
+              <select class="fc2" id="pc-item"></select>
+            </div>
+            <div class="fg2">
+              <label>Window</label>
+              <select class="fc2" id="pc-win">
+                <option value="6">Last 6 months</option>
+                <option value="3">Last 3 months</option>
+                <option value="12">Last 12 months</option>
+              </select>
+            </div>
+          </div>
+          <div class="hint">Rates are normalised (g→kg, ml→L) so pack sizes compare fairly.</div>
+        </div>
+
+        <div class="grid g4 mb" id="pc-cards"></div>
+
+        <div class="pnl">
+          <h3>Average Rate per Month</h3>
+          <div id="pc-bars"></div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>Month-wise Rate Movement</h3>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Buys</th>
+                  <th>Total Qty</th>
+                  <th>Spend</th>
+                  <th>Avg Rate</th>
+                  <th>Change vs prev</th>
+                  <th>Cheapest at</th>
+                </tr>
+              </thead>
+              <tbody id="pc-month"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>Purchase History of this Item</h3>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Qty</th>
+                  <th>Amount</th>
+                  <th>Rate</th>
+                  <th>vs last buy</th>
+                  <th>Gap since last</th>
+                  <th>Bought From</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pc-hist"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>All Items — Price Movement</h3>
+            <span class="rb" id="pc-all-count">0</span>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Oldest rate</th>
+                  <th>Latest rate</th>
+                  <th>Change</th>
+                  <th>Min</th>
+                  <th>Max</th>
+                  <th>Last bought</th>
+                  <th>Days ago</th>
+                </tr>
+              </thead>
+              <tbody id="pc-all"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: MONTHLY REPORT
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-monthly" class="tp">
+
+        <div class="pnl">
+          <h3>🗓️ Month-wise Grocery Expenditure</h3>
+          <div class="grid g2">
+            <div class="fg2">
+              <label>Year</label>
+              <select class="fc2" id="mr-year"></select>
+            </div>
+            <div class="fg2">
+              <label>Drill into month</label>
+              <select class="fc2" id="mr-month"></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g4 mb" id="mr-cards"></div>
+
+        <div class="pnl">
+          <h3>Monthly Spend</h3>
+          <div id="mr-bars"></div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>Monthly Summary</h3>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Entries</th>
+                  <th>Total Spend</th>
+                  <th>Avg / entry</th>
+                  <th>Change vs prev</th>
+                  <th>Online</th>
+                  <th>Offline</th>
+                  <th>Top Category</th>
+                </tr>
+              </thead>
+              <tbody id="mr-table"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid g2">
+          <div class="pnl">
+            <h3>Category Split — <span id="mr-m1"></span></h3>
+            <div id="mr-cat"></div>
+          </div>
+          <div class="pnl">
+            <h3>Platform Split — <span id="mr-m2"></span></h3>
+            <div id="mr-src"></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: ITEM INSIGHTS
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-items" class="tp">
+
+        <div class="pnl">
+          <h3>🧺 Item Insights — last buy, gap &amp; refill due</h3>
+          <div class="grid g3">
+            <div class="fg2">
+              <label>Search item</label>
+              <input class="fc2" id="it-q" placeholder="Search…"/>
+            </div>
+            <div class="fg2">
+              <label>Category</label>
+              <select class="fc2" id="it-cat"></select>
+            </div>
+            <div class="fg2">
+              <label>Show</label>
+              <select class="fc2" id="it-view">
+                <option value="all">All items</option>
+                <option value="due">Only due for refill</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>Items Purchased</h3>
+            <span class="rb" id="it-count">0</span>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Times</th>
+                  <th>Total Qty</th>
+                  <th>Total Spent</th>
+                  <th>Avg Rate</th>
+                  <th>Last Rate</th>
+                  <th>Last Purchased</th>
+                  <th>Days Ago</th>
+                  <th>Avg Gap</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="it-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: SETTINGS
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-settings" class="tp">
+
+        <!-- Firestore status -->
+        <div class="pnl">
+          <h3>☁️ Firestore Connection</h3>
+          <div id="fb-status"></div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="pnl">
+          <h3>🎨 Appearance</h3>
+          <div class="fg2">
+            <label>Mode</label>
+            <div class="theme-row">
+              <div class="theme-opt" id="th-light" onclick="setThemeMode('light')">☀️ Light</div>
+              <div class="theme-opt" id="th-dark" onclick="setThemeMode('dark')">🌙 Dark</div>
+            </div>
+          </div>
+          <div class="fg2" style="margin-top:12px">
+            <label>Theme — pick a palette (12 options)</label>
+            <div class="palette-gallery" id="pal-grid"></div>
+          </div>
+        </div>
+
+        <!-- Data -->
+        <div class="pnl">
+          <h3>💾 Data</h3>
+          <p class="hint" style="margin-bottom:12px">
+            Live data lives in Firestore. Offline edits queue locally and sync automatically when you reconnect.
+          </p>
+          <div class="ba">
+            <button class="btn bp" id="btn-expall" type="button">⬇ Export all CSV</button>
+            <button class="btn bo" id="btn-backup" type="button">🗄️ Backup JSON</button>
+            <button class="btn bg2" id="btn-restore" type="button">📥 Restore JSON</button>
+            <input type="file" id="imp" accept=".json" style="display:none"/>
+            <button class="btn bd" id="btn-wipe" type="button">🧨 Delete all grocery data</button>
+          </div>
+        </div>
+
+        <!-- Custom items -->
+        <div class="pnl">
+          <h3>🧾 Custom Items</h3>
+          <p class="hint">
+            Any new item name you type while saving is stored in
+            <b>grocery_items_custom</b> and appears in suggestions on every device.
+          </p>
+          <div class="chips cat-chip-list" id="custom-chips" style="margin-top:10px"></div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DATALIST for item autocomplete
+     ═══════════════════════════════════════════════════════════════ -->
+<datalist id="itemlist"></datalist>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EDIT PURCHASE MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="edit-mo">
+  <div class="md wide">
+    <div class="mt">✏️ Edit Purchase</div>
+    <div class="grid g2">
+      <div class="fg2">
+        <label>Item Name</label>
+        <input class="fc2" id="e-name" list="itemlist"/>
+      </div>
+      <div class="fg2">
+        <label>Category</label>
+        <select class="fc2" id="e-cat"></select>
+      </div>
+      <div class="fg2">
+        <label>Purchased On</label>
+        <input type="date" class="fc2" id="e-date"/>
+      </div>
+      <div class="fg2">
+        <label>Quantity</label>
+        <input type="number" class="fc2" id="e-qty" step="any" min="0"/>
+      </div>
+      <div class="fg2">
+        <label>Unit</label>
+        <select class="fc2" id="e-unit"></select>
+      </div>
+      <div class="fg2">
+        <label>Rate (₹/unit)</label>
+        <input type="number" class="fc2" id="e-rate" step="any" min="0"/>
+      </div>
+      <div class="fg2">
+        <label>Amount (₹)</label>
+        <input type="number" class="fc2" id="e-amount" step="any" min="0"/>
+      </div>
+      <div class="fg2">
+        <label>Medium</label>
+        <select class="fc2" id="e-medium">
+          <option>Online</option>
+          <option>Offline</option>
+        </select>
+      </div>
+      <div class="fg2">
+        <label>Platform / Store</label>
+        <select class="fc2" id="e-source"></select>
+      </div>
+      <div class="fg2">
+        <label>Store name</label>
+        <input class="fc2" id="e-store"/>
+      </div>
+      <div class="fg2" style="grid-column:1/-1">
+        <label>Note</label>
+        <input class="fc2" id="e-note"/>
+      </div>
+    </div>
+    <input type="hidden" id="e-id"/>
+    <div class="mf">
+      <button class="btn bg2" id="btn-ecancel" type="button">Cancel</button>
+      <button class="btn bp" id="btn-esave" type="button">💾 Update</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CONFIRM MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="confirm-mo">
+  <div class="md">
+    <div class="mt" id="confirm-title">⚠️ Confirm</div>
+    <div id="confirm-body"></div>
+    <div class="mf">
+      <button class="btn bg2" id="confirm-cancel" type="button">Cancel</button>
+      <button class="btn bd" id="confirm-ok-btn" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Toast container -->
+<div class="tc2" id="toast-c"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE SCRIPT — Grocery Tracker
+     Shared helpers imported from app.js
+     ═══════════════════════════════════════════════════════════════ -->
+<script type="module">
+
+import {
+  // Firebase
+  db, COL, firebaseConfig,
+  // Constants
+  MF, MS, MN, CAL_MONTHS, COLORS,
+  GROCERY_UNITS, GROCERY_SOURCES,
+  // Helpers
+  $, esc, escQ, fmt, fmtAmt, fmt0, fmtDate, monthLabel, mkey, mlabel,
+  localDateStr, today, daysBetween, lastKeys,
+  bars, download, printLetterhead, openPrintWindow,
+  // UI
+    toast, pill, showConfirm, ensureConfirmModal, closeMo, openMo,
+  dataSaved, dataUpdated, dataDeleted,
+  // Theme
+  applyTheme, setThemeMode, setPalette, renderThemeGallery,
+  // Session & header
+  installSession, installHeader, setCounter, setSyncStatus,
+  currentUser, isLoggedIn,
+  // CRUD
+  addRecord, updateRecord, deleteRecord, setRecord,
+  // History
+  ACT, logHistory,
+  // Export
+  exportCSV, backupJSON, restoreJSON, readJSONFile, emailBackup,
+  // Subscription
+  subscribeCollection, subscribeDocument, registerUnsub,
+  // Bootstrap
+  initPage,
+  // Settings
+  saveHouseholdSettings, HOUSEHOLD_SETTINGS,
+  // Tab switcher
+  switchTab, installSidebarTabs
+} from './app.js';
+
+// Firestore functions used directly on this page (bulk writes)
+import {
+  collection, doc, getDocs, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+
+/* ═══════════════════════════════════════════════════════════════
+   GROCERY CATALOG — Indian household items
+   Format: "Item Name|unit"
+   These are pre-loaded and combined with custom items from Firestore.
+   ═══════════════════════════════════════════════════════════════ */
+const CATALOG = {
+  "Spices & Masala": [
+    "Turmeric Powder|g","Red Chilli Powder|g","Kashmiri Chilli Powder|g","Coriander Powder|g",
+    "Cumin Seeds (Jeera)|g","Cumin Powder|g","Mustard Seeds (Sarso)|g","Fenugreek Seeds (Methi)|g",
+    "Kasuri Methi|g","Garam Masala|g","Chaat Masala|g","Kitchen King Masala|g","Chicken Masala|g",
+    "Meat Masala|g","Biryani Masala|g","Sambar Powder|g","Rasam Powder|g","Tandoori Masala|g",
+    "Panch Phoron|g","Black Pepper|g","Cloves (Laung)|g","Green Cardamom (Elaichi)|g",
+    "Black Cardamom|g","Cinnamon (Dalchini)|g","Bay Leaf (Tej Patta)|g","Star Anise|g",
+    "Asafoetida (Hing)|g","Carom Seeds (Ajwain)|g","Fennel (Saunf)|g","Nigella (Kalonji)|g",
+    "Dry Red Chilli|g","Amchur Powder|g","Tamarind (Imli)|g","Poppy Seeds (Posto)|g",
+    "Mustard Paste / Kasundi|ml","Ginger-Garlic Paste|g"
+  ],
+  "Rice, Grains & Cereals": [
+    "Basmati Rice|kg","Miniket Rice|kg","Gobindobhog Rice|kg","Sona Masoori Rice|kg",
+    "Wheat (Gehu)|kg","Poha (Chire)|g","Suji / Rava|g","Vermicelli (Semiya)|g","Daliya|g",
+    "Sabudana|g","Puffed Rice (Muri)|g","Oats|g","Cornflakes|g","Muesli|g","Quinoa|g"
+  ],
+  "Flours (Atta & Besan)": [
+    "Wheat Atta|kg","Maida|kg","Besan|kg","Rice Flour|kg","Ragi Flour|kg","Corn Flour|g",
+    "Sattu|g","Bajra Flour|kg"
+  ],
+  "Pulses & Dal": [
+    "Toor / Arhar Dal|kg","Moong Dal|kg","Masoor Dal|kg","Chana Dal|kg","Urad Dal|kg",
+    "Whole Moong|kg","Rajma|kg","Kabuli Chana|kg","Kala Chana|kg","Lobia|kg",
+    "Dried Peas (Matar)|kg","Soya Chunks|g"
+  ],
+  "Oils & Ghee": [
+    "Mustard Oil|L","Sunflower Oil|L","Soybean Refined Oil|L","Rice Bran Oil|L",
+    "Groundnut Oil|L","Coconut Oil|ml","Olive Oil|ml","Vanaspati / Dalda|kg",
+    "Desi Ghee|g","Butter|g"
+  ],
+  "Dairy & Eggs": [
+    "Milk (Packet)|L","Toned Milk|L","Curd / Dahi|g","Paneer|g","Cheese Slices|pack",
+    "Cheese Cubes|pack","Fresh Cream|ml","Condensed Milk|pack","Milk Powder|g","Eggs|pcs",
+    "Lassi|ml","Buttermilk|ml","Flavoured Yogurt|pcs"
+  ],
+  "Vegetables": [
+    "Potato|kg","Onion|kg","Tomato|kg","Ginger|g","Garlic|g","Green Chilli|g",
+    "Coriander Leaves|bundle","Curry Leaves|bundle","Brinjal|kg","Lady Finger (Bhindi)|kg",
+    "Cauliflower|pcs","Cabbage|pcs","Capsicum|g","Carrot|kg","Beans|g","Bitter Gourd (Karela)|g",
+    "Bottle Gourd (Lauki)|pcs","Pumpkin|kg","Pointed Gourd (Parwal)|g","Ridge Gourd (Jhinge)|g",
+    "Spinach (Palak)|bundle","Radish (Mooli)|g","Beetroot|g","Cucumber|kg","Lemon|pcs",
+    "Drumstick|g","Raw Banana|pcs","Raw Papaya|g","Mushroom|pack","Sweet Corn|pcs",
+    "Green Peas (Frozen)|g","Colocasia (Kochu)|g","Sweet Potato|kg"
+  ],
+  "Fruits": [
+    "Apple|kg","Banana|dozen","Orange|kg","Mango|kg","Grapes|kg","Papaya|kg","Guava|kg",
+    "Pomegranate|kg","Watermelon|pcs","Muskmelon|pcs","Pineapple|pcs","Litchi|kg",
+    "Sapota (Chiku)|kg","Pear|kg","Kiwi|pcs","Coconut (Tender)|pcs"
+  ],
+  "Meat, Fish & Seafood": [
+    "Chicken (Curry Cut)|kg","Chicken Breast|kg","Mutton|kg","Rohu Fish|kg","Katla Fish|kg",
+    "Hilsa (Ilish)|kg","Pabda Fish|kg","Bhetki Fish|kg","Tilapia|kg","Prawns|g",
+    "Mutton Keema|g","Chicken Sausage|pack","Dry Fish (Shutki)|g"
+  ],
+  "Bakery & Breakfast": [
+    "Bread|pcs","Brown Bread|pcs","Pav / Bun|pack","Rusk / Toast|pack","Parle-G Biscuit|pack",
+    "Marie Biscuit|pack","Cream Biscuit|pack","Digestive Biscuit|pack","Cake / Pastry|pcs",
+    "Jam|g","Honey|g","Peanut Butter|g","Maggi Noodles|pack","Pasta|g","Macaroni|g"
+  ],
+  "Dry Fruits & Nuts": [
+    "Almonds|g","Cashew Nuts|g","Raisins (Kishmish)|g","Walnuts|g","Pistachio|g",
+    "Dates (Khajur)|g","Dry Figs (Anjeer)|g","Peanuts|g","Dry Coconut|pcs","Makhana|g","Chironji|g"
+  ],
+  "Sugar, Salt & Essentials": [
+    "Sugar|kg","Brown Sugar|g","Jaggery (Gur)|g","Iodised Salt|kg","Rock Salt (Sendha)|g",
+    "Black Salt|g","Baking Soda|g","Baking Powder|g","Instant Yeast|g","Vinegar|ml",
+    "Soy Sauce|ml","Tomato Ketchup|g","Mayonnaise|g","Pickle (Achar)|g","Papad|pack",
+    "Custard Powder|g","Jelly|pack"
+  ],
+  "Beverages": [
+    "Tea Leaf|g","Tea Bags|pack","Green Tea|pack","Ground Coffee|g","Instant Coffee|g",
+    "Horlicks / Bournvita|g","Fruit Juice|L","Soft Drink|L","Soda Water|L","Glucon-D|g",
+    "ORS Packet|pcs","Drinking Water Jar|pcs","Energy Drink|pcs"
+  ],
+  "Snacks & Namkeen": [
+    "Potato Chips|pack","Namkeen Mixture|g","Bhujia|g","Chanachur|g","Popcorn|pack",
+    "Chocolate|pcs","Ice Cream|pack","Sev|g","Soan Papdi|pack","Rasgulla / Sweets|pcs",
+    "Biscuit Combo Pack|pack"
+  ],
+  "Baby Care": [
+    "Diapers|pack","Baby Wipes|pack","Baby Soap|pcs","Baby Shampoo|ml","Baby Lotion|ml",
+    "Baby Massage Oil|ml","Baby Powder|g","Baby Cereal / Cerelac|g","Infant Formula Milk|g",
+    "Baby Liquid Detergent|ml","Feeding Bottle|pcs","Nappy Rash Cream|g",
+    "Baby Mosquito Patch|pack","Baby Towel|pcs"
+  ],
+  "Personal Care": [
+    "Bath Soap|pcs","Body Wash|ml","Shampoo|ml","Hair Conditioner|ml","Hair Oil|ml",
+    "Toothpaste|g","Toothbrush|pcs","Mouthwash|ml","Face Wash|g","Moisturiser / Cream|g",
+    "Sunscreen|g","Deodorant|pcs","Talcum Powder|g","Shaving Cream|g","Razor / Blades|pack",
+    "Sanitary Pads|pack","Hand Wash|ml","Hand Sanitizer|ml","Cotton Roll|pack",
+    "Petroleum Jelly|g","Comb|pcs","Nail Cutter|pcs"
+  ],
+  "Cleaning & Detergent": [
+    "Detergent Powder|kg","Liquid Detergent|ml","Detergent Bar|pcs","Fabric Conditioner|ml",
+    "Dishwash Liquid|ml","Dishwash Bar|pcs","Scrubber / Sponge|pcs","Floor Cleaner|ml",
+    "Toilet Cleaner|ml","Glass Cleaner|ml","Bleach|ml","Phenyl|L","Broom (Jhadu)|pcs",
+    "Floor Mop|pcs","Wiper|pcs","Dustbin Bags|pack","Toilet Brush|pcs","Drain Cleaner|g",
+    "Stain Remover|ml"
+  ],
+  "Household & Utilities": [
+    "Toilet Paper Roll|pack","Tissue Paper|pack","Kitchen Towel Roll|pack",
+    "Aluminium Foil|pcs","Cling Film|pcs","Butter Paper|pcs","Garbage Bags|pack",
+    "Match Box|pcs","Candle|pack","Gas Lighter|pcs","Agarbatti|pack","Camphor|g",
+    "Dhoop|pack","Mosquito Liquid Refill|pcs","Mosquito Coil|pack","Cockroach Killer|pcs",
+    "Naphthalene Balls|g","Air Freshener|pcs","Batteries|pack","LED Bulb|pcs",
+    "Shoe Polish|pcs","LPG Cylinder Refill|pcs","Water Can (20L)|pcs"
+  ],
+  "Medicine & First Aid": [
+    "Paracetamol|pack","Band-Aid|pack","Antiseptic Liquid|ml","Pain Balm|g","Cough Syrup|ml",
+    "Antacid|pack","Thermometer|pcs","Multivitamin|pack","Face Mask|pack"
+  ]
+};
+
+// Build the fast lookup from CATALOG — "item lower name" → { name, cat, unit }
+const ITEM_INFO = {};
+const CATS = Object.keys(CATALOG);
+CATS.forEach(cat => {
+  CATALOG[cat].forEach(s => {
+    const [name, unit] = s.split("|");
+    ITEM_INFO[name.toLowerCase()] = { name, cat, unit };
+  });
+});
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE STATE
+   ═══════════════════════════════════════════════════════════════ */
+let DB = { purchases: [], custom: [], list: [] };
+let READY = { p: false, c: false, l: false };
+let PAGE = 1;
+const PER = 15;
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ═══════════════════════════════════════════════════════════════ */
+initPage({
+  appName: 'Grocery Tracker',
+  counters: [
+    { id: 'items',     icon: '🧺', label: 'items', value: 0 },
+    { id: 'purchases', icon: '🛒', label: 'buys',  value: 0 },
+    { id: 'due',       icon: '⏰', label: 'due',   value: 0 }
+  ],
+  onReady: () => {
+    buildStatic();
+    wire();
+    startListeners();
+    applyTheme();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+
+// Normalize quantity to a common unit so rates compare fairly
+// Map pack-style units to (pieces per pack, canonical unit)
+// Map pack-style units to (pieces per pack, canonical unit)
+const PACK_SIZES = {
+  '6-pack':  6,
+  '10-pack': 10,
+  '12-pack': 12,
+  '15-pack': 15,
+  '30-pack': 30,
+  'dozen':   12
+};
+
+// Map fixed-gram units to grams (canonical will be kg)
+const GRAM_SIZES = {
+  '10g':  10,
+  '25g':  25,
+  '50g':  50,
+  '100g': 100,
+  '250g': 250,
+  '500g': 500,
+  '750g': 750
+};
+
+function norm(p){
+  let q = +p.qty || 0;
+  let u = p.unit || 'pcs';
+
+  // Convert raw grams to kg
+  if (u === 'g'){ q /= 1000; u = 'kg'; }
+  // Convert fixed-gram units: qty × grams → grams → kg
+  else if (GRAM_SIZES[u]){
+    q = (q * GRAM_SIZES[u]) / 1000;
+    u = 'kg';
+  }
+  // Convert millilitres to L
+  else if (u === 'ml'){ q /= 1000; u = 'L'; }
+  // Convert pack-style units to pieces
+  else if (PACK_SIZES[u]){
+    q *= PACK_SIZES[u];
+    u = 'pcs';
+  }
+
+  return { q, u, rate: q ? (+p.amount || 0) / q : 0 };
+}
+
+// All item names — catalogue + custom + already-purchased
+function allItemNames(){
+  const s = new Set(Object.values(ITEM_INFO).map(i => i.name));
+  DB.custom.forEach(c => s.add(c.name));
+  DB.purchases.forEach(p => s.add(p.name));
+  return [...s].sort((a,b) => a.localeCompare(b));
+}
+
+// Look up the info (category + unit) for an item name
+function infoFor(name){
+  const k = (name || '').trim().toLowerCase();
+  return ITEM_INFO[k]
+      || DB.custom.find(c => (c.name || '').toLowerCase() === k)
+      || null;
+}
+
+// All purchases of a specific item, sorted by date ascending
+function purchasesOf(name){
+  const k = (name || '').toLowerCase();
+  return DB.purchases
+    .filter(p => (p.name || '').toLowerCase() === k)
+    .sort((a,b) => String(a.date).localeCompare(String(b.date)));
+}
+
+// Most recent purchase of an item BEFORE a given date (excluding one id)
+function prevBuy(name, date, excludeId){
+  const ps = purchasesOf(name).filter(p => p.id !== excludeId && p.date <= date);
+  return ps.length ? ps[ps.length - 1] : null;
+}
+
+// Aggregated stats for one item
+function itemStats(name){
+  const ps = purchasesOf(name);
+  if (!ps.length) return null;
+  const gaps = [];
+  for (let i = 1; i < ps.length; i++) gaps.push(daysBetween(ps[i-1].date, ps[i].date));
+  const last = ps[ps.length - 1];
+  const spend = ps.reduce((s,p) => s + (+p.amount || 0), 0);
+  const qty = ps.reduce((s,p) => s + norm(p).q, 0);
+  return {
+    name: last.name,
+    cat: last.cat,
+    ps,
+    times: ps.length,
+    spend,
+    qty,
+    unit: norm(last).u,
+    avgRate: qty ? spend / qty : 0,
+    lastRate: norm(last).rate,
+    last: last.date,
+    daysAgo: daysBetween(last.date, today()),
+    avgGap: gaps.length ? Math.round(gaps.reduce((a,b) => a + b, 0) / gaps.length) : null
+  };
+}
+
+// All items with aggregated stats
+function allStats(){
+  return [...new Set(DB.purchases.map(p => p.name))]
+    .map(itemStats)
+    .filter(Boolean);
+}
+
+// Is an item due for refill?
+function isDue(s){
+  return s.avgGap && s.daysAgo >= s.avgGap;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   STATIC DOM SETUP
+   ═══════════════════════════════════════════════════════════════ */
+function buildStatic(){
+  // Category options for the main form
+  const catOpts = CATS.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  const fCat = $('f-cat');  if (fCat)  fCat.innerHTML  = catOpts;
+  const eCat = $('e-cat');  if (eCat)  eCat.innerHTML  = catOpts;
+  const flCat = $('fl-cat');if (flCat) flCat.innerHTML= '<option value="">All categories</option>' + catOpts;
+  const itCat = $('it-cat');if (itCat) itCat.innerHTML= '<option value="">All categories</option>' + catOpts;
+
+  // Unit options
+  const uOpts = GROCERY_UNITS.map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('');
+  const fUnit = $('f-unit'); if (fUnit) fUnit.innerHTML = uOpts;
+  const eUnit = $('e-unit'); if (eUnit) eUnit.innerHTML = uOpts;
+
+  // Sources for main form + edit form + filters
+  fillSources('f');
+  fillSources('e');
+
+  const allSrc = [...GROCERY_SOURCES.Online, ...GROCERY_SOURCES.Offline];
+  const flSrc = $('fl-src');
+  if (flSrc){
+    flSrc.innerHTML = '<option value="">All platforms / stores</option>' +
+      allSrc.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  }
+
+  // Default purchase date
+  const fDate = $('f-date');
+  if (fDate) fDate.value = today();
+
+  buildItemList();
+}
+
+function fillSources(prefix, keep){
+  const med = $(prefix + '-medium').value;
+  const src = $(prefix + '-source');
+  if (!src) return;
+  src.innerHTML = (GROCERY_SOURCES[med] || [])
+    .map(s => `<option value="${esc(s)}"${s === keep ? ' selected' : ''}>${esc(s)}</option>`)
+    .join('');
+}
+
+function buildItemList(){
+  const list = $('itemlist');
+  if (!list) return;
+  list.innerHTML = allItemNames().map(n => `<option value="${esc(n)}"></option>`).join('');
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIRESTORE LISTENERS
+   ═══════════════════════════════════════════════════════════════ */
+function startListeners(){
+  // Purchases
+  subscribeCollection(COL.GROCERY, rows => {
+    DB.purchases = rows.sort((a,b) => String(b.date).localeCompare(String(a.date)));
+    READY.p = true;
+    setCounter('purchases', rows.length);
+    setSyncStatus('live');                    // ← ADD THIS LINE
+    onData();
+  }, null, 'date');
+
+  // Custom items
+  subscribeCollection(COL.GROCERY_ITEMS, rows => {
+    DB.custom = rows.sort((a,b) => String(a.name || '').localeCompare(String(b.name || '')));
+    READY.c = true;
+    onData();
+  });
+
+  // Shopping list
+  subscribeCollection(COL.GROCERY_LIST, rows => {
+    DB.list = rows;
+    READY.l = true;
+    onData();
+  });
+}
+
+function hydrated(){ return READY.p && READY.c && READY.l; }
+
+function onData(){
+  if (!hydrated()) return;
+  buildItemList();
+  buildPcItems();
+  buildYears();
+  refreshAll();
+}
+
+function refreshAll(){
+  renderDash();
+  renderRecords();
+  renderList();
+  renderPrice();
+  renderMonthly();
+  renderItems();
+  renderCustomChips();
+  renderFbStatus();
+  updateDueCounter();
+}
+
+function updateDueCounter(){
+  const due = allStats().filter(isDue).length;
+  setCounter('due', due);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER DISPATCHER
+   ═══════════════════════════════════════════════════════════════ */
+window.__onTabChange = (tabId) => {
+  switch (tabId){
+    case 'dashboard': renderDash(); break;
+    case 'add':       buildItemList(); renderQuick(); break;
+    case 'records':   renderRecords(); break;
+    case 'list':      renderList(); break;
+    case 'price':     buildPcItems(); renderPrice(); break;
+    case 'monthly':   buildYears(); renderMonthly(); break;
+    case 'items':     renderItems(); break;
+    case 'settings':  renderSettingsUI(); applyTheme(); renderCustomChips(); renderFbStatus(); break;
+  }
+};
+
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+   ═══════════════════════════════════════════════════════════════ */
+function renderDash(){
+  const tm = mkey(today());
+  const P  = DB.purchases;
+
+  const thisM  = P.filter(p => mkey(p.date) === tm);
+  const lastKey = lastKeys(2)[0];
+  const lastM  = P.filter(p => mkey(p.date) === lastKey);
+
+  const tot     = thisM.reduce((s,p) => s + (+p.amount || 0), 0);
+  const lastTot = lastM.reduce((s,p) => s + (+p.amount || 0), 0);
+  const life    = P.reduce((s,p) => s + (+p.amount || 0), 0);
+
+  const k6 = lastKeys(6);
+  const in6 = P.filter(p => k6.includes(mkey(p.date)));
+  const months6 = k6.filter(k => P.some(p => mkey(p.date) === k)).length || 1;
+  const avg6 = in6.reduce((s,p) => s + (+p.amount || 0), 0) / months6;
+
+  const dayNo = new Date().getDate();
+  const dim   = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  const proj  = dayNo ? (tot / dayNo) * dim : 0;
+  const chg   = lastTot ? ((tot - lastTot) / lastTot * 100) : 0;
+  const due   = allStats().filter(isDue);
+
+  const cards = $('dash-cards');
+  if (cards) cards.innerHTML = `
+    <div class="sc"><div class="lbl">This Month Spend</div><div class="amt">₹${fmtAmt(tot)}</div>
+      <div class="sub">${thisM.length} entries · ${mlabel(tm)}</div></div>
+    <div class="sc ${chg > 0 ? 'e' : 'o'}"><div class="lbl">vs Last Month</div>
+      <div class="amt ${chg > 0 ? 'up' : chg < 0 ? 'down' : 'eq'}">${lastTot ? (chg > 0 ? '↑ ' : chg < 0 ? '↓ ' : '') + Math.abs(chg).toFixed(1) + '%' : '—'}</div>
+      <div class="sub">${mlabel(lastKey)}: ₹${fmtAmt(lastTot)}</div></div>
+    <div class="sc a"><div class="lbl">6-Month Monthly Avg</div><div class="amt">₹${fmtAmt(avg6)}</div>
+      <div class="sub">across ${months6} active month(s)</div></div>
+    <div class="sc w"><div class="lbl">Projected This Month</div><div class="amt">₹${fmtAmt(proj)}</div>
+      <div class="sub">at current daily pace</div></div>
+    <div class="sc o"><div class="lbl">Lifetime Spend</div><div class="amt">₹${fmtAmt(life)}</div>
+      <div class="sub">${P.length} purchases</div></div>
+    <div class="sc"><div class="lbl">Distinct Items</div><div class="amt">${new Set(P.map(p => p.name)).size}</div>
+      <div class="sub">${new Set(P.map(p => p.cat)).size} categories</div></div>
+    <div class="sc a"><div class="lbl">Avg per Entry</div><div class="amt">₹${fmtAmt(P.length ? life / P.length : 0)}</div>
+      <div class="sub">this month ₹${fmtAmt(thisM.length ? tot / thisM.length : 0)}</div></div>
+    <div class="sc ${due.length ? 'e' : 'o'}"><div class="lbl">Due for Refill</div><div class="amt">${due.length}</div>
+      <div class="sub">based on your buying gap</div></div>`;
+
+  // 6-month bars
+  const barsEl = $('dash-bars');
+  if (barsEl) barsEl.innerHTML = bars(
+    k6.map(k => {
+      const g = P.filter(p => mkey(p.date) === k);
+      const v = g.reduce((s,p) => s + (+p.amount || 0), 0);
+      return { label: mlabel(k), value: v, sub: '₹' + fmt0(v) + ' · ' + g.length };
+    }),
+    v => '₹' + fmt0(v)
+  );
+
+  // Top items this month
+  const byItem = {};
+  thisM.forEach(p => { byItem[p.name] = (byItem[p.name] || 0) + (+p.amount || 0); });
+  const topEl = $('dash-top');
+  if (topEl) topEl.innerHTML = bars(
+    Object.keys(byItem).sort((a,b) => byItem[b] - byItem[a]).slice(0, 8)
+      .map(n => ({ label: n.length > 13 ? n.slice(0, 12) + '…' : n, value: byItem[n], sub: '₹' + fmt0(byItem[n]) })),
+    v => '₹' + fmt0(v)
+  );
+
+  // Category split
+  const byCat = {};
+  thisM.forEach(p => { byCat[p.cat] = (byCat[p.cat] || 0) + (+p.amount || 0); });
+  const catEl = $('dash-cat');
+  if (catEl) catEl.innerHTML = bars(
+    Object.keys(byCat).sort((a,b) => byCat[b] - byCat[a]).slice(0, 10)
+      .map(c => ({
+        label: (c || '').length > 13 ? c.slice(0, 12) + '…' : c,
+        value: byCat[c],
+        sub: (tot ? (100 * byCat[c] / tot).toFixed(0) : 0) + '% · ₹' + fmt0(byCat[c])
+      })),
+    v => '₹' + fmt0(v)
+  );
+
+  // Online vs offline + platforms
+  const bySrc = {};
+  thisM.forEach(p => { bySrc[p.source] = (bySrc[p.source] || 0) + (+p.amount || 0); });
+  const on  = thisM.filter(p => p.medium === 'Online').reduce((s,p) => s + (+p.amount || 0), 0);
+  const off = tot - on;
+  const medEl = $('dash-med');
+  if (medEl){
+    medEl.innerHTML =
+      bars([
+        { label: 'Online',  value: on,  sub: (tot ? (100 * on / tot).toFixed(0) : 0) + '% · ₹' + fmt0(on) },
+        { label: 'Offline', value: off, sub: (tot ? (100 * off / tot).toFixed(0) : 0) + '% · ₹' + fmt0(off) }
+      ], v => '₹' + fmt0(v)) +
+      '<div style="height:10px"></div>' +
+      bars(
+        Object.keys(bySrc).sort((a,b) => bySrc[b] - bySrc[a]).slice(0, 6)
+          .map(s => ({
+            label: (s || '').length > 13 ? s.slice(0, 12) + '…' : s,
+            value: bySrc[s],
+            sub: '₹' + fmt0(bySrc[s])
+          })),
+        v => '₹' + fmt0(v)
+      );
+  }
+
+  // Due-for-refill list
+  const dueEl = $('dash-due');
+  if (dueEl){
+    dueEl.innerHTML = due.length
+      ? `<div class="tw"><table><thead><tr>
+          <th>Item</th><th>Last Bought</th><th>Days Ago</th><th>Usual Gap</th><th>Overdue By</th><th>Last Rate</th><th></th>
+        </tr></thead><tbody>
+          ${due.sort((a,b) => (b.daysAgo - b.avgGap) - (a.daysAgo - a.avgGap)).map(s => `<tr>
+            <td><b>${esc(s.name)}</b><div class="dc">${esc(s.cat || '')}</div></td>
+            <td class="dc">${fmtDate(s.last)}</td>
+            <td>${s.daysAgo}</td>
+            <td>${s.avgGap}</td>
+            <td class="up">+${s.daysAgo - s.avgGap} d</td>
+            <td>₹${fmtAmt(s.lastRate)}/${esc(s.unit)}</td>
+            <td><div class="ab">
+              <button class="btn bo bxs" data-buy="${esc(s.name)}" type="button">Buy</button>
+              <button class="btn bg2 bxs" data-plist="${esc(s.name)}" type="button">+List</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody></table></div>`
+      : '<div class="es">Nothing overdue 🎉 — gaps are learnt automatically after 2 purchases of an item.</div>';
+
+    dueEl.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => quickFromStats(b.dataset.buy));
+    dueEl.querySelectorAll('[data-plist]').forEach(b => b.onclick = () => pushList(b.dataset.plist));
+  }
+
+  // Recent purchases
+  const rec = [...P].sort((a,b) =>
+    String(b.date).localeCompare(String(a.date)) ||
+    String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
+  ).slice(0, 10);
+
+  const recCnt = $('recent-count');
+  if (recCnt) recCnt.textContent = rec.length;
+
+  const recBody = $('recent-body');
+  if (recBody){
+    recBody.innerHTML = rec.length
+      ? rec.map(p => {
+          const n = norm(p);
+          return `<tr>
+            <td class="dc">${fmtDate(p.date)}</td>
+            <td><b>${esc(p.name)}</b></td>
+            <td>${esc(p.qty + ' ' + p.unit)}</td>
+            <td>₹${fmtAmt(n.rate)}/${esc(n.u)}</td>
+            <td class="amc">₹${fmtAmt(p.amount)}</td>
+            <td><span class="cb ${p.medium === 'Online' ? 'on' : 'off'}">${esc(p.source)}</span></td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="6" class="es">No purchases yet — tap ➕ Add to begin.</td></tr>';
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ADD PURCHASE
+   ═══════════════════════════════════════════════════════════════ */
+function onNameChange(prefix){
+  const el = $(prefix + '-name');
+  if (!el) return;
+  const info = infoFor(el.value);
+  if (info){
+    $(prefix + '-cat').value  = info.cat;
+    $(prefix + '-unit').value = info.unit;
+  }
+  if (prefix === 'f') showAddInfo();
+}
+
+function showAddInfo(){
+  const box = $('add-info');
+  if (!box) return;
+  const name = $('f-name').value.trim();
+  const d = $('f-date').value || today();
+  if (!name){ box.innerHTML = ''; return; }
+
+  const s = itemStats(name);
+  if (!s){
+    box.innerHTML = `<div class="ibx okb">🆕 <b>First purchase</b> of “${esc(name)}” — no history yet.</div>`;
+    return;
+  }
+  const pb = prevBuy(name, d, null) || s.ps[s.ps.length - 1];
+  const gap = pb ? daysBetween(pb.date, d) : null;
+  const r = pb ? norm(pb) : null;
+
+  box.innerHTML = `<div class="ibx">🕘 Last bought on <b>${fmtDate(pb.date)}</b>
+    ${gap !== null ? ` — <b>${gap} day${gap === 1 ? '' : 's'}</b> gap from this purchase` : ''}<br>
+    Last paid <b>₹${fmtAmt(pb.amount)}</b> for ${esc(pb.qty + ' ' + pb.unit)}
+    (<b>₹${fmtAmt(r.rate)}/${esc(r.u)}</b>) from <b>${esc(pb.source)}</b>.
+    Bought <b>${s.times}</b> time(s), avg rate ₹${fmtAmt(s.avgRate)}/${esc(s.unit)}${s.avgGap ? `, usual gap <b>${s.avgGap} days</b>` : ''}.</div>`;
+}
+
+function recalc(prefix, from){
+  const q = +$(prefix + '-qty').value || 0;
+  const r = +$(prefix + '-rate').value || 0;
+  const a = +$(prefix + '-amount').value || 0;
+
+  if (from === 'amount'){
+    if (q) $(prefix + '-rate').value = +(a / q).toFixed(2);
+  } else {
+    if (q && r) $(prefix + '-amount').value = +(q * r).toFixed(2);
+  }
+}
+
+function readForm(prefix){
+  let rate = +$(prefix + '-rate').value;
+  let amount = +$(prefix + '-amount').value;
+  const qty = +$(prefix + '-qty').value;
+
+  if (!amount && qty && rate) amount = +(qty * rate).toFixed(2);
+  if (!rate && qty && amount) rate = +(amount / qty).toFixed(2);
+
+  return {
+    name:   $(prefix + '-name').value.trim(),
+    cat:    $(prefix + '-cat').value,
+    date:   $(prefix + '-date').value,
+    qty,
+    unit:   $(prefix + '-unit').value,
+    rate:   rate || 0,
+    amount: amount || 0,
+    medium: $(prefix + '-medium').value,
+    source: $(prefix + '-source').value,
+    store:  $(prefix + '-store').value.trim(),
+    note:   $(prefix + '-note').value.trim()
+  };
+}
+
+function validate(r){
+  if (!r.name) return 'Please enter the item name.';
+  if (!r.date) return 'Please select the purchase date.';
+  if (!(r.qty > 0)) return 'Quantity must be greater than 0.';
+  if (!(r.amount > 0)) return 'Amount paid must be greater than 0.';
+  return null;
+}
+
+async function rememberCustom(name, cat, unit){
+  if (infoFor(name)) return;
+  try {
+    await addRecord(COL.GROCERY_ITEMS, { name, cat, unit },
+      { pillMsg: 'Item remembered', pillIcon: '🧾' });
+  } catch (e) { /* best-effort */ }
+}
+
+async function addPurchase(again){
+  const r = readForm('f');
+  const err = validate(r);
+  if (err){ toast('❌ ' + err, 'error'); return; }
+
+  const prev = prevBuy(r.name, r.date, null);
+
+  const btns = [$('btn-save'), $('btn-save2')];
+  btns.forEach(b => b.disabled = true);
+
+  await rememberCustom(r.name, r.cat, r.unit);
+
+  const res = await addRecord(COL.GROCERY, r, {
+    pillMsg: `Saved ₹${fmtAmt(r.amount)}`,
+    pillIcon: '🛒',
+    historyAction: ACT.GROC_ADD,
+    historyData: { name: r.name, amount: r.amount, cat: r.cat }
+  });
+
+  btns.forEach(b => b.disabled = false);
+
+  if (res.ok){
+    let extra = '';
+    if (prev){
+      const g = daysBetween(prev.date, r.date);
+      const d1 = norm(prev).rate, d2 = norm(r).rate;
+      const diff = d1 ? ((d2 - d1) / d1 * 100) : 0;
+      extra = ` · ${g} d since last buy · rate ${diff > 0.5 ? '↑' : diff < -0.5 ? '↓' : '='}${Math.abs(diff).toFixed(1)}%`;
+      // Append to the pill message
+      pill('Saved ₹' + fmtAmt(r.amount) + extra, '🛒');
+    }
+    if (again){
+      ['f-qty','f-rate','f-amount','f-note','f-name'].forEach(i => { const el = $(i); if (el) el.value = ''; });
+      $('add-info').innerHTML = '';
+      $('f-name').focus();
+    } else {
+      resetForm();
+    }
+  }
+}
+
+function resetForm(){
+  ['f-name','f-qty','f-rate','f-amount','f-store','f-note'].forEach(i => { const el = $(i); if (el) el.value = ''; });
+  const d = $('f-date'); if (d) d.value = today();
+  const info = $('add-info'); if (info) info.innerHTML = '';
+}
+
+function renderQuick(){
+  const el = $('quick-chips');
+  if (!el) return;
+
+  const counts = {};
+  DB.purchases.forEach(p => { counts[p.name] = (counts[p.name] || 0) + 1; });
+
+  let names = Object.keys(counts).sort((a,b) => counts[b] - counts[a]).slice(0, 18);
+  if (names.length < 12){
+    const fallbacks = ['Milk (Packet)','Wheat Atta','Sugar','Mustard Oil','Potato','Onion','Tomato',
+                       'Eggs','Detergent Powder','Toor / Arhar Dal','Turmeric Powder','Diapers'];
+    names = names.concat(fallbacks.filter(n => !names.includes(n))).slice(0, 18);
+  }
+
+  el.innerHTML = names.map(n => `<span class="chip" data-n="${esc(n)}">${esc(n)}</span>`).join('');
+  el.querySelectorAll('.chip').forEach(c => c.onclick = () => quickPick(c.dataset.n));
+}
+
+function quickPick(name){
+  $('f-name').value = name;
+  onNameChange('f');
+
+  const ps = purchasesOf(name);
+  if (ps.length){
+    const l = ps[ps.length - 1];
+    $('f-qty').value = l.qty;
+    $('f-unit').value = l.unit;
+    $('f-rate').value = l.rate || '';
+    $('f-medium').value = l.medium;
+    fillSources('f', l.source);
+    recalc('f', 'rate');
+  }
+  $('f-qty').focus();
+}
+
+function quickFromStats(name){
+  const b = document.querySelector('.tb[data-tab="add"]');
+  if (b) switchTab('add', b);
+  setTimeout(() => quickPick(name), 220);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   EDIT / DELETE
+   ═══════════════════════════════════════════════════════════════ */
+function editRec(id){
+  const r = DB.purchases.find(p => p.id === id);
+  if (!r) return;
+  $('e-id').value = id;
+  $('e-name').value = r.name;
+  $('e-cat').value  = r.cat || CATS[0];
+  $('e-date').value = r.date;
+  $('e-qty').value  = r.qty;
+  $('e-unit').value = r.unit || 'pcs';
+  $('e-rate').value = r.rate || '';
+  $('e-amount').value = r.amount;
+  $('e-medium').value = r.medium || 'Offline';
+  fillSources('e', r.source);
+  $('e-store').value = r.store || '';
+  $('e-note').value  = r.note || '';
+  $('edit-mo').classList.add('open');
+}
+
+async function saveEdit(){
+  const id = $('e-id').value;
+  const r = readForm('e');
+  const err = validate(r);
+  if (err){ toast('❌ ' + err, 'error'); return; }
+
+  const b = $('btn-esave');
+  b.disabled = true;
+
+  await rememberCustom(r.name, r.cat, r.unit);
+  const res = await updateRecord(COL.GROCERY, id, r, {
+    pillMsg: 'Purchase updated',
+    pillIcon: '✏️',
+    historyAction: ACT.GROC_EDIT,
+    historyData: { id, name: r.name }
+  });
+
+  b.disabled = false;
+  if (res.ok) closeMo('edit-mo');
+}
+
+function delRec(id){
+  const r = DB.purchases.find(p => p.id === id);
+  if (!r) return;
+  showConfirm(
+    '🗑️ Delete Purchase',
+    `<div class="ibx warnb"><b>${esc(r.name)}</b><br>${fmtDate(r.date)} · ${esc(r.qty + ' ' + r.unit)} · ₹${fmtAmt(r.amount)} · ${esc(r.source)}</div>
+     <p class="hint">This removes the document from Firestore.</p>`,
+    'Delete',
+    async () => {
+      await deleteRecord(COL.GROCERY, id, {
+        pillMsg: 'Purchase deleted',
+        pillIcon: '🗑️',
+        historyAction: ACT.GROC_DEL,
+        historyData: { name: r.name, amount: r.amount }
+      });
+    },
+    'bd'
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RECORDS TAB
+   ═══════════════════════════════════════════════════════════════ */
+function filteredPurchases(){
+  const q  = ($('q')?.value || '').trim().toLowerCase();
+  const c  = $('fl-cat')?.value || '';
+  const m  = $('fl-med')?.value || '';
+  const s  = $('fl-src')?.value || '';
+  const f  = $('fl-from')?.value || '';
+  const t  = $('fl-to')?.value || '';
+  const sort = $('fl-sort')?.value || 'dnew';
+
+  const rows = DB.purchases.filter(p => {
+    if (q && !((p.name + ' ' + (p.store || '') + ' ' + (p.note || '') + ' ' + (p.source || '')).toLowerCase().includes(q))) return false;
+    if (c && p.cat !== c) return false;
+    if (m && p.medium !== m) return false;
+    if (s && p.source !== s) return false;
+    if (f && p.date < f) return false;
+    if (t && p.date > t) return false;
+    return true;
+  });
+
+  const cmp = {
+    dnew:  (a,b) => String(b.date).localeCompare(String(a.date)),
+    dold:  (a,b) => String(a.date).localeCompare(String(b.date)),
+    ahigh: (a,b) => (+b.amount) - (+a.amount),
+    alow:  (a,b) => (+a.amount) - (+b.amount),
+    name:  (a,b) => a.name.localeCompare(b.name) || String(b.date).localeCompare(String(a.date))
+  };
+  return rows.sort(cmp[sort] || cmp.dnew);
+}
+
+function renderRecords(){
+  const rows = filteredPurchases();
+  const tot = rows.reduce((s,p) => s + (+p.amount || 0), 0);
+
+  const sumEl = $('rec-sum');
+  if (sumEl) sumEl.textContent = rows.length + ' records · ₹' + fmtAmt(tot);
+
+  const pages = Math.max(1, Math.ceil(rows.length / PER));
+  if (PAGE > pages) PAGE = pages;
+  const slice = rows.slice((PAGE - 1) * PER, PAGE * PER);
+
+  const body = $('rec-body');
+  if (!body) return;
+
+  if (!slice.length){
+    body.innerHTML = '<tr><td colspan="12" class="es">No records match these filters.</td></tr>';
+  } else {
+    body.innerHTML = slice.map(p => {
+      const n = norm(p);
+      const pb = prevBuy(p.name, p.date, p.id);
+      const gap = pb ? daysBetween(pb.date, p.date) : null;
+
+      let mv = '';
+      if (pb){
+        const r0 = norm(pb).rate;
+        const d = r0 ? ((n.rate - r0) / r0 * 100) : 0;
+        mv = `<div class="dc ${d > 0.5 ? 'up' : d < -0.5 ? 'down' : 'eq'}">${d > 0.5 ? '↑' : d < -0.5 ? '↓' : '='}${Math.abs(d).toFixed(1)}%</div>`;
+      }
+
+      return `<tr>
+        <td class="dc">${fmtDate(p.date)}</td>
+        <td><b>${esc(p.name)}</b>${mv}</td>
+        <td class="dc">${esc(p.cat || '')}</td>
+        <td>${esc(p.qty + ' ' + p.unit)}</td>
+        <td>₹${fmtAmt(n.rate)}/${esc(n.u)}</td>
+        <td class="amc">₹${fmtAmt(p.amount)}</td>
+        <td><span class="cb ${p.medium === 'Online' ? 'on' : 'off'}">${esc(p.medium)}</span></td>
+        <td class="dc">${esc(p.source || '')}${p.store ? '<br>' + esc(p.store) : ''}</td>
+        <td class="dc">${pb ? fmtDate(pb.date) : 'first buy'}</td>
+        <td>${gap !== null ? gap + ' d' : '—'}</td>
+        <td class="dc">${esc(p.note || '—')}</td>
+        <td><div class="ab">
+          <button class="btn bo bxs" data-edit="${p.id}" type="button">✏️</button>
+          <button class="btn bd bxs" data-del="${p.id}" type="button">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+
+    body.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editRec(b.dataset.edit));
+    body.querySelectorAll('[data-del]').forEach(b => b.onclick = () => delRec(b.dataset.del));
+  }
+
+  const info = $('pg-info');
+  if (info) info.textContent = rows.length
+    ? `Showing ${(PAGE - 1) * PER + 1}–${Math.min(PAGE * PER, rows.length)} of ${rows.length}`
+    : 'Nothing to show';
+
+  const pbHost = $('pg-btns');
+  if (pbHost){
+    let btns = `<button class="pb" data-pg="${PAGE-1}" ${PAGE === 1 ? 'disabled' : ''} type="button">‹</button>`;
+    const from = Math.max(1, PAGE - 2);
+    const to   = Math.min(pages, Math.max(1, PAGE - 2) + 4);
+    for (let i = from; i <= to; i++){
+      btns += `<button class="pb ${i === PAGE ? 'active' : ''}" data-pg="${i}" type="button">${i}</button>`;
+    }
+    btns += `<button class="pb" data-pg="${PAGE+1}" ${PAGE === pages ? 'disabled' : ''} type="button">›</button>`;
+    pbHost.innerHTML = btns;
+    pbHost.querySelectorAll('[data-pg]').forEach(b => {
+      b.onclick = () => {
+        PAGE = Math.max(1, +b.dataset.pg);
+        renderRecords();
+      };
+    });
+  }
+}
+
+function clearFilters(){
+  ['q','fl-cat','fl-med','fl-src','fl-from','fl-to'].forEach(i => { const el = $(i); if (el) el.value = ''; });
+  const s = $('fl-sort'); if (s) s.value = 'dnew';
+  PAGE = 1;
+  renderRecords();
+  pill('Filters reset', '↺');
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SHOPPING LIST
+   ═══════════════════════════════════════════════════════════════ */
+async function addList(){
+  const n = $('l-name').value.trim();
+  if (!n){ toast('❌ Enter an item', 'error'); return; }
+  await addRecord(COL.GROCERY_LIST, {
+    name: n,
+    qty: $('l-qty').value.trim(),
+    done: false
+  }, { pillMsg: 'Added to list', pillIcon: '➕' });
+  $('l-name').value = '';
+  $('l-qty').value = '';
+}
+
+async function pushList(name){
+  if (DB.list.some(x => (x.name || '').toLowerCase() === name.toLowerCase())){
+    toast('Already in list');
+    return;
+  }
+  await addRecord(COL.GROCERY_LIST, { name, qty: '', done: false },
+    { pillMsg: name + ' added to list', pillIcon: '➕' });
+}
+
+async function toggleList(id, cur){
+  await updateRecord(COL.GROCERY_LIST, id, { done: !cur }, { pillMsg: 'Toggled', pillIcon: '✓' });
+}
+
+async function delList(id){
+  await deleteRecord(COL.GROCERY_LIST, id, { pillMsg: 'Removed', pillIcon: '✕' });
+}
+
+async function clearDoneList(){
+  const done = DB.list.filter(l => l.done);
+  if (!done.length){ toast('Nothing ticked'); return; }
+  for (let i = 0; i < done.length; i += 400){
+    const batch = writeBatch(db);
+    done.slice(i, i + 400).forEach(l => batch.delete(doc(db, COL.GROCERY_LIST, l.id)));
+    await batch.commit();
+  }
+  pill('Cleared ' + done.length + ' ticked item(s)', '🗑️');
+}
+
+async function autoFillList(){
+  const due = allStats().filter(isDue)
+    .filter(s => !DB.list.some(x => (x.name || '').toLowerCase() === s.name.toLowerCase()));
+  if (!due.length){ toast('Nothing new due right now'); return; }
+
+  for (let i = 0; i < due.length; i += 400){
+    const batch = writeBatch(db);
+    due.slice(i, i + 400).forEach(s => {
+      batch.set(doc(collection(db, COL.GROCERY_LIST)), {
+        name: s.name, qty: '', done: false, createdAt: new Date().toISOString()
+      });
+    });
+    await batch.commit();
+  }
+  pill('Added ' + due.length + ' due item(s)', '🪄');
+}
+
+function renderList(){
+  const el = $('list-body');
+  if (!el) return;
+  if (!DB.list.length){
+    el.innerHTML = '<div class="es">List is empty. Add items or tap “Auto-add due items”.</div>';
+    return;
+  }
+  const rows = [...DB.list].sort((a,b) =>
+    (a.done ? 1 : 0) - (b.done ? 1 : 0) ||
+    String(a.createdAt || '').localeCompare(String(b.createdAt || ''))
+  );
+  el.innerHTML = rows.map(l => {
+    const s = itemStats(l.name);
+    return `<div class="lsrow ${l.done ? 'done' : ''}">
+      <input type="checkbox" ${l.done ? 'checked' : ''} data-tg="${l.id}" data-cur="${l.done ? 1 : 0}"/>
+      <div class="lsn">${esc(l.name)}${l.qty ? ' <span class="dc">· ' + esc(l.qty) + '</span>' : ''}
+        ${s ? `<div class="dc">last ${fmtDate(s.last)} · ${s.daysAgo} d ago · ₹${fmtAmt(s.lastRate)}/${esc(s.unit)}</div>` : '<div class="dc">new item</div>'}
+      </div>
+      <button class="btn bo bxs" data-lbuy="${esc(l.name)}" type="button">Buy</button>
+      <button class="btn bd bxs" data-ldel="${l.id}" type="button">✕</button>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('[data-tg]').forEach(c => c.onchange = () => toggleList(c.dataset.tg, c.dataset.cur === '1'));
+  el.querySelectorAll('[data-lbuy]').forEach(b => b.onclick = () => quickFromStats(b.dataset.lbuy));
+  el.querySelectorAll('[data-ldel]').forEach(b => b.onclick = () => delList(b.dataset.ldel));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PRICE COMPARE
+   ═══════════════════════════════════════════════════════════════ */
+function buildPcItems(){
+  const stats = allStats().sort((a,b) => b.times - a.times || a.name.localeCompare(b.name));
+  const sel = $('pc-item');
+  if (!sel) return;
+  const keep = sel.value;
+  sel.innerHTML = stats.length
+    ? stats.map(s => `<option value="${esc(s.name)}" ${keep === s.name ? 'selected' : ''}>${esc(s.name)} (${s.times}×)</option>`).join('')
+    : '<option value="">— no purchases yet —</option>';
+}
+
+function renderPrice(){
+  const name = $('pc-item')?.value || '';
+  const win  = +($('pc-win')?.value || 6);
+  const keys = lastKeys(win);
+
+  if (!name){
+    $('pc-cards').innerHTML = '<div class="sc"><div class="lbl">No data</div><div class="amt">—</div><div class="sub">Add purchases first</div></div>';
+    ['pc-bars','pc-month','pc-hist','pc-all'].forEach(i => { const el = $(i); if (el) el.innerHTML = '<div class="es">No data yet</div>'; });
+    const cnt = $('pc-all-count'); if (cnt) cnt.textContent = '0';
+    return;
+  }
+
+  const ps = purchasesOf(name);
+  const inWin = ps.filter(p => keys.includes(mkey(p.date)));
+  const rates = inWin.map(p => norm(p).rate).filter(r => r > 0);
+
+  const first = inWin.length ? norm(inWin[0]).rate : 0;
+  const last  = inWin.length ? norm(inWin[inWin.length - 1]).rate : 0;
+  const chg   = first ? ((last - first) / first * 100) : 0;
+  const spend = inWin.reduce((s,p) => s + (+p.amount || 0), 0);
+  const qty   = inWin.reduce((s,p) => s + norm(p).q, 0);
+  const u     = inWin.length ? norm(inWin[inWin.length - 1]).u : norm(ps[ps.length - 1]).u;
+  const min   = rates.length ? Math.min(...rates) : 0;
+  const max   = rates.length ? Math.max(...rates) : 0;
+  const cheapest = inWin.filter(p => norm(p).rate === min)[0];
+  const st = itemStats(name);
+
+  $('pc-cards').innerHTML = `
+    <div class="sc"><div class="lbl">Latest Rate</div><div class="amt">₹${fmtAmt(st.lastRate)}</div><div class="sub">per ${esc(st.unit)} · ${fmtDate(st.last)}</div></div>
+    <div class="sc ${chg > 0 ? 'e' : 'o'}"><div class="lbl">${win}-Month Change</div>
+      <div class="amt ${chg > 0 ? 'up' : chg < 0 ? 'down' : 'eq'}">${rates.length > 1 ? (chg > 0 ? '↑ ' : chg < 0 ? '↓ ' : '') + Math.abs(chg).toFixed(1) + '%' : '—'}</div>
+      <div class="sub">${rates.length > 1 ? 'from ₹' + fmtAmt(first) : 'need 2+ buys'}</div></div>
+    <div class="sc a"><div class="lbl">Avg Rate (${win}m)</div><div class="amt">₹${fmtAmt(qty ? spend / qty : 0)}</div><div class="sub">per ${esc(u)} · ${inWin.length} buys</div></div>
+    <div class="sc o"><div class="lbl">Cheapest Rate</div><div class="amt">₹${fmtAmt(min)}</div>
+      <div class="sub">${cheapest ? esc(cheapest.source || '') + ' · ' + fmtDate(cheapest.date) : '—'}</div></div>
+    <div class="sc e"><div class="lbl">Costliest Rate</div><div class="amt">₹${fmtAmt(max)}</div><div class="sub">spread ₹${fmtAmt(max - min)}</div></div>
+    <div class="sc w"><div class="lbl">Spend (${win}m)</div><div class="amt">₹${fmtAmt(spend)}</div><div class="sub">${fmtAmt(qty)} ${esc(u)} bought</div></div>
+    <div class="sc"><div class="lbl">Last Purchased</div><div class="amt">${st.daysAgo} d ago</div><div class="sub">${fmtDate(st.last)}</div></div>
+    <div class="sc ${isDue(st) ? 'e' : 'o'}"><div class="lbl">Usual Gap</div><div class="amt">${st.avgGap ? st.avgGap + ' d' : '—'}</div>
+      <div class="sub">${st.avgGap ? (isDue(st) ? 'Overdue by ' + (st.daysAgo - st.avgGap) + ' d' : 'Next in ~' + (st.avgGap - st.daysAgo) + ' d') : 'need 2+ buys'}</div></div>`;
+
+  // Month bars
+  const mrow = keys.map(k => {
+    const g = ps.filter(p => mkey(p.date) === k);
+    const sp = g.reduce((s,p) => s + (+p.amount || 0), 0);
+    const q  = g.reduce((s,p) => s + norm(p).q, 0);
+    return { k, n: g.length, sp, q, rate: q ? sp / q : 0, g };
+  });
+  $('pc-bars').innerHTML = bars(
+    mrow.map(r => ({ label: mlabel(r.k), value: r.rate, sub: r.n ? '₹' + fmtAmt(r.rate) + '/' + u : 'no buy' })),
+    v => '₹' + fmtAmt(v)
+  );
+
+  // Month movement table
+  let prev = null;
+  $('pc-month').innerHTML = mrow.map(r => {
+    let c = '<span class="eq">—</span>';
+    if (r.rate && prev){
+      const d = ((r.rate - prev) / prev * 100);
+      c = `<span class="${d > 0.5 ? 'up' : d < -0.5 ? 'down' : 'eq'}">${d > 0.5 ? '↑' : d < -0.5 ? '↓' : '='} ${Math.abs(d).toFixed(1)}%</span>`;
+    }
+    if (r.rate) prev = r.rate;
+    const cheap = r.g.length ? r.g.reduce((a,b) => norm(a).rate <= norm(b).rate ? a : b) : null;
+    return `<tr>
+      <td><b>${mlabel(r.k)}</b></td>
+      <td>${r.n || '—'}</td>
+      <td>${r.q ? fmtAmt(r.q) + ' ' + esc(u) : '—'}</td>
+      <td class="amc">${r.sp ? '₹' + fmtAmt(r.sp) : '—'}</td>
+      <td>${r.rate ? '₹' + fmtAmt(r.rate) + '/' + esc(u) : '—'}</td>
+      <td>${c}</td>
+      <td class="dc">${cheap ? esc(cheap.source || '') + ' @ ₹' + fmtAmt(norm(cheap).rate) : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  // History of this item
+  const hist = $('pc-hist');
+  hist.innerHTML = [...ps].reverse().map(p => {
+    const n = norm(p);
+    const pb = prevBuy(p.name, p.date, p.id);
+    let mv = '<span class="eq">first buy</span>';
+    let gp = '—';
+    if (pb){
+      const r0 = norm(pb).rate;
+      const d = r0 ? ((n.rate - r0) / r0 * 100) : 0;
+      mv = `<span class="${d > 0.5 ? 'up' : d < -0.5 ? 'down' : 'eq'}">${d > 0.5 ? '↑' : d < -0.5 ? '↓' : '='} ${Math.abs(d).toFixed(1)}% (₹${fmtAmt(r0)})</span>`;
+      gp = daysBetween(pb.date, p.date) + ' d';
+    }
+    return `<tr>
+      <td class="dc">${fmtDate(p.date)}</td>
+      <td>${esc(p.qty + ' ' + p.unit)}</td>
+      <td class="amc">₹${fmtAmt(p.amount)}</td>
+      <td>₹${fmtAmt(n.rate)}/${esc(n.u)}</td>
+      <td>${mv}</td>
+      <td>${gp}</td>
+      <td><span class="cb ${p.medium === 'Online' ? 'on' : 'off'}">${esc(p.source || '')}</span></td>
+      <td><div class="ab">
+        <button class="btn bo bxs" data-edit="${p.id}" type="button">✏️</button>
+        <button class="btn bd bxs" data-del="${p.id}" type="button">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" class="es">No history</td></tr>';
+
+  hist.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editRec(b.dataset.edit));
+  hist.querySelectorAll('[data-del]').forEach(b => b.onclick = () => delRec(b.dataset.del));
+
+  // All items movement
+  const all = allStats().map(s => {
+    const w = s.ps.filter(p => keys.includes(mkey(p.date)));
+    if (!w.length) return null;
+    const r = w.map(p => norm(p).rate).filter(x => x > 0);
+    const f = norm(w[0]).rate;
+    const l = norm(w[w.length - 1]).rate;
+    return {
+      name: s.name,
+      unit: s.unit,
+      f, l,
+      d: f ? ((l - f) / f * 100) : 0,
+      min: r.length ? Math.min(...r) : 0,
+      max: r.length ? Math.max(...r) : 0,
+      last: s.last,
+      ago: s.daysAgo,
+      n: w.length
+    };
+  }).filter(Boolean).sort((a,b) => Math.abs(b.d) - Math.abs(a.d));
+
+  const cntAll = $('pc-all-count');
+  if (cntAll) cntAll.textContent = all.length + ' items';
+
+  $('pc-all').innerHTML = all.length
+    ? all.map(a => `<tr>
+        <td><b>${esc(a.name)}</b><div class="dc">${a.n} buys</div></td>
+        <td>₹${fmtAmt(a.f)}/${esc(a.unit)}</td>
+        <td>₹${fmtAmt(a.l)}/${esc(a.unit)}</td>
+        <td><span class="${a.d > 0.5 ? 'up' : a.d < -0.5 ? 'down' : 'eq'}">${a.n > 1 ? (a.d > 0.5 ? '↑' : a.d < -0.5 ? '↓' : '=') + ' ' + Math.abs(a.d).toFixed(1) + '%' : '—'}</span></td>
+        <td class="dc">₹${fmtAmt(a.min)}</td>
+        <td class="dc">₹${fmtAmt(a.max)}</td>
+        <td class="dc">${fmtDate(a.last)}</td>
+        <td>${a.ago} d</td>
+      </tr>`).join('')
+    : '<tr><td colspan="8" class="es">No purchases in this window</td></tr>';
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MONTHLY REPORT
+   ═══════════════════════════════════════════════════════════════ */
+function buildYears(){
+  const ys = [...new Set(DB.purchases.map(p => String(p.date).slice(0,4)))].filter(Boolean);
+  const cy = String(new Date().getFullYear());
+  if (!ys.includes(cy)) ys.push(cy);
+  ys.sort((a,b) => b.localeCompare(a));
+
+  const ySel = $('mr-year');
+  if (ySel){
+    const keep = ySel.value;
+    ySel.innerHTML = ys.map(v => `<option value="${v}">${v}</option>`).join('');
+    ySel.value = ys.includes(keep) ? keep : cy;
+  }
+
+  const ms = [...new Set(DB.purchases.map(p => mkey(p.date)))].sort((a,b) => b.localeCompare(a));
+  const tm = mkey(today());
+  if (!ms.includes(tm)) ms.unshift(tm);
+
+  const mSel = $('mr-month');
+  if (mSel){
+    const km = mSel.value;
+    mSel.innerHTML = ms.map(k => `<option value="${k}" ${(ms.includes(km) ? km : tm) === k ? 'selected' : ''}>${mlabel(k)}</option>`).join('');
+  }
+}
+
+function renderMonthly(){
+  const year = $('mr-year')?.value || String(new Date().getFullYear());
+  const P = DB.purchases.filter(p => String(p.date).slice(0,4) === year);
+
+  const rows = [];
+  for (let i = 0; i < 12; i++){
+    const k = year + '-' + String(i+1).padStart(2,'0');
+    const g = P.filter(p => mkey(p.date) === k);
+    const sp = g.reduce((s,p) => s + (+p.amount || 0), 0);
+    const on = g.filter(p => p.medium === 'Online').reduce((s,p) => s + (+p.amount || 0), 0);
+    const bc = {};
+    g.forEach(p => { bc[p.cat] = (bc[p.cat] || 0) + (+p.amount || 0); });
+    const top = Object.keys(bc).sort((a,b) => bc[b] - bc[a])[0];
+    rows.push({ k, label: mlabel(k), n: g.length, sp, on, off: sp - on, top, topAmt: top ? bc[top] : 0 });
+  }
+
+  const active = rows.filter(r => r.n);
+  const tot = rows.reduce((s,r) => s + r.sp, 0);
+  const best  = active.length ? active.reduce((a,b) => a.sp < b.sp ? a : b) : null;
+  const worst = active.length ? active.reduce((a,b) => a.sp > b.sp ? a : b) : null;
+
+  const cards = $('mr-cards');
+  if (cards) cards.innerHTML = `
+    <div class="sc"><div class="lbl">Total ${esc(year)}</div><div class="amt">₹${fmtAmt(tot)}</div><div class="sub">${P.length} entries</div></div>
+    <div class="sc a"><div class="lbl">Monthly Average</div><div class="amt">₹${fmtAmt(active.length ? tot / active.length : 0)}</div><div class="sub">${active.length} active months</div></div>
+    <div class="sc e"><div class="lbl">Highest Month</div><div class="amt">${worst ? '₹' + fmt0(worst.sp) : '—'}</div><div class="sub">${worst ? worst.label : '—'}</div></div>
+    <div class="sc o"><div class="lbl">Lowest Month</div><div class="amt">${best ? '₹' + fmt0(best.sp) : '—'}</div><div class="sub">${best ? best.label : '—'}</div></div>`;
+
+  const barsEl = $('mr-bars');
+  if (barsEl) barsEl.innerHTML = bars(
+    rows.map(r => ({ label: r.label, value: r.sp, sub: r.n ? '₹' + fmt0(r.sp) + ' · ' + r.n : '—' })),
+    v => '₹' + fmt0(v)
+  );
+
+  let prev = null;
+  const mTable = $('mr-table');
+  if (mTable) mTable.innerHTML = rows.map(r => {
+    let c = '<span class="eq">—</span>';
+    if (prev !== null && prev > 0 && r.sp){
+      const d = ((r.sp - prev) / prev * 100);
+      c = `<span class="${d > 0 ? 'up' : d < 0 ? 'down' : 'eq'}">${d > 0 ? '↑' : d < 0 ? '↓' : '='} ${Math.abs(d).toFixed(1)}%</span>`;
+    }
+    if (r.sp) prev = r.sp;
+    return `<tr>
+      <td><b>${r.label}</b></td>
+      <td>${r.n || '—'}</td>
+      <td class="amc">${r.sp ? '₹' + fmtAmt(r.sp) : '—'}</td>
+      <td>${r.n ? '₹' + fmtAmt(r.sp / r.n) : '—'}</td>
+      <td>${c}</td>
+      <td>${r.on ? '₹' + fmt0(r.on) : '—'}</td>
+      <td>${r.off ? '₹' + fmt0(r.off) : '—'}</td>
+      <td class="dc">${r.top ? esc(r.top) + ' (₹' + fmt0(r.topAmt) + ')' : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  const mk = $('mr-month')?.value;
+  const m1 = $('mr-m1'); if (m1) m1.textContent = mk ? mlabel(mk) : '';
+  const m2 = $('mr-m2'); if (m2) m2.textContent = mk ? mlabel(mk) : '';
+
+  const g = DB.purchases.filter(p => mkey(p.date) === mk);
+  const t = g.reduce((s,p) => s + (+p.amount || 0), 0);
+  const bc = {}, bs = {};
+  g.forEach(p => {
+    bc[p.cat] = (bc[p.cat] || 0) + (+p.amount || 0);
+    bs[p.source] = (bs[p.source] || 0) + (+p.amount || 0);
+  });
+
+  const catEl = $('mr-cat');
+  if (catEl) catEl.innerHTML = bars(
+    Object.keys(bc).sort((a,b) => bc[b] - bc[a])
+      .map(c => ({
+        label: (c || '').length > 13 ? c.slice(0, 12) + '…' : c,
+        value: bc[c],
+        sub: (t ? (100 * bc[c] / t).toFixed(0) : 0) + '% · ₹' + fmt0(bc[c])
+      })),
+    v => '₹' + fmt0(v)
+  );
+
+  const srcEl = $('mr-src');
+  if (srcEl) srcEl.innerHTML = bars(
+    Object.keys(bs).sort((a,b) => bs[b] - bs[a])
+      .map(s => ({
+        label: (s || '').length > 13 ? s.slice(0, 12) + '…' : s,
+        value: bs[s],
+        sub: (t ? (100 * bs[s] / t).toFixed(0) : 0) + '% · ₹' + fmt0(bs[s])
+      })),
+    v => '₹' + fmt0(v)
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ITEM INSIGHTS
+   ═══════════════════════════════════════════════════════════════ */
+function renderItems(){
+  const q = ($('it-q')?.value || '').trim().toLowerCase();
+  const c = $('it-cat')?.value || '';
+  const v = $('it-view')?.value || 'all';
+
+  let st = allStats().filter(s =>
+    (!q || s.name.toLowerCase().includes(q)) && (!c || s.cat === c));
+  if (v === 'due') st = st.filter(isDue);
+  st.sort((a,b) => b.daysAgo - a.daysAgo);
+
+  const cnt = $('it-count');
+  if (cnt) cnt.textContent = st.length + ' items';
+
+  const body = $('it-body');
+  if (!body) return;
+
+  body.innerHTML = st.length
+    ? st.map(s => {
+        const status = !s.avgGap
+          ? '<span class="cb">learning</span>'
+          : isDue(s)
+            ? `<span class="cb" style="background:#FEE2E2;color:#B91C1C">Due · +${s.daysAgo - s.avgGap} d</span>`
+            : `<span class="cb off">OK · ~${s.avgGap - s.daysAgo} d left</span>`;
+        return `<tr>
+          <td><b>${esc(s.name)}</b></td>
+          <td class="dc">${esc(s.cat || '')}</td>
+          <td>${s.times}</td>
+          <td>${fmtAmt(s.qty)} ${esc(s.unit)}</td>
+          <td class="amc">₹${fmtAmt(s.spend)}</td>
+          <td>₹${fmtAmt(s.avgRate)}/${esc(s.unit)}</td>
+          <td>₹${fmtAmt(s.lastRate)}/${esc(s.unit)}</td>
+          <td class="dc">${fmtDate(s.last)}</td>
+          <td>${s.daysAgo} d</td>
+          <td>${s.avgGap ? s.avgGap + ' d' : '—'}</td>
+          <td>${status}</td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="11" class="es">No items to show.</td></tr>';
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   DATA EXPORT / BACKUP / RESTORE / WIPE
+   ═══════════════════════════════════════════════════════════════ */
+function exportGroceryCSV(rows, label){
+  if (!rows.length){ toast('❌ Nothing to export', 'error'); return; }
+  const headers = [
+    { label:'Date', key:'date' },
+    { label:'Item', key:'name' },
+    { label:'Category', key:'cat' },
+    { label:'Quantity', key:'qty' },
+    { label:'Unit', key:'unit' },
+    { label:'Rate', key:'rate' },
+    { label:'Amount', key:'amount' },
+    { label:'Medium', key:'medium' },
+    { label:'Platform / Store', key:'source' },
+    { label:'Store Name', key:'store' },
+    { label:'Note', key:'note' },
+    { label:'Normalised Rate', value: p => norm(p).rate.toFixed(2) },
+    { label:'Normalised Unit', value: p => norm(p).u }
+  ];
+  exportCSV('grocery-' + label + '-' + today() + '.csv', headers, rows);
+}
+
+function backupGrocery(){
+  backupJSON({
+    groceryPurchases: DB.purchases,
+    groceryItems:     DB.custom,
+    groceryList:      DB.list
+  }, 'grocery-backup-' + today() + '.json');
+}
+
+async function restoreGrocery(inp){
+  const file = inp.files[0];
+  if (!file) return;
+  try {
+    const d = await readJSONFile(file);
+    if (!d || !Array.isArray(d.groceryPurchases)){
+      toast('❌ Not a grocery backup', 'error');
+      inp.value = '';
+      return;
+    }
+
+    showConfirm(
+      '📥 Restore Grocery Backup',
+      `<div class="ibx warnb">
+        Will replace everything with
+        <b>${d.groceryPurchases.length}</b> purchases,
+        <b>${(d.groceryItems || []).length}</b> custom items,
+        <b>${(d.groceryList || []).length}</b> list entries.
+      </div>`,
+      'Restore',
+      async () => {
+        await restoreJSON({ groceryPurchases: d.groceryPurchases },
+                          { groceryPurchases: COL.GROCERY }, { wipeFirst: true });
+        if (d.groceryItems){
+          await restoreJSON({ groceryItems: d.groceryItems },
+                            { groceryItems: COL.GROCERY_ITEMS }, { wipeFirst: true });
+        }
+        if (d.groceryList){
+          await restoreJSON({ groceryList: d.groceryList },
+                            { groceryList: COL.GROCERY_LIST }, { wipeFirst: true });
+        }
+      }
+    );
+  } catch (e){
+    toast('❌ Invalid file', 'error');
+  }
+  inp.value = '';
+}
+
+function wipeGrocery(){
+  showConfirm(
+    '🧨 Delete All Grocery Data',
+    `<div class="ibx warnb">All <b>${DB.purchases.length}</b> purchases,
+     <b>${DB.custom.length}</b> custom items and
+     <b>${DB.list.length}</b> list entries will be permanently deleted.</div>`,
+    'Delete All',
+    async () => {
+      const a = await wipeCollection(COL.GROCERY);
+      const b = await wipeCollection(COL.GROCERY_ITEMS);
+      const c = await wipeCollection(COL.GROCERY_LIST);
+      await logHistory(ACT.DELETE_ALL, { kind: 'grocery', purchases: a, items: b, list: c });
+      pill('Deleted ' + (a + b + c) + ' documents', '🧨');
+    }
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CUSTOM ITEMS LIST
+   ═══════════════════════════════════════════════════════════════ */
+function renderCustomChips(){
+  const el = $('custom-chips');
+  if (!el) return;
+  el.innerHTML = DB.custom.length
+    ? DB.custom
+        .sort((a,b) => (a.name || '').localeCompare(b.name || ''))
+        .map(c => `<span class="chip">${esc(c.name)} · ${esc(c.unit || '')}</span>`)
+        .join('')
+    : '<span class="hint">No custom items yet.</span>';
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIRESTORE STATUS PANEL
+   ═══════════════════════════════════════════════════════════════ */
+function renderFbStatus(){
+  const el = $('fb-status');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="ibx okb">
+      ✅ Connected to Firestore<br>
+      Project: <b>${esc(firebaseConfig.projectId)}</b>
+    </div>
+    <div class="tw"><table><thead><tr><th>Collection</th><th>Purpose</th><th>Docs</th></tr></thead><tbody>
+      <tr><td><b>${COL.GROCERY}</b></td><td class="dc">Every purchase entry</td><td>${DB.purchases.length}</td></tr>
+      <tr><td><b>${COL.GROCERY_ITEMS}</b></td><td class="dc">Custom item names you typed</td><td>${DB.custom.length}</td></tr>
+      <tr><td><b>${COL.GROCERY_LIST}</b></td><td class="dc">Shopping list</td><td>${DB.list.length}</td></tr>
+    </tbody></table></div>
+    <p class="hint" style="margin-top:10px">Offline persistence is on — entries made without internet are queued locally and pushed on reconnect.</p>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   EVENT WIRING
+   ═══════════════════════════════════════════════════════════════ */
+function wire(){
+  // Sidebar tabs
+  const nav = $('side-nav');
+  if (nav){
+    nav.addEventListener('click', e => {
+      const btn = e.target.closest('.tb[data-tab]');
+      if (!btn) return;
+      e.preventDefault();
+      switchTab(btn.dataset.tab, btn);
+    });
+  }
+
+  // Topbar Add
+  $('btn-add-top').onclick = () => {
+    const b = document.querySelector('.tb[data-tab="add"]');
+    switchTab('add', b);
+    setTimeout(() => $('f-name')?.focus(), 200);
+  };
+
+  // Add form
+  $('btn-save').onclick  = () => addPurchase(false);
+  $('btn-save2').onclick = () => addPurchase(true);
+  $('btn-clear').onclick = resetForm;
+
+  const fName = $('f-name');
+  if (fName){
+    fName.addEventListener('input',  () => onNameChange('f'));
+    fName.addEventListener('change', () => onNameChange('f'));
+  }
+  const fDate = $('f-date');
+  if (fDate) fDate.addEventListener('change', showAddInfo);
+
+  const eName = $('e-name');
+  if (eName) eName.addEventListener('change', () => onNameChange('e'));
+
+  const fMed = $('f-medium');
+  if (fMed) fMed.addEventListener('change', () => fillSources('f'));
+  const eMed = $('e-medium');
+  if (eMed) eMed.addEventListener('change', () => fillSources('e'));
+
+  ['f-qty','f-rate'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('input', () => recalc('f', 'rate'));
+  });
+  const fAmt = $('f-amount');
+  if (fAmt) fAmt.addEventListener('input', () => recalc('f', 'amount'));
+
+  ['e-qty','e-rate'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('input', () => recalc('e', 'rate'));
+  });
+  const eAmt = $('e-amount');
+  if (eAmt) eAmt.addEventListener('input', () => recalc('e', 'amount'));
+
+  if (fName) fName.addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('f-qty')?.focus();
+  });
+
+  // Filters
+  ['q','fl-cat','fl-med','fl-src','fl-from','fl-to','fl-sort'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('input', () => { PAGE = 1; renderRecords(); });
+  });
+  $('btn-clearf').onclick = clearFilters;
+  $('btn-expf').onclick   = () => exportGroceryCSV(filteredPurchases(), 'filtered');
+
+  // Shopping list
+  $('btn-addlist').onclick = addList;
+  const lName = $('l-name');
+  if (lName) lName.addEventListener('keydown', e => { if (e.key === 'Enter') addList(); });
+  $('btn-autolist').onclick = autoFillList;
+  $('btn-clrdone').onclick  = clearDoneList;
+
+  // Price compare
+  ['pc-item','pc-win'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('change', renderPrice);
+  });
+
+  // Monthly
+  ['mr-year','mr-month'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('change', renderMonthly);
+  });
+
+  // Item insights
+  ['it-q','it-cat','it-view'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('input', renderItems);
+  });
+
+  // Edit modal
+  $('btn-esave').onclick  = saveEdit;
+  $('btn-ecancel').onclick = () => closeMo('edit-mo');
+
+  // Settings — appearance
+  $('th-light').onclick = () => { setThemeMode('light'); applyTheme(); };
+  $('th-dark').onclick  = () => { setThemeMode('dark');  applyTheme(); };
+
+  // Settings — data
+  $('btn-expall').onclick  = () => exportGroceryCSV(DB.purchases, 'all');
+  $('btn-backup').onclick  = backupGrocery;
+  $('btn-restore').onclick = () => $('imp').click();
+  $('imp').addEventListener('change', e => restoreGrocery(e.target));
+  $('btn-wipe').onclick    = wipeGrocery;
+
+  // Modal click-outside
+  document.querySelectorAll('.mo').forEach(m => {
+    m.addEventListener('click', e => {
+      if (e.target === m) m.classList.remove('open');
+    });
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){
+      document.querySelectorAll('.mo.open').forEach(m => m.classList.remove('open'));
+    }
+    if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){
+      e.preventDefault();
+      const b = document.querySelector('.tb[data-tab="records"]');
+      if (b) switchTab('records', b);
+      setTimeout(() => $('q')?.focus(), 200);
+    }
+    if (e.key.toLowerCase() === 'n' && (e.ctrlKey || e.metaKey)){
+      e.preventDefault();
+      const b = document.querySelector('.tb[data-tab="add"]');
+      if (b) switchTab('add', b);
+      setTimeout(() => $('f-name')?.focus(), 200);
+    }
+  });
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME GALLERY (rendered by app.js)
+   ═══════════════════════════════════════════════════════════════ */
+function renderSettingsUI(){
+  const theme = localStorage.getItem('hh_theme_mode') || 'light';
+  const lt = $('th-light'), dk = $('th-dark');
+  if (lt && dk){
+    lt.classList.toggle('active', theme === 'light');
+    dk.classList.toggle('active', theme === 'dark');
+  }
+  renderThemeGallery('pal-grid', renderSettingsUI);
+  renderCustomChips();
+  renderFbStatus();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   END OF PAGE SCRIPT
+   ═══════════════════════════════════════════════════════════════ */
+
+</script>
+</body>
+</html>

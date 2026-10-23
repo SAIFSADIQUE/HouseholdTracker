@@ -1,0 +1,2511 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-palette="signature">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Birthday Tracker</title>
+
+<!-- ══════════ FAVICON ══════════ -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="alternate icon" href="favicon.svg">
+
+<!-- ══════════ FONTS ══════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- ══════════ SHARED STYLESHEET ══════════ -->
+<link rel="stylesheet" href="styles.css"/>
+
+<style>
+  /* Birthday-specific overrides — all base styles come from styles.css */
+  .btn.bw { background: #25D366; color: #fff; }
+  .btn.bw:hover:not(:disabled) { background: #1da851; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LOGIN OVERLAY
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="login-overlay" id="login-overlay" style="display:none">
+  <div class="login-blob b1"></div>
+  <div class="login-blob b2"></div>
+  <div class="login-blob b3"></div>
+  <div class="login-box">
+    <div class="login-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="26" height="26" fill="none">
+        <path d="M14 12h20M14 20h20M14 12c0 8 3 12 10 16l-10 8M24 28h10"
+              stroke="currentColor" stroke-width="2.6"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>Birthday Tracker</h1>
+    <p>Enter your password to continue.</p>
+    <input type="password" id="login-pass" class="fc2"
+           placeholder="••••" maxlength="20" inputmode="numeric"
+           autocomplete="off"/>
+    <button class="btn bp" type="button">Unlock</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LOADING OVERLAY
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <p id="loading-msg">Connecting to Firebase…</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     OFFLINE BAR
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="offline-bar" id="offline-bar">
+  ⚠️ You are offline — changes will sync automatically when reconnected
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SYNC BANNER
+     Content injected by installHeader() from app.js
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="sync-banner">
+  <div class="sg">
+    <div class="si">
+      <span class="dot dot-yellow" id="sync-dot"></span>
+      <span id="sync-status">Connecting…</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     APP SHELL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark" aria-hidden="true">🎂</div>
+      <span class="brand-name">Birthday Tracker</span>
+    </div>
+
+    <nav class="side-nav" id="side-nav">
+
+      <!-- ══ Cross-links ══ -->
+      <div class="side-group-label">Apps</div>
+      <a class="tb" href="index.html">
+        <span>🏠</span>
+        <span class="tb-lbl">Household Tracker</span>
+      </a>
+      <a class="tb active" href="Birthday.html">
+        <span>🎂</span>
+        <span class="tb-lbl">Birthday Tracker</span>
+      </a>
+      <a class="tb" href="Grocery.html">
+        <span>🛒</span>
+        <span class="tb-lbl">Grocery Tracker</span>
+      </a>
+
+      <!-- ══ Birthday sections ══ -->
+      <div class="side-group-label">Birthdays</div>
+      <button class="tb" data-tab="dashboard" data-title="Birthday Dashboard" type="button">
+        <span>📊</span><span class="tb-lbl">Dashboard</span>
+      </button>
+      <button class="tb" data-tab="upcoming" data-title="Upcoming Birthdays" type="button">
+        <span>⏳</span><span class="tb-lbl">Upcoming</span>
+        <span class="block-tag" id="bdg-up">0</span>
+      </button>
+      <button class="tb" data-tab="add" data-title="Add / Import People" type="button">
+        <span>➕</span><span class="tb-lbl">Add Person</span>
+      </button>
+      <button class="tb" data-tab="all" data-title="All People" type="button">
+        <span>📋</span><span class="tb-lbl">All People</span>
+      </button>
+      <button class="tb" data-tab="calendar" data-title="Calendar View" type="button">
+        <span>🗓️</span><span class="tb-lbl">Calendar</span>
+      </button>
+      <button class="tb" data-tab="insights" data-title="Insights & Fun Facts" type="button">
+        <span>✨</span><span class="tb-lbl">Insights</span>
+      </button>
+      <button class="tb" data-tab="settings" data-title="Reminders & Settings" type="button">
+        <span>⚙️</span><span class="tb-lbl">Settings</span>
+      </button>
+
+      <!-- ══ Logout ══ -->
+      <div class="side-group-label">Account</div>
+      <button class="tb" type="button"
+              onclick="window.__householdLogout && window.__householdLogout('manual')">
+        <span>🚪</span><span class="tb-lbl">Logout</span>
+      </button>
+
+    </nav>
+  </aside>
+
+  <!-- ═══════════ APP CONTENT ═══════════ -->
+  <div class="app-content">
+
+    <!-- ══ TOPBAR ══ -->
+    <header class="topbar">
+      <h2 class="topbar-title" id="topbar-title">Birthday Dashboard</h2>
+      <div class="topbar-actions">
+        <button class="bell" id="bell" title="Reminders" type="button">
+          🔔<span class="nd" id="nd"></span>
+        </button>
+        <button class="ib" id="btn-add-top" type="button">
+          ➕ <span class="ib-lbl">Add</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ══ NOTIFICATION PANEL ══ -->
+    <div class="npanel" id="npanel">
+      <div class="nph">
+        <b>🔔 Reminders</b>
+        <button class="btn bg2 bxs" id="btn-nclose" type="button">Close</button>
+      </div>
+      <div class="nlist" id="nlist"></div>
+      <div class="nph" style="border-top:1px solid var(--bdr);border-bottom:none">
+        <span class="hint" id="nperm">—</span>
+        <button class="btn bo bxs" id="btn-nperm" type="button">Enable alerts</button>
+      </div>
+    </div>
+
+    <!-- ═══════════ MAIN ═══════════ -->
+    <main class="main" id="main-content">
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: DASHBOARD
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-dashboard" class="tp active">
+
+        <!-- Hero card (next birthday) -->
+        <div id="hero"></div>
+
+        <!-- Stat cards -->
+        <div class="grid g4 mb" id="dash-cards"></div>
+
+        <!-- Action panel: needs wishes -->
+        <div class="pnl" id="pnl-action" style="display:none">
+          <h3>💌 Needs your wishes</h3>
+          <div id="dash-action"></div>
+        </div>
+
+        <!-- Two-column: next 10 + this/next month -->
+        <div class="grid g2">
+          <div class="pnl">
+            <h3>⏳ Next 10 Birthdays</h3>
+            <div id="dash-next"></div>
+          </div>
+          <div class="pnl">
+            <h3>📅 This Month &amp; Next Month</h3>
+            <div id="dash-month"></div>
+          </div>
+        </div>
+
+        <!-- 90-day timeline -->
+        <div class="pnl">
+          <h3>🔭 Next 90 Days Timeline</h3>
+          <div id="dash-timeline"></div>
+        </div>
+
+        <!-- By relation + birthdays per month -->
+        <div class="grid g2">
+          <div class="pnl">
+            <h3>👨‍👩‍👧 By Relation</h3>
+            <div id="dash-rel"></div>
+          </div>
+          <div class="pnl">
+            <h3>🎉 Birthdays per Month</h3>
+            <div id="dash-mdist"></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: UPCOMING
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-upcoming" class="tp">
+
+        <div class="pnl">
+          <h3>⏳ Upcoming Window</h3>
+          <div class="seg" id="up-seg">
+            <button data-w="7" class="active" type="button">7 days</button>
+            <button data-w="15" type="button">15 days</button>
+            <button data-w="30" type="button">30 days</button>
+            <button data-w="60" type="button">60 days</button>
+            <button data-w="90" type="button">90 days</button>
+            <button data-w="366" type="button">Full year</button>
+          </div>
+          <div class="chips" style="margin-top:12px">
+            <span class="chip" id="chip-vip" data-on="0">⭐ VIP only</span>
+            <span class="chip" id="chip-unwished" data-on="0">💌 Not wished yet</span>
+          </div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>Upcoming</h3>
+            <span class="rb" id="up-count">0</span>
+          </div>
+          <div style="padding:6px 16px 14px">
+            <div class="ulist" id="up-list"></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: ADD
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-add" class="tp">
+
+        <div class="pnl">
+          <h3>➕ Add a Person</h3>
+          <div id="add-info"></div>
+
+          <div class="grid g3">
+            <div class="fg2">
+              <label>Full Name *</label>
+              <input class="fc2" id="f-name" placeholder="e.g. Saif Sadique"/>
+            </div>
+            <div class="fg2">
+              <label>Relation *</label>
+              <input class="fc2" id="f-relation" list="rellist"
+                     placeholder="Mother, Friend, Cousin…"/>
+            </div>
+            <div class="fg2">
+              <label>Event Type</label>
+              <select class="fc2" id="f-type"></select>
+            </div>
+            <div class="fg2">
+              <label>Day *</label>
+              <select class="fc2" id="f-day"></select>
+            </div>
+            <div class="fg2">
+              <label>Month *</label>
+              <select class="fc2" id="f-month"></select>
+            </div>
+            <div class="fg2">
+              <label>Birth Year (optional)</label>
+              <input type="number" class="fc2" id="f-year"
+                     min="1900" max="2100" placeholder="e.g. 1962"/>
+            </div>
+            <div class="fg2">
+              <label>Phone / WhatsApp (optional)</label>
+              <input class="fc2" id="f-phone" placeholder="9876543210"/>
+            </div>
+            <div class="fg2">
+              <label>Email (optional)</label>
+              <input class="fc2" id="f-email" placeholder="name@mail.com"/>
+            </div>
+            <div class="fg2">
+              <label>Remind me (days before)</label>
+              <input class="fc2" id="f-lead" placeholder="blank = global setting, e.g. 7,3,1,0"/>
+            </div>
+            <div class="fg2">
+              <label>Gift ideas (optional)</label>
+              <input class="fc2" id="f-gift" placeholder="Saree, book, cake from…"/>
+            </div>
+            <div class="fg2" style="grid-column:1/-1">
+              <label>Notes (optional)</label>
+              <textarea class="fc2" id="f-notes"
+                        placeholder="Likes dark chocolate, allergic to nuts…"></textarea>
+            </div>
+          </div>
+
+          <label class="hint" style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <input type="checkbox" id="f-vip"/>
+            ⭐ Mark as VIP (always alerted first, extra early reminder)
+          </label>
+
+          <div class="ba">
+            <button class="btn bp" id="btn-save" type="button">💾 Save Person</button>
+            <button class="btn bo" id="btn-save2" type="button">💾 Save &amp; Add Another</button>
+            <button class="btn bg2" id="btn-clear" type="button">↺ Clear</button>
+          </div>
+        </div>
+
+        <div class="pnl">
+          <h3>📥 Bulk Paste Import</h3>
+          <p class="hint" style="margin-bottom:10px">
+            One per line: <b>Name, DD-MM-YYYY, Relation</b>
+            (year &amp; relation optional). Accepts
+            <code>DD/MM/YYYY</code>, <code>DD-MM</code>, <code>15 Aug 1990</code>.
+          </p>
+          <textarea class="fc2" id="bulk" style="min-height:120px"
+                    placeholder="Rahul Verma, 15-08-1990, Friend&#10;Aarav, 02/01/2026, Son&#10;Meena Aunty, 23 Nov, Relative"></textarea>
+          <div class="ba" style="margin-top:10px">
+            <button class="btn bp bsm" id="btn-bulk" type="button">⬆ Import lines</button>
+            <button class="btn bg2 bsm" id="btn-bulkclr" type="button">Clear</button>
+          </div>
+          <div id="bulk-out"></div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: ALL PEOPLE
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-all" class="tp">
+
+        <div class="pnl">
+          <h3>🔎 Search &amp; Filter</h3>
+          <div class="grid g3">
+            <div class="fg2">
+              <label>Search name / relation / note</label>
+              <input class="fc2" id="q" placeholder="Type to search… ( / )"/>
+            </div>
+            <div class="fg2">
+              <label>Relation</label>
+              <select class="fc2" id="fl-rel"></select>
+            </div>
+            <div class="fg2">
+              <label>Event type</label>
+              <select class="fc2" id="fl-type"></select>
+            </div>
+            <div class="fg2">
+              <label>Birth month</label>
+              <select class="fc2" id="fl-month"></select>
+            </div>
+            <div class="fg2">
+              <label>Sort by</label>
+              <select class="fc2" id="fl-sort">
+                <option value="soon">Coming soonest</option>
+                <option value="name">Name A–Z</option>
+                <option value="date">Calendar date (Jan→Dec)</option>
+                <option value="age">Age — oldest first</option>
+                <option value="ageY">Age — youngest first</option>
+                <option value="new">Recently added</option>
+              </select>
+            </div>
+            <div class="fg2">
+              <label>Show</label>
+              <select class="fc2" id="fl-view">
+                <option value="all">Everyone</option>
+                <option value="vip">⭐ VIP only</option>
+                <option value="noyear">Missing birth year</option>
+                <option value="nophone">Missing phone</option>
+              </select>
+            </div>
+          </div>
+          <div class="ba">
+            <button class="btn bg2 bsm" id="btn-clearf" type="button">Reset filters</button>
+            <button class="btn bo bsm" id="btn-expcsv" type="button">⬇ Export CSV</button>
+            <button class="btn bo bsm" id="btn-expics" type="button">📆 Export .ics (filtered)</button>
+          </div>
+        </div>
+
+        <div class="tc">
+          <div class="th2">
+            <h3>All People</h3>
+            <span class="rb" id="all-count">0</span>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Person</th>
+                  <th>Relation</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Turns</th>
+                  <th>Countdown</th>
+                  <th>Wished</th>
+                  <th>Contact</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="all-body"></tbody>
+            </table>
+          </div>
+          <div class="pag">
+            <span class="pi" id="pg-info"></span>
+            <div class="pb2" id="pg-btns"></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: CALENDAR
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-calendar" class="tp">
+
+        <div class="pnl">
+          <div class="calh">
+            <div class="ba">
+              <button class="btn bg2 bsm" id="cal-prev" type="button">‹ Prev</button>
+              <button class="btn bo bsm" id="cal-today" type="button">Today</button>
+              <button class="btn bg2 bsm" id="cal-next" type="button">Next ›</button>
+            </div>
+            <div class="cm" id="cal-month">—</div>
+            <span class="rb" id="cal-count">0 this month</span>
+          </div>
+          <div class="cgrid" id="cal-dow"></div>
+          <div class="cgrid" id="cal-grid" style="margin-top:5px"></div>
+        </div>
+
+        <div class="pnl">
+          <h3 id="cal-list-h">Events this month</h3>
+          <div class="ulist" id="cal-list"></div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: INSIGHTS
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-insights" class="tp">
+
+        <div class="grid g4 mb" id="ins-cards"></div>
+
+        <div class="grid g2">
+          <div class="pnl">
+            <h3>♈ Zodiac Spread</h3>
+            <div id="ins-zod"></div>
+          </div>
+          <div class="pnl">
+            <h3>📆 Day of Week (next birthday)</h3>
+            <div id="ins-dow"></div>
+          </div>
+        </div>
+
+        <div class="pnl">
+          <h3>🏆 Milestone Birthdays Ahead</h3>
+          <div id="ins-mile"></div>
+        </div>
+
+        <div class="grid g2">
+          <div class="pnl">
+            <h3>🎈 Age Groups</h3>
+            <div id="ins-age"></div>
+          </div>
+          <div class="pnl">
+            <h3>🧮 Shared Birthdays &amp; Clashes</h3>
+            <div id="ins-clash"></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           TAB: SETTINGS
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-settings" class="tp">
+
+        <!-- Reminder engine -->
+        <div class="pnl">
+          <h3>🔔 Reminder Engine</h3>
+          <div id="perm-box"></div>
+
+          <div class="fg2">
+            <label>Alert me these many days before</label>
+            <div class="chips" id="lead-chips"></div>
+          </div>
+
+          <div class="grid g3">
+            <div class="fg2">
+              <label>Daily alert time</label>
+              <input type="time" class="fc2" id="s-time"/>
+            </div>
+            <div class="fg2">
+              <label>Default country code (WhatsApp)</label>
+              <input class="fc2" id="s-cc" placeholder="91"/>
+            </div>
+            <div class="fg2">
+              <label>29 Feb falls back to</label>
+              <select class="fc2" id="s-leap">
+                <option value="feb28">28 February</option>
+                <option value="mar1">1 March</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="hint" style="display:flex;align-items:center;gap:8px;margin:4px 0 10px">
+            <input type="checkbox" id="s-confetti"/>
+            🎉 Celebrate today's birthdays with confetti
+          </label>
+
+          <div class="ba">
+            <button class="btn bp" id="btn-saveprefs" type="button">💾 Save preferences</button>
+            <button class="btn bo" id="btn-test" type="button">🔔 Send test notification</button>
+            <button class="btn bg2" id="btn-recheck" type="button">🔄 Re-run reminder check</button>
+          </div>
+
+          <div class="ibx warnb" style="margin-top:14px">
+            ⚠️ <b>Important:</b> browser notifications only fire while this page is open in a tab.
+            For guaranteed phone alerts, use <b>Export .ics</b> below and import it into Google Calendar —
+            it creates yearly repeating events with alarms that notify you even when this page is closed.
+          </div>
+        </div>
+
+        <!-- Calendar export -->
+        <div class="pnl">
+          <h3>📆 Calendar Export</h3>
+          <p class="hint" style="margin-bottom:12px">
+            Creates one yearly-recurring all-day event per person, with alarms matching your lead days.
+          </p>
+          <div class="ba">
+            <button class="btn bp" id="btn-icsall" type="button">📆 Download all birthdays (.ics)</button>
+            <button class="btn bo" id="btn-icsvip" type="button">⭐ VIP only (.ics)</button>
+          </div>
+        </div>
+
+        <!-- Firebase connection -->
+        <div class="pnl">
+          <h3>☁️ Firestore Connection</h3>
+          <div id="fb-status"></div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="pnl">
+          <h3>🎨 Appearance</h3>
+          <div class="fg2">
+            <label>Mode</label>
+            <div class="theme-row">
+              <div class="theme-opt" id="th-light" onclick="setThemeMode('light')">☀️ Light</div>
+              <div class="theme-opt" id="th-dark" onclick="setThemeMode('dark')">🌙 Dark</div>
+            </div>
+          </div>
+          <div class="fg2" style="margin-top:12px">
+            <label>Theme — pick a palette (12 options)</label>
+            <div class="palette-gallery" id="pal-grid"></div>
+          </div>
+        </div>
+
+        <!-- Data -->
+        <div class="pnl">
+          <h3>💾 Data</h3>
+          <div class="ba">
+            <button class="btn bp" id="btn-expall" type="button">⬇ Export all CSV</button>
+            <button class="btn bo" id="btn-backup" type="button">🗄️ Backup JSON</button>
+            <button class="btn bg2" id="btn-restore" type="button">📥 Restore JSON</button>
+            <input type="file" id="imp" accept=".json" style="display:none"/>
+            <button class="btn bd" id="btn-wipe" type="button">🧨 Delete all birthdays</button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DATALIST for relation suggestions
+     ═══════════════════════════════════════════════════════════════ -->
+<datalist id="rellist"></datalist>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EDIT PERSON MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="edit-mo">
+  <div class="md">
+    <div class="mt">✏️ Edit Person</div>
+    <div class="grid g2">
+      <div class="fg2">
+        <label>Full Name</label>
+        <input class="fc2" id="e-name"/>
+      </div>
+      <div class="fg2">
+        <label>Relation</label>
+        <input class="fc2" id="e-relation" list="rellist"/>
+      </div>
+      <div class="fg2">
+        <label>Event Type</label>
+        <select class="fc2" id="e-type"></select>
+      </div>
+      <div class="fg2">
+        <label>Day</label>
+        <select class="fc2" id="e-day"></select>
+      </div>
+      <div class="fg2">
+        <label>Month</label>
+        <select class="fc2" id="e-month"></select>
+      </div>
+      <div class="fg2">
+        <label>Birth Year</label>
+        <input type="number" class="fc2" id="e-year" min="1900" max="2100"/>
+      </div>
+      <div class="fg2">
+        <label>Phone / WhatsApp</label>
+        <input class="fc2" id="e-phone"/>
+      </div>
+      <div class="fg2">
+        <label>Email</label>
+        <input class="fc2" id="e-email"/>
+      </div>
+      <div class="fg2">
+        <label>Remind me (days before)</label>
+        <input class="fc2" id="e-lead" placeholder="7,3,1,0"/>
+      </div>
+      <div class="fg2">
+        <label>Gift ideas</label>
+        <input class="fc2" id="e-gift"/>
+      </div>
+      <div class="fg2" style="grid-column:1/-1">
+        <label>Notes</label>
+        <textarea class="fc2" id="e-notes"></textarea>
+      </div>
+    </div>
+    <label class="hint" style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="e-vip"/> ⭐ VIP
+    </label>
+    <input type="hidden" id="e-id"/>
+    <div class="mf">
+      <button class="btn bg2" id="btn-ecancel" type="button">Cancel</button>
+      <button class="btn bp" id="btn-esave" type="button">💾 Update</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW PERSON MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="view-mo">
+  <div class="md wide" id="view-body"></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     WISH MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="wish-mo">
+  <div class="md">
+    <div class="mt">💌 Send Wishes</div>
+    <div id="wish-head"></div>
+    <div class="fg2">
+      <label>Pick a template</label>
+      <div class="chips" id="wish-chips"></div>
+    </div>
+    <div class="fg2">
+      <label>Message</label>
+      <textarea class="fc2" id="wish-msg" style="min-height:110px"></textarea>
+    </div>
+    <div class="ba">
+      <button class="btn bw" id="btn-wa" type="button">💬 WhatsApp</button>
+      <button class="btn bo" id="btn-copy" type="button">📋 Copy</button>
+      <button class="btn bg2" id="btn-sms" type="button">✉️ SMS</button>
+      <button class="btn bg2" id="btn-call" type="button">📞 Call</button>
+      <button class="btn bp" id="btn-markwished" type="button">✅ Mark as wished</button>
+    </div>
+    <input type="hidden" id="wish-id"/>
+    <div class="mf">
+      <button class="btn bg2" id="btn-wclose" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CONFIRM MODAL (auto-created by app.js if not present, kept here for clarity)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="confirm-mo">
+  <div class="md">
+    <div class="mt" id="confirm-title">⚠️ Confirm</div>
+    <div id="confirm-body"></div>
+    <div class="mf">
+      <button class="btn bg2" id="confirm-cancel" type="button">Cancel</button>
+      <button class="btn bd" id="confirm-ok-btn" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Toast container -->
+<div class="tc2" id="toast-c"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE SCRIPT — Birthday Tracker
+     Shared helpers imported from app.js
+     ═══════════════════════════════════════════════════════════════ -->
+<script type="module">
+
+import {
+  // Firebase
+  db, COL,
+  // Constants
+  MF, MS, MN, DOW,
+  BIRTHDAY_TYPES, TYPE_ICON, RELATIONS, STONE, ZOD, MILESTONES, WISH_TEMPLATES,
+  // Helpers
+  $, esc, escQ, fmt, fmtAmt, fmtDate, fmtFull, monthLabel,
+  localDateStr, today, dayShort, daysBetween, bars,
+  avatarHTML, initials, hue,
+  // UI
+   toast, pill, download, openPrintWindow, showConfirm, ensureConfirmModal, closeMo, openMo,
+  dataSaved, dataUpdated, dataDeleted,
+  // Theme
+  applyTheme, setThemeMode, setPalette, renderThemeGallery,
+  // Session & header
+  installSession, installHeader, setCounter, setSyncStatus,
+  currentUser, isLoggedIn, touchSession,
+  // CRUD
+  addRecord, updateRecord, deleteRecord, setRecord,
+  // History
+  ACT, logHistory,
+  // Export
+  exportCSV, backupJSON, restoreJSON, readJSONFile,
+  // Subscription
+  subscribeCollection, subscribeDocument, registerUnsub,
+  // Bootstrap
+  initPage,
+  // Settings
+  saveHouseholdSettings, HOUSEHOLD_SETTINGS
+} from './app.js';
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE STATE
+   ═══════════════════════════════════════════════════════════════ */
+let PEOPLE = [];
+let PREFS  = {
+  lead:     [7, 3, 1, 0],
+  time:     '09:00',
+  cc:       '91',
+  leap:     'feb28',
+  confetti: true
+};
+
+let READY = { b: false, s: false };
+let FIRED = (() => {
+  try { return JSON.parse(localStorage.getItem('bd_fired') || '{}'); }
+  catch { return {}; }
+})();
+
+let UPWIN   = 7;
+let UPVIP   = false;
+let UPUNW   = false;
+let PAGE    = 1;
+const PER   = 25;
+let CAL     = new Date(); CAL.setDate(1);
+let heroTimer = null;
+
+const LEAD_CHOICES = [0, 1, 2, 3, 5, 7, 10, 15, 21, 30];
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ═══════════════════════════════════════════════════════════════ */
+initPage({
+  appName: 'Birthday Tracker',
+  counters: [
+    { id: 'people', icon: '👥', label: 'people', value: 0 },
+    { id: 'upcoming', icon: '⏳', label: 'soon', value: 0 }
+  ],
+  onReady: () => {
+    buildStatic();
+    wire();
+    startListeners();
+    applyTheme();
+    renderAll();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════════
+   STATIC DOM SETUP
+   ═══════════════════════════════════════════════════════════════ */
+function buildStatic(){
+  const dayOpts = '<option value="">Day</option>' +
+    Array.from({length:31}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
+  const monOpts = '<option value="">Month</option>' +
+    MF.slice(1).map((m, i) => `<option value="${i+1}">${m}</option>`).join('');
+
+  const fDay = $('f-day'); if (fDay) fDay.innerHTML = dayOpts;
+  const eDay = $('e-day'); if (eDay) eDay.innerHTML = dayOpts;
+  const fMon = $('f-month'); if (fMon) fMon.innerHTML = monOpts;
+  const eMon = $('e-month'); if (eMon) eMon.innerHTML = monOpts;
+
+  const tOpts = BIRTHDAY_TYPES.map(t => `<option value="${t}">${TYPE_ICON[t]} ${t}</option>`).join('');
+  const fType = $('f-type'); if (fType) fType.innerHTML = tOpts;
+  const eType = $('e-type'); if (eType) eType.innerHTML = tOpts;
+  const flType = $('fl-type'); if (flType) flType.innerHTML = '<option value="">All types</option>' + tOpts;
+  const flMonth = $('fl-month'); if (flMonth) flMonth.innerHTML = '<option value="">All months</option>' + MF.slice(1).map((m, i) => `<option value="${i+1}">${m}</option>`).join('');
+
+  const calDow = $('cal-dow');
+  if (calDow) calDow.innerHTML = DOW.map(d => `<div class="cdow">${d.slice(0,3)}</div>`).join('');
+
+  buildRelations();
+}
+
+function buildRelations(){
+  const set = new Set(RELATIONS);
+  PEOPLE.forEach(p => { if (p.relation) set.add(p.relation); });
+  const arr = [...set].sort((a,b) => a.localeCompare(b));
+
+  const relList = $('rellist');
+  if (relList) relList.innerHTML = arr.map(r => `<option value="${esc(r)}"></option>`).join('');
+
+  const flRel = $('fl-rel');
+  if (flRel){
+    const keep = flRel.value;
+    flRel.innerHTML = '<option value="">All relations</option>' +
+      arr.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
+    if (keep) flRel.value = keep;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   HELPERS — date math for birthdays
+   ═══════════════════════════════════════════════════════════════ */
+function startOfToday(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  return d;
+}
+function isLeap(y){ return (y%4===0 && y%100!==0) || y%400===0; }
+function dim(y, m){ return new Date(y, m, 0).getDate(); }
+
+function occurIn(year, b){
+  let m = +b.month, d = +b.day;
+  if (m === 2 && d === 29 && !isLeap(year)){
+    if (PREFS.leap === 'mar1'){ m = 3; d = 1; }
+    else d = 28;
+  }
+  d = Math.min(d, dim(year, m));
+  return new Date(year, m-1, d);
+}
+function nextOccur(b){
+  const t = startOfToday();
+  let o = occurIn(t.getFullYear(), b);
+  if (o < t) o = occurIn(t.getFullYear() + 1, b);
+  return o;
+}
+function lastOccur(b){
+  const t = startOfToday();
+  let o = occurIn(t.getFullYear(), b);
+  if (o > t) o = occurIn(t.getFullYear() - 1, b);
+  return o;
+}
+function daysUntil(b){ return Math.round((nextOccur(b) - startOfToday()) / 86400000); }
+function turningAge(b){ return b.year ? nextOccur(b).getFullYear() - (+b.year) : null; }
+function currentAge(b){
+  if (!b.year) return null;
+  const t = startOfToday();
+  let a = t.getFullYear() - (+b.year);
+  if (occurIn(t.getFullYear(), b) > t) a--;
+  return a;
+}
+function daysLived(b){
+  if (!b.year) return null;
+  return Math.round((startOfToday() - new Date(+b.year, +b.month - 1, +b.day)) / 86400000);
+}
+function zodiac(m, d){
+  for (const [zm, zd, name] of ZOD){
+    if (m < zm || (m === zm && d < zd)) return name;
+  }
+  return 'Capricorn ♑';
+}
+function dateLabel(b){ return (+b.day) + ' ' + MN[(+b.month) - 1] + (b.year ? ' ' + b.year : ''); }
+function cdLabel(d){
+  return d === 0 ? '🎂 TODAY' : d === 1 ? 'Tomorrow' : d < 0 ? Math.abs(d) + ' d ago' : 'in ' + d + ' days';
+}
+function wished(b, yr){ return Array.isArray(b.wishedYears) && b.wishedYears.includes(yr); }
+function isCeleb(b){ return (b.type || 'Birthday') !== 'Remembrance'; }
+
+function leadsFor(b){
+  if (b.lead){
+    const a = String(b.lead).split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x) && x >= 0);
+    if (a.length) return a;
+  }
+  const base = [...PREFS.lead];
+  if (b.vip && !base.includes(15)) base.push(15);
+  return base;
+}
+
+function sorted(){
+  return [...PEOPLE].sort((a,b) => daysUntil(a) - daysUntil(b) || String(a.name).localeCompare(String(b.name)));
+}
+function todayList(){ return sorted().filter(b => daysUntil(b) === 0); }
+
+function needsWishing(){
+  const out = [];
+  PEOPLE.forEach(b => {
+    if (!isCeleb(b)) return;
+    const d = daysUntil(b);
+    if (d === 0 && !wished(b, nextOccur(b).getFullYear())){
+      out.push({ b, kind: 'today', d: 0 });
+      return;
+    }
+    const lo = lastOccur(b);
+    const ago = Math.round((startOfToday() - lo) / 86400000);
+    if (ago > 0 && ago <= 7 && !wished(b, lo.getFullYear())){
+      out.push({ b, kind: 'missed', d: -ago });
+    }
+  });
+  return out.sort((x,y) => y.d - x.d);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PERSON ROW RENDERER
+   ═══════════════════════════════════════════════════════════════ */
+function rowHTML(b, opts){
+  opts = opts || {};
+  const d = daysUntil(b);
+  const age = turningAge(b);
+  const nx = nextOccur(b);
+  const cls = d === 0 ? 'today' : d <= 7 ? 'soon' : '';
+  const ic = TYPE_ICON[b.type || 'Birthday'];
+
+  return `<div class="urow ${cls}">
+    ${avatarHTML(b.name)}
+    <div class="ui">
+      <div class="pr">
+        <span class="pn">${ic} ${esc(b.name)} ${b.vip ? '<span class="star" title="VIP">★</span>' : ''}</span>
+        ${d === 0 ? '<span class="cb" style="background:var(--acc);color:#fff">TODAY</span>' : ''}
+      </div>
+      <div class="dc">${esc(b.relation || '—')} · ${fmtFull(nx)}${age ? ' · turns ' + age : ''}${opts.compact ? '' : ' · ' + esc(zodiac(+b.month, +b.day))}</div>
+    </div>
+    <div class="uc">
+      <b>${d === 0 ? '🎂' : d}</b>
+      <span class="dc">${d === 0 ? 'today' : d === 1 ? 'day' : 'days'}</span>
+    </div>
+    <div class="ab">
+      <button class="btn bo bxs" data-act="view" data-id="${b.id}" type="button">👤</button>
+      ${isCeleb(b) ? `<button class="btn bw bxs" data-act="wish" data-id="${b.id}" type="button">💬</button>` : ''}
+    </div>
+  </div>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIRESTORE LISTENERS
+   ═══════════════════════════════════════════════════════════════ */
+function startListeners(){
+  // Birthdays collection
+  subscribeCollection(COL.BIRTHDAY, rows => {
+    PEOPLE = rows;
+    READY.b = true;
+    setCounter('people', rows.length);
+    setSyncStatus('live');                    // ← ADD THIS LINE
+    cachePeople();
+    buildRelations();
+    renderAll();
+    runReminders();
+  });
+
+  // Birthday prefs (single doc)
+  subscribeDocument(COL.BIRTHDAY_PREFS, 'prefs', data => {
+    if (data){
+      PREFS = Object.assign(PREFS, {
+        lead: Array.isArray(data.lead) && data.lead.length ? data.lead : PREFS.lead,
+        time: data.time || PREFS.time,
+        cc:   data.cc   || PREFS.cc,
+        leap: data.leap || PREFS.leap,
+        confetti: typeof data.confetti === 'boolean' ? data.confetti : PREFS.confetti
+      });
+    }
+    READY.s = true;
+    renderPrefsUI();
+    runReminders();
+  });
+}
+
+function cachePeople(){
+  try { localStorage.setItem('bd_people_cache', JSON.stringify(PEOPLE.slice(0, 200))); }
+  catch (e) {}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MASTER RENDER DISPATCHER
+   ═══════════════════════════════════════════════════════════════ */
+function renderAll(){
+  renderHero();
+  renderDash();
+  renderUpcoming();
+  renderAllPeople();
+  renderCalendar();
+  renderInsights();
+  renderPrefsUI();
+  renderFbStatus();
+  updateBadges();
+}
+
+function updateBadges(){
+  const up = sorted().filter(b => daysUntil(b) <= 30).length;
+  const bdg = $('bdg-up');
+  if (bdg) bdg.textContent = up;
+  setCounter('upcoming', up);
+
+  const info = document.querySelector('.sync-banner');
+  if (info){
+    const list = sorted();
+    const nx = list.find(b => isCeleb(b));
+    // No direct append — installHeader owns this
+  }
+}
+
+// Hook into switchTab from app.js
+window.__onTabChange = (tabId) => {
+  switch (tabId){
+    case 'dashboard': renderHero(); renderDash(); break;
+    case 'upcoming':  renderUpcoming(); break;
+    case 'all':       renderAllPeople(); break;
+    case 'calendar':  renderCalendar(); break;
+    case 'insights':  renderInsights(); break;
+    case 'settings':  renderPrefsUI(); renderFbStatus(); applyTheme(); break;
+  }
+};
+
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO CARD (next birthday)
+   ═══════════════════════════════════════════════════════════════ */
+function renderHero(){
+  const host = $('hero');
+  if (!host) return;
+
+  const list = sorted().filter(isCeleb);
+  if (!list.length){
+    host.innerHTML = `<div class="pnl" style="margin:0"><div class="es"><div class="ei">🎂</div>
+      No birthdays saved yet. Tap <b>➕ Add</b> to add your first loved one.</div></div>`;
+    return;
+  }
+
+  const tl = todayList().filter(isCeleb);
+  const b = tl.length ? tl[0] : list[0];
+  const d = daysUntil(b);
+  const age = turningAge(b);
+  const nx = nextOccur(b);
+  const ms = nx.getTime() + 9*3600000 - Date.now();
+  const hrs = Math.max(0, Math.floor(ms / 3600000) % 24);
+  const mins = Math.max(0, Math.floor(ms / 60000) % 60);
+
+  host.innerHTML = `<div class="hero">
+    <div class="hav">${esc(initials(b.name))}</div>
+    <div class="hi">
+      <div class="hk">${d === 0 ? '🎉 Today is the day' : 'Next up' + (tl.length > 1 ? ' · ' + tl.length + ' today' : '')}</div>
+      <div class="hn">${esc(b.name)}</div>
+      <div class="hd">${esc(b.relation || '—')} · ${fmtFull(nx)}${age ? ` · turning <b>${age}</b>` : ''} · ${esc(zodiac(+b.month, +b.day))}</div>
+    </div>
+    <div class="hc">
+      <div><b>${d}</b><span>days</span></div>
+      ${d === 0
+        ? `<div><b>🎂</b><span>today</span></div>`
+        : `<div><b>${hrs}</b><span>hrs</span></div><div><b>${mins}</b><span>min</span></div>`}
+    </div>
+    <div class="ha">
+      <button class="hbtn" data-act="wish" data-id="${b.id}" type="button">💌 Send wishes</button>
+      <button class="hbtn" data-act="view" data-id="${b.id}" type="button">👤 Profile</button>
+      <button class="hbtn" data-act="gcal" data-id="${b.id}" type="button">📆 Add to Google Calendar</button>
+      ${d === 0 ? `<button class="hbtn" data-act="party" type="button">🎉 Celebrate</button>` : ''}
+    </div>
+  </div>`;
+
+  clearTimeout(heroTimer);
+  heroTimer = setTimeout(renderHero, 60000);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+   ═══════════════════════════════════════════════════════════════ */
+function renderDash(){
+  const list = sorted();
+  const celeb = list.filter(isCeleb);
+  const t  = celeb.filter(b => daysUntil(b) === 0);
+  const tm = celeb.filter(b => daysUntil(b) === 1);
+  const w  = celeb.filter(b => daysUntil(b) <= 7);
+  const m  = celeb.filter(b => daysUntil(b) <= 30);
+  const thisM = new Date().getMonth() + 1;
+  const inThisMonth = PEOPLE.filter(b => +b.month === thisM);
+  const vip = PEOPLE.filter(b => b.vip);
+  const nw = needsWishing();
+  const withYear = PEOPLE.filter(b => b.year);
+  const avgAge = withYear.length
+    ? Math.round(withYear.reduce((s,b) => s + currentAge(b), 0) / withYear.length)
+    : 0;
+
+  const cards = $('dash-cards');
+  if (cards) cards.innerHTML = `
+    <div class="sc ${t.length ? 'a' : ''}"><div class="lbl">🎂 Today</div><div class="amt">${t.length}</div>
+      <div class="sub">${t.length ? esc(t.map(b => b.name).join(', ')) : 'no birthdays today'}</div></div>
+    <div class="sc w"><div class="lbl">Tomorrow</div><div class="amt">${tm.length}</div>
+      <div class="sub">${tm.length ? esc(tm.map(b => b.name).join(', ')) : '—'}</div></div>
+    <div class="sc o"><div class="lbl">Next 7 Days</div><div class="amt">${w.length}</div>
+      <div class="sub">${w.length ? esc(w.slice(0,3).map(b => b.name.split(' ')[0]).join(', ')) : 'all clear'}</div></div>
+    <div class="sc"><div class="lbl">Next 30 Days</div><div class="amt">${m.length}</div>
+      <div class="sub">this calendar month: ${inThisMonth.length}</div></div>
+    <div class="sc ${nw.length ? 'e' : 'o'}"><div class="lbl">💌 Needs Wishing</div><div class="amt">${nw.length}</div>
+      <div class="sub">today + last 7 days</div></div>
+    <div class="sc a"><div class="lbl">⭐ VIPs</div><div class="amt">${vip.length}</div>
+      <div class="sub">of ${PEOPLE.length} people</div></div>
+    <div class="sc"><div class="lbl">Average Age</div><div class="amt">${avgAge || '—'}</div>
+      <div class="sub">${withYear.length} with birth year</div></div>
+    <div class="sc ${notifState() === '✅ On' ? 'o' : 'w'}"><div class="lbl">Alerts</div>
+      <div class="amt" style="font-size:1rem;margin-top:8px">${notifState()}</div>
+      <div class="sub">lead days: ${PREFS.lead.join(', ')}</div></div>`;
+
+  // Needs wishing panel
+  const act = $('pnl-action');
+  if (act){
+    if (nw.length){
+      act.style.display = '';
+      $('dash-action').innerHTML = `<div class="ulist">` + nw.map(x => {
+        const b = x.b, age = turningAge(b);
+        return `<div class="urow ${x.kind === 'today' ? 'today' : ''}">
+          ${avatarHTML(b.name)}
+          <div class="ui">
+            <div class="pr"><span class="pn">${esc(b.name)} ${b.vip ? '<span class="star">★</span>' : ''}</span></div>
+            <div class="dc">${esc(b.relation || '—')} · ${x.kind === 'today' ? '🎂 Birthday is today' : 'was ' + Math.abs(x.d) + ' day(s) ago'}${age ? ' · turns ' + age : ''}</div>
+          </div>
+          <div class="ab">
+            <button class="btn bw bxs" data-act="wish" data-id="${b.id}" type="button">💬 Wish</button>
+            <button class="btn bo bxs" data-act="markwish" data-id="${b.id}" type="button">✅ Done</button>
+          </div>
+        </div>`;
+      }).join('') + `</div>`;
+    } else {
+      act.style.display = 'none';
+    }
+  }
+
+  // Next 10
+  const nextEl = $('dash-next');
+  if (nextEl) nextEl.innerHTML = celeb.length
+    ? `<div class="ulist">` + celeb.slice(0, 10).map(b => rowHTML(b)).join('') + `</div>`
+    : '<div class="es">No birthdays yet</div>';
+
+  // This + next month
+  const now = new Date();
+  const m1 = now.getMonth() + 1;
+  const m2 = (m1 % 12) + 1;
+  const mg = mm => PEOPLE.filter(b => +b.month === mm).sort((a,b) => (+a.day) - (+b.day));
+  const mBlock = (mm, label) => {
+    const g = mg(mm);
+    return `<div style="margin-bottom:12px">
+      <div class="lbl" style="font-size:.7rem;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px">${label} · ${MF[mm-1]} (${g.length})</div>
+      ${g.length ? `<div class="ulist">` + g.map(b => rowHTML(b, {compact:true})).join('') + `</div>` : '<div class="hint">Nobody this month</div>'}
+    </div>`;
+  };
+  const monthEl = $('dash-month');
+  if (monthEl) monthEl.innerHTML = mBlock(m1, 'This month') + mBlock(m2, 'Next month');
+
+  // 90-day timeline (15-day buckets)
+  const buckets = [];
+  for (let i = 0; i < 6; i++){
+    const a = i * 15, z = a + 14;
+    const g = celeb.filter(b => { const d = daysUntil(b); return d >= a && d <= z; });
+    buckets.push({
+      label: a + '–' + z + ' d',
+      value: g.length,
+      sub: g.length ? g.slice(0, 2).map(b => b.name.split(' ')[0]).join(', ') + (g.length > 2 ? ' +' + (g.length - 2) : '') : '—'
+    });
+  }
+  const tl = $('dash-timeline');
+  if (tl) tl.innerHTML = bars(buckets, v => v + ' 🎂');
+
+  // By relation
+  const rc = {};
+  PEOPLE.forEach(b => { const r = b.relation || 'Unspecified'; rc[r] = (rc[r] || 0) + 1; });
+  const relEl = $('dash-rel');
+  if (relEl) relEl.innerHTML = bars(
+    Object.keys(rc).sort((a,b) => rc[b] - rc[a]).slice(0, 12)
+      .map(r => ({
+        label: r.length > 13 ? r.slice(0, 12) + '…' : r,
+        value: rc[r],
+        sub: (PEOPLE.length ? (100 * rc[r] / PEOPLE.length).toFixed(0) : 0) + '%'
+      })),
+    v => v
+  );
+
+    // Birthdays per month
+  const mdEl = $('dash-mdist');
+  if (mdEl) mdEl.innerHTML = bars(
+    MS.slice(1).map((mm, i) => {
+      const monthNum = i + 1;
+      const n = PEOPLE.filter(b => +b.month === monthNum).length;
+      return { label: mm, value: n, sub: n ? n + ' people' : '—' };
+    }),
+    v => v
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   UPCOMING TAB
+   ═══════════════════════════════════════════════════════════════ */
+function renderUpcoming(){
+  let list = sorted().filter(b => daysUntil(b) <= UPWIN);
+  if (UPVIP) list = list.filter(b => b.vip);
+  if (UPUNW) list = list.filter(b => isCeleb(b) && !wished(b, nextOccur(b).getFullYear()));
+
+  const countEl = $('up-count');
+  if (countEl) countEl.textContent = list.length + ' in ' + (UPWIN > 365 ? 'the year' : UPWIN + ' days');
+
+  const host = $('up-list');
+  if (!host) return;
+
+  if (!list.length){
+    host.innerHTML = '<div class="es"><div class="ei">🌤️</div>Nothing in this window. Enjoy the quiet!</div>';
+    return;
+  }
+
+  let lastHead = '';
+  const out = [];
+  list.forEach(b => {
+    const d = daysUntil(b);
+    const head = d === 0 ? '🎂 Today'
+              : d === 1 ? 'Tomorrow'
+              : d <= 7  ? 'This week'
+              : d <= 30 ? 'Within a month'
+              : d <= 90 ? 'Next 3 months'
+              : 'Later this year';
+    if (head !== lastHead){
+      lastHead = head;
+      out.push(`<div class="lbl" style="margin:14px 0 2px;font-size:.7rem;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase">${head}</div>`);
+    }
+    out.push(rowHTML(b));
+  });
+  host.innerHTML = out.join('');
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ALL PEOPLE TAB
+   ═══════════════════════════════════════════════════════════════ */
+function filteredPeople(){
+  const q  = ($('q')?.value || '').trim().toLowerCase();
+  const r  = $('fl-rel')?.value || '';
+  const ty = $('fl-type')?.value || '';
+  const mo = $('fl-month')?.value || '';
+  const v  = $('fl-view')?.value || 'all';
+
+  let L = PEOPLE.filter(b => {
+    if (q){
+      const hay = [b.name, b.relation, b.notes, b.gift, b.phone, b.email].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    if (r && b.relation !== r) return false;
+    if (ty && (b.type || 'Birthday') !== ty) return false;
+    if (mo && +b.month !== +mo) return false;
+    if (v === 'vip' && !b.vip) return false;
+    if (v === 'noyear' && b.year) return false;
+    if (v === 'nophone' && b.phone) return false;
+    return true;
+  });
+
+  const s = $('fl-sort')?.value || 'soon';
+  const cmp = {
+    soon: (a,b) => daysUntil(a) - daysUntil(b),
+    name: (a,b) => String(a.name).localeCompare(String(b.name)),
+    date: (a,b) => (+a.month) - (+b.month) || (+a.day) - (+b.day),
+    age:  (a,b) => (currentAge(b) ?? -1) - (currentAge(a) ?? -1),
+    ageY: (a,b) => (currentAge(a) ?? 999) - (currentAge(b) ?? 999),
+    new:  (a,b) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
+  }[s] || ((a,b) => daysUntil(a) - daysUntil(b));
+
+  return L.sort(cmp);
+}
+
+function renderAllPeople(){
+  const L = filteredPeople();
+  const countEl = $('all-count');
+  if (countEl) countEl.textContent = L.length + ' / ' + PEOPLE.length;
+
+  const pages = Math.max(1, Math.ceil(L.length / PER));
+  PAGE = Math.min(PAGE, pages);
+  const slice = L.slice((PAGE - 1) * PER, PAGE * PER);
+
+  const tbody = $('all-body');
+  if (!tbody) return;
+
+  if (!slice.length){
+    tbody.innerHTML = `<tr><td colspan="9" class="es"><div class="ei">🔍</div>No one matches these filters.</td></tr>`;
+  } else {
+    tbody.innerHTML = slice.map(b => {
+      const d = daysUntil(b);
+      const age = turningAge(b);
+      const cur = currentAge(b);
+      const yr = nextOccur(b).getFullYear();
+      const w = isCeleb(b)
+        ? (wished(b, yr) ? `<span class="cb off">✓ ${yr}</span>` : '<span class="cb amb">pending</span>')
+        : '<span class="dc">—</span>';
+
+      return `<tr>
+        <td><div class="pr">${avatarHTML(b.name)}<span class="pn">${esc(b.name)} ${b.vip ? '<span class="star">★</span>' : ''}</span></div></td>
+        <td class="dc">${esc(b.relation || '—')}</td>
+        <td><span class="cb">${TYPE_ICON[b.type || 'Birthday']} ${esc(b.type || 'Birthday')}</span></td>
+        <td>${dateLabel(b)}<div class="dc">${esc(zodiac(+b.month, +b.day))}</div></td>
+        <td>${age ? '<b>' + age + '</b>' + (cur != null ? '<div class="dc">now ' + cur + '</div>' : '') : '<span class="dc">—</span>'}</td>
+        <td><span class="cb ${d === 0 ? 'red' : d <= 7 ? 'amb' : 'off'}">${cdLabel(d)}</span></td>
+        <td>${w}</td>
+        <td class="dc">${b.phone ? esc(b.phone) : '—'}</td>
+        <td><div class="ab">
+          <button class="btn bo bxs" data-act="view" data-id="${b.id}" type="button">👤</button>
+          <button class="btn bo bxs" data-act="edit" data-id="${b.id}" type="button">✏️</button>
+          <button class="btn bg2 bxs" data-act="vip" data-id="${b.id}" type="button">${b.vip ? '☆' : '⭐'}</button>
+          <button class="btn bd bxs" data-act="del" data-id="${b.id}" type="button">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  const info = $('pg-info');
+  if (info) info.textContent = L.length
+    ? `Showing ${(PAGE - 1) * PER + 1}–${Math.min(PAGE * PER, L.length)} of ${L.length}`
+    : 'No records';
+
+  const btns = [];
+  btns.push(`<button class="pb" data-p="${PAGE-1}" ${PAGE===1?'disabled':''} type="button">‹</button>`);
+  for (let i = 1; i <= pages; i++){
+    if (pages > 7 && i !== 1 && i !== pages && Math.abs(i - PAGE) > 1){
+      if (i === 2 || i === pages - 1) btns.push('<span class="pi">…</span>');
+      continue;
+    }
+    btns.push(`<button class="pb ${i === PAGE ? 'active' : ''}" data-p="${i}" type="button">${i}</button>`);
+  }
+  btns.push(`<button class="pb" data-p="${PAGE+1}" ${PAGE===pages?'disabled':''} type="button">›</button>`);
+
+  const pagHost = $('pg-btns');
+  if (pagHost){
+    pagHost.innerHTML = btns.join('');
+    pagHost.querySelectorAll('[data-p]').forEach(b => {
+      b.onclick = () => {
+        PAGE = +b.dataset.p;
+        renderAllPeople();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      };
+    });
+  }
+}
+
+function clearFilters(){
+  ['q','fl-rel','fl-type','fl-month'].forEach(i => { const el = $(i); if (el) el.value = ''; });
+  const s = $('fl-sort'); if (s) s.value = 'soon';
+  const v = $('fl-view'); if (v) v.value = 'all';
+  PAGE = 1;
+  renderAllPeople();
+  pill('Filters reset', '↺');
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CALENDAR TAB
+   ═══════════════════════════════════════════════════════════════ */
+function renderCalendar(){
+  const y = CAL.getFullYear();
+  const m = CAL.getMonth();
+
+  const mLabel = $('cal-month');
+  if (mLabel) mLabel.textContent = MF[m] + ' ' + y;
+
+  const ev = {};
+  PEOPLE.forEach(b => {
+    const o = occurIn(y, b);
+    if (o.getMonth() === m) (ev[o.getDate()] = ev[o.getDate()] || []).push(b);
+  });
+
+  const n = Object.values(ev).reduce((s, a) => s + a.length, 0);
+  const cnt = $('cal-count');
+  if (cnt) cnt.textContent = n + ' event' + (n === 1 ? '' : 's');
+
+  const first = new Date(y, m, 1).getDay();
+  const total = dim(y, m + 1);
+  const prevTotal = dim(m === 0 ? y-1 : y, m === 0 ? 12 : m);
+  const t = startOfToday();
+  const cells = [];
+
+  for (let i = first - 1; i >= 0; i--){
+    cells.push(`<div class="cday pad"><div class="cn">${prevTotal - i}</div></div>`);
+  }
+  for (let d = 1; d <= total; d++){
+    const g = ev[d] || [];
+    const isT = t.getFullYear() === y && t.getMonth() === m && t.getDate() === d;
+    cells.push(`<div class="cday ${g.length ? 'has' : ''} ${isT ? 'today' : ''}" ${g.length ? `data-cd="${d}" style="cursor:pointer"` : ''}>
+      <div class="cn">${d}</div>
+      ${g.slice(0, 2).map(b => `<div class="ce mini">${TYPE_ICON[b.type || 'Birthday']} ${esc(String(b.name).split(' ')[0])}</div>`).join('')}
+      ${g.length > 2 ? `<div class="ce">+${g.length - 2} more</div>` : ''}
+    </div>`);
+  }
+  const tail = (7 - ((first + total) % 7)) % 7;
+  for (let i = 1; i <= tail; i++){
+    cells.push(`<div class="cday pad"><div class="cn">${i}</div></div>`);
+  }
+
+  const grid = $('cal-grid');
+  if (grid){
+    grid.innerHTML = cells.join('');
+    grid.querySelectorAll('[data-cd]').forEach(c => c.onclick = () => {
+      const d = +c.dataset.cd;
+      const g = ev[d] || [];
+      if (g.length === 1) openView(g[0].id);
+      else {
+        const h = $('cal-list-h');
+        if (h) h.textContent = d + ' ' + MF[m] + ' ' + y + ' · ' + g.length + ' event(s)';
+        const l = $('cal-list');
+        if (l) l.innerHTML = g.map(b => rowHTML(b)).join('');
+        l?.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    });
+  }
+
+  const all = [];
+  Object.keys(ev).map(Number).sort((a,b) => a-b).forEach(d => ev[d].forEach(b => all.push(b)));
+
+  const lh = $('cal-list-h');
+  if (lh) lh.textContent = 'Events in ' + MF[m] + ' ' + y;
+
+  const ll = $('cal-list');
+  if (ll) ll.innerHTML = all.length
+    ? all.map(b => rowHTML(b)).join('')
+    : '<div class="es"><div class="ei">🗓️</div>No events this month</div>';
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   INSIGHTS TAB
+   ═══════════════════════════════════════════════════════════════ */
+function renderInsights(){
+  const wy = PEOPLE.filter(b => b.year);
+  const oldest = wy.length ? wy.reduce((a,b) => currentAge(a) >= currentAge(b) ? a : b) : null;
+  const young  = wy.length ? wy.reduce((a,b) => currentAge(a) <= currentAge(b) ? a : b) : null;
+
+  const mc = {};
+  PEOPLE.forEach(b => { mc[+b.month] = (mc[+b.month] || 0) + 1; });
+  const topM = Object.keys(mc).sort((a,b) => mc[b] - mc[a])[0];
+
+  const zc = {};
+  PEOPLE.forEach(b => { const z = zodiac(+b.month, +b.day); zc[z] = (zc[z] || 0) + 1; });
+  const topZ = Object.keys(zc).sort((a,b) => zc[b] - zc[a])[0];
+
+  const miles = PEOPLE
+    .filter(b => b.year && MILESTONES.includes(turningAge(b)))
+    .sort((a,b) => daysUntil(a) - daysUntil(b));
+
+  const rc = {};
+  PEOPLE.forEach(b => { const r = b.relation || 'Other'; rc[r] = (rc[r] || 0) + 1; });
+  const topR = Object.keys(rc).sort((a,b) => rc[b] - rc[a])[0];
+
+  const cards = $('ins-cards');
+  if (cards) cards.innerHTML = `
+    <div class="sc"><div class="lbl">People Tracked</div><div class="amt">${PEOPLE.length}</div><div class="sub">${wy.length} with birth year</div></div>
+    <div class="sc a"><div class="lbl">Busiest Month</div><div class="amt" style="font-size:1.05rem;margin-top:8px">${topM ? MF[topM - 1] : '—'}</div><div class="sub">${topM ? mc[topM] + ' birthdays' : '—'}</div></div>
+    <div class="sc o"><div class="lbl">Eldest</div><div class="amt" style="font-size:1rem;margin-top:8px">${oldest ? esc(oldest.name) : '—'}</div><div class="sub">${oldest ? currentAge(oldest) + ' years' : '—'}</div></div>
+    <div class="sc w"><div class="lbl">Youngest</div><div class="amt" style="font-size:1rem;margin-top:8px">${young ? esc(young.name) : '—'}</div><div class="sub">${young ? currentAge(young) + ' years' : '—'}</div></div>
+    <div class="sc"><div class="lbl">Top Zodiac</div><div class="amt" style="font-size:1rem;margin-top:8px">${topZ ? esc(topZ) : '—'}</div><div class="sub">${topZ ? zc[topZ] + ' people' : '—'}</div></div>
+    <div class="sc a"><div class="lbl">Milestones Ahead</div><div class="amt">${miles.length}</div><div class="sub">next 12 months</div></div>
+    <div class="sc o"><div class="lbl">Largest Circle</div><div class="amt" style="font-size:1.05rem;margin-top:8px">${topR ? esc(topR) : '—'}</div><div class="sub">${topR ? rc[topR] + ' people' : '—'}</div></div>
+    <div class="sc e"><div class="lbl">Missing Data</div><div class="amt">${PEOPLE.filter(b => !b.year).length + PEOPLE.filter(b => !b.phone).length}</div><div class="sub">${PEOPLE.filter(b => !b.year).length} no year · ${PEOPLE.filter(b => !b.phone).length} no phone</div></div>`;
+
+  const zorder = ['Capricorn ♑','Aquarius ♒','Pisces ♓','Aries ♈','Taurus ♉','Gemini ♊','Cancer ♋','Leo ♌','Virgo ♍','Libra ♎','Scorpio ♏','Sagittarius ♐'];
+  const zEl = $('ins-zod');
+  if (zEl) zEl.innerHTML = bars(zorder.filter(z => zc[z]).map(z => ({ label:z, value:zc[z], sub: zc[z] + ' people' })), v => v);
+
+  const dc = {};
+  PEOPLE.forEach(b => { const d = DOW[nextOccur(b).getDay()]; dc[d] = (dc[d] || 0) + 1; });
+  const dEl = $('ins-dow');
+  if (dEl) dEl.innerHTML = bars(DOW.filter(d => dc[d]).map(d => ({ label: d.slice(0,3), value: dc[d], sub: dc[d] + ' people' })), v => v);
+
+  const mEl = $('ins-mile');
+  if (mEl){
+    mEl.innerHTML = miles.length
+      ? `<div class="tw"><table>
+          <thead><tr><th>Person</th><th>Relation</th><th>Turns</th><th>On</th><th>Countdown</th><th></th></tr></thead>
+          <tbody>${miles.map(b => `<tr>
+            <td><b>${esc(b.name)}</b></td>
+            <td class="dc">${esc(b.relation || '—')}</td>
+            <td><span class="cb" style="background:var(--acc);color:#fff">${turningAge(b)} 🎉</span></td>
+            <td>${fmtFull(nextOccur(b))}</td>
+            <td>${cdLabel(daysUntil(b))}</td>
+            <td><button class="btn bo bxs" data-act="view" data-id="${b.id}" type="button">👤</button></td>
+          </tr>`).join('')}</tbody>
+        </table></div>`
+      : '<div class="es">No milestone birthdays (1, 5, 10, 18, 21, 25, 30… 100) in the next year.</div>';
+  }
+
+  const groups = [
+    ['0–12 Child', 0, 12], ['13–19 Teen', 13, 19], ['20–29', 20, 29], ['30–39', 30, 39],
+    ['40–49', 40, 49], ['50–59', 50, 59], ['60–74', 60, 74], ['75+', 75, 200]
+  ];
+  const aEl = $('ins-age');
+  if (aEl){
+    aEl.innerHTML = bars(
+      groups.map(g => {
+        const n = wy.filter(b => { const a = currentAge(b); return a >= g[1] && a <= g[2]; }).length;
+        return { label: g[0], value: n, sub: n ? n + ' people' : '—' };
+      }),
+      v => v
+    );
+  }
+
+  const dmap = {};
+  PEOPLE.forEach(b => {
+    const k = String(b.month).padStart(2,'0') + '-' + String(b.day).padStart(2,'0');
+    (dmap[k] = dmap[k] || []).push(b);
+  });
+  const clash = Object.keys(dmap).filter(k => dmap[k].length > 1).sort();
+  const cEl = $('ins-clash');
+  if (cEl){
+    cEl.innerHTML = clash.length
+      ? clash.map(k => {
+          const g = dmap[k];
+          return `<div class="urow">
+            <div class="ui">
+              <b>${(+k.slice(3))} ${MN[(+k.slice(0,2)) - 1]}</b>
+              <div class="dc">${g.map(b => esc(b.name) + ' (' + esc(b.relation || '—') + ')').join(' · ')}</div>
+            </div>
+            <div class="uc"><b>${g.length}</b><span class="dc">people</span></div>
+          </div>`;
+        }).join('')
+      : '<div class="es">No shared dates — everyone has their own day 🎈</div>';
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ADD / EDIT / DELETE PERSON
+   ═══════════════════════════════════════════════════════════════ */
+function showAddInfo(){
+  const box = $('add-info');
+  if (!box) return;
+
+  const n = $('f-name').value.trim().toLowerCase();
+  const dup = n ? PEOPLE.find(p => String(p.name).trim().toLowerCase() === n) : null;
+  const d = +$('f-day').value;
+  const m = +$('f-month').value;
+  const y = +$('f-year').value;
+
+  let html = '';
+  if (dup){
+    html += `<div class="ibx warnb">⚠️ <b>${esc(dup.name)}</b> already exists (${dateLabel(dup)}). Saving creates a second entry.</div>`;
+  }
+  if (d && m){
+    const probe = { day: d, month: m, year: y || '' };
+    const nx = nextOccur(probe);
+    const age = y ? nx.getFullYear() - y : null;
+    html += `<div class="ibx okb">🔮 Next occurrence: <b>${fmtFull(nx)}</b> · ${cdLabel(daysUntil(probe))}${age ? ' · turns <b>' + age + '</b>' : ''} · ${esc(zodiac(m, d))} · birthstone ${esc(STONE[m-1])}${y ? ' · born on a <b>' + DOW[new Date(y, m-1, d).getDay()] + '</b>' : ''}</div>`;
+    if (m === 2 && d === 29){
+      html += `<div class="ibx warnb">🗓️ Leap-day birthday — non-leap years will use <b>${PREFS.leap === 'mar1' ? '1 March' : '28 February'}</b>.</div>`;
+    }
+  }
+  box.innerHTML = html;
+}
+
+function readForm(prefix){
+  const g = id => $(prefix + '-' + id).value.trim();
+  return {
+    name: g('name'),
+    relation: g('relation'),
+    type: $(prefix + '-type').value || 'Birthday',
+    day: +$(prefix + '-day').value || 0,
+    month: +$(prefix + '-month').value || 0,
+    year: g('year') ? +g('year') : '',
+    phone: g('phone'),
+    email: g('email'),
+    lead: g('lead'),
+    gift: g('gift'),
+    notes: g('notes'),
+    vip: $(prefix + '-vip').checked
+  };
+}
+
+function validate(o){
+  if (!o.name) return 'Name is required';
+  if (!o.relation) return 'Relation is required';
+  if (!o.day || !o.month) return 'Day and month are required';
+  if (o.day > dim(o.year || 2024, o.month)) return o.day + ' ' + MF[o.month - 1] + ' is not a valid date';
+  if (o.year && (o.year < 1900 || o.year > new Date().getFullYear() + 1)) return 'Birth year looks wrong';
+  return '';
+}
+
+function resetForm(){
+  ['f-name','f-relation','f-year','f-phone','f-email','f-lead','f-gift','f-notes']
+    .forEach(i => { const el = $(i); if (el) el.value = ''; });
+  const fDay = $('f-day'); if (fDay) fDay.value = '';
+  const fMon = $('f-month'); if (fMon) fMon.value = '';
+  const fType = $('f-type'); if (fType) fType.value = 'Birthday';
+  const fVip = $('f-vip'); if (fVip) fVip.checked = false;
+  const info = $('add-info'); if (info) info.innerHTML = '';
+  $('f-name')?.focus();
+}
+
+async function addPerson(stay){
+  const o = readForm('f');
+  const err = validate(o);
+  if (err){ toast('❌ ' + err, 'error'); return; }
+
+  const btn1 = $('btn-save'), btn2 = $('btn-save2');
+  btn1.disabled = btn2.disabled = true;
+
+  const res = await addRecord(COL.BIRTHDAY,
+    Object.assign({}, o, { wishedYears: [] }),
+    { pillMsg: o.name + ' saved · ' + cdLabel(daysUntil(o)), pillIcon: '🎂',
+      historyAction: ACT.BDAY_ADD, historyData: { name: o.name, relation: o.relation } });
+
+  btn1.disabled = btn2.disabled = false;
+
+  if (res.ok){
+    if (stay){
+      const r = $('f-relation').value;
+      resetForm();
+      $('f-relation').value = r;
+    } else {
+      resetForm();
+      const b = document.querySelector('.tb[data-tab="upcoming"]');
+      if (b) switchTab('upcoming', b);
+    }
+  }
+}
+
+function openEdit(id){
+  const b = PEOPLE.find(x => x.id === id);
+  if (!b) return;
+  $('e-id').value = id;
+  $('e-name').value = b.name || '';
+  $('e-relation').value = b.relation || '';
+  $('e-type').value = b.type || 'Birthday';
+  $('e-day').value = b.day || '';
+  $('e-month').value = b.month || '';
+  $('e-year').value = b.year || '';
+  $('e-phone').value = b.phone || '';
+  $('e-email').value = b.email || '';
+  $('e-lead').value = b.lead || '';
+  $('e-gift').value = b.gift || '';
+  $('e-notes').value = b.notes || '';
+  $('e-vip').checked = !!b.vip;
+  closeMo('view-mo');
+  $('edit-mo').classList.add('open');
+}
+
+async function saveEdit(){
+  const id = $('e-id').value;
+  const o = readForm('e');
+  const err = validate(o);
+  if (err){ toast('❌ ' + err, 'error'); return; }
+
+  const btn = $('btn-esave');
+  btn.disabled = true;
+
+  const res = await updateRecord(COL.BIRTHDAY, id, o,
+    { pillMsg: 'Person updated', pillIcon: '✏️',
+      historyAction: ACT.BDAY_EDIT, historyData: { id, name: o.name } });
+
+  btn.disabled = false;
+  if (res.ok) closeMo('edit-mo');
+}
+
+function delPerson(id){
+  const b = PEOPLE.find(x => x.id === id);
+  if (!b) return;
+
+  showConfirm(
+    '🗑️ Delete Person',
+    `<div class="ibx warnb">Delete <b>${esc(b.name)}</b> (${esc(b.relation || '—')} · ${dateLabel(b)}) permanently?</div>`,
+    'Delete',
+    async () => {
+      await deleteRecord(COL.BIRTHDAY, id, {
+        pillMsg: b.name + ' deleted', pillIcon: '🗑️',
+        historyAction: ACT.BDAY_DEL, historyData: { name: b.name }
+      });
+      closeMo('view-mo');
+    },
+    'bd'
+  );
+}
+
+async function toggleVip(id){
+  const b = PEOPLE.find(x => x.id === id);
+  if (!b) return;
+  await updateRecord(COL.BIRTHDAY, id, { vip: !b.vip }, {
+    pillMsg: b.vip ? 'VIP removed' : 'Marked VIP',
+    pillIcon: b.vip ? '☆' : '⭐'
+  });
+}
+
+async function markWished(id){
+  const b = PEOPLE.find(x => x.id === id);
+  if (!b) return;
+  const yr = daysUntil(b) === 0 ? nextOccur(b).getFullYear() : lastOccur(b).getFullYear();
+  const arr = Array.isArray(b.wishedYears) ? [...b.wishedYears] : [];
+  if (arr.includes(yr)){ toast('Already marked for ' + yr); return; }
+  arr.push(yr);
+
+  await updateRecord(COL.BIRTHDAY, id, {
+    wishedYears: arr, lastWishedAt: new Date().toISOString()
+  }, {
+    pillMsg: 'Marked as wished (' + yr + ')',
+    pillIcon: '✅'
+  });
+  closeMo('wish-mo');
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   VIEW PERSON MODAL
+   ═══════════════════════════════════════════════════════════════ */
+function openView(id){
+  const b = PEOPLE.find(x => x.id === id);
+  if (!b) return;
+
+  const d = daysUntil(b);
+  const nx = nextOccur(b);
+  const age = turningAge(b);
+  const cur = currentAge(b);
+  const lived = daysLived(b);
+  const yr = nx.getFullYear();
+  const hist = (Array.isArray(b.wishedYears) ? [...b.wishedYears] : []).sort((x,y) => y - x);
+
+  const next5 = [];
+  for (let i = 0; i < 5; i++){
+    const o = occurIn(yr + i, b);
+    next5.push(`<tr>
+      <td>${o.getFullYear()}</td>
+      <td>${fmtFull(o)}</td>
+      <td>${b.year ? (o.getFullYear() - (+b.year)) + ' yrs' : '—'}</td>
+      <td class="dc">${DOW[o.getDay()]}</td>
+    </tr>`);
+  }
+
+  $('view-body').innerHTML = `
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+      ${avatarHTML(b.name, 'lg')}
+      <div>
+        <div class="mt" style="margin:0">${TYPE_ICON[b.type || 'Birthday']} ${esc(b.name)} ${b.vip ? '<span class="star">★</span>' : ''}</div>
+        <div class="dc">${esc(b.relation || '—')} · ${dateLabel(b)} · ${esc(zodiac(+b.month, +b.day))}</div>
+      </div>
+    </div>
+    <div class="grid g3 mb">
+      <div class="sc a"><div class="lbl">Countdown</div><div class="amt">${d === 0 ? '🎂' : d}</div><div class="sub">${d === 0 ? 'Today!' : cdLabel(d)}</div></div>
+      <div class="sc"><div class="lbl">Turning</div><div class="amt">${age || '—'}</div><div class="sub">${cur != null ? 'currently ' + cur : 'birth year unknown'}</div></div>
+      <div class="sc o"><div class="lbl">Next Date</div><div class="amt" style="font-size:.95rem;margin-top:8px">${fmtFull(nx)}</div><div class="sub">${DOW[nx.getDay()]}</div></div>
+      <div class="sc w"><div class="lbl">Days Lived</div><div class="amt">${lived ? Number(lived).toLocaleString('en-IN') : '—'}</div><div class="sub">${lived ? Math.floor(lived / 7).toLocaleString('en-IN') + ' weeks' : '—'}</div></div>
+      <div class="sc"><div class="lbl">Birthstone</div><div class="amt" style="font-size:1rem;margin-top:8px">${esc(STONE[(+b.month) - 1])}</div><div class="sub">${MF[(+b.month) - 1]}</div></div>
+      <div class="sc ${isCeleb(b) && !wished(b, yr) ? 'e' : 'o'}"><div class="lbl">Wished ${yr}</div>
+        <div class="amt" style="font-size:1rem;margin-top:8px">${isCeleb(b) ? (wished(b, yr) ? '✅ Yes' : '⏳ Not yet') : '—'}</div>
+        <div class="sub">${hist.length ? hist.length + ' year(s) logged' : 'no history'}</div></div>
+    </div>
+    ${b.gift ? `<div class="ibx">🎁 <b>Gift ideas:</b> ${esc(b.gift)}</div>` : ''}
+    ${b.notes ? `<div class="ibx">📝 ${esc(b.notes)}</div>` : ''}
+    ${(b.phone || b.email) ? `<div class="ibx">📇 ${b.phone ? '<b>' + esc(b.phone) + '</b>' : ''}${b.phone && b.email ? ' · ' : ''}${b.email ? esc(b.email) : ''}</div>` : ''}
+    <div class="ibx">🔔 Reminders at <b>${leadsFor(b).sort((x,y) => y - x).join(', ')}</b> day(s) before${b.lead ? ' (custom)' : ''}</div>
+    <div class="tw mb"><table><thead><tr><th>Year</th><th>Falls on</th><th>Age</th><th>Day</th></tr></thead><tbody>${next5.join('')}</tbody></table></div>
+    ${hist.length ? `<p class="hint mb">✅ Wished in: ${hist.join(', ')}</p>` : ''}
+    <div class="ba">
+      ${isCeleb(b) ? `<button class="btn bw bsm" data-act="wish" data-id="${b.id}" type="button">💬 Send wishes</button>` : ''}
+      <button class="btn bo bsm" data-act="gcal" data-id="${b.id}" type="button">📆 Google Calendar</button>
+      <button class="btn bo bsm" data-act="ics1" data-id="${b.id}" type="button">⬇ .ics file</button>
+      <button class="btn bg2 bsm" data-act="edit" data-id="${b.id}" type="button">✏️ Edit</button>
+      <button class="btn bg2 bsm" data-act="vip" data-id="${b.id}" type="button">${b.vip ? '☆ Remove VIP' : '⭐ Make VIP'}</button>
+      <button class="btn bd bsm" data-act="del" data-id="${b.id}" type="button">🗑️ Delete</button>
+    </div>
+    <div class="mf"><button class="btn bg2" data-act="closeview" type="button">Close</button></div>`;
+
+  $('view-mo').classList.add('open');
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   WISH MODAL
+   ═══════════════════════════════════════════════════════════════ */
+function phoneOf(b){
+  let p = String(b.phone || '').replace(/[^\d]/g, '');
+  if (!p) return '';
+  if (p.length === 10) p = (PREFS.cc || '91') + p;
+  return p;
+}
+
+function openWish(id){
+  const b = PEOPLE.find(x => x.id === id);
+  if (!b) return;
+
+  $('wish-id').value = id;
+  const age = turningAge(b);
+  const d = daysUntil(b);
+
+  $('wish-head').innerHTML = `<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+    ${avatarHTML(b.name, 'lg')}
+    <div><b>${esc(b.name)}</b>
+      <div class="dc">${esc(b.relation || '—')} · ${dateLabel(b)} · ${cdLabel(d)}${age ? ' · turns ' + age : ''}</div>
+      ${b.phone ? '<div class="dc">📱 ' + esc(b.phone) + '</div>' : '<div class="dc">⚠️ No phone saved — use Copy</div>'}
+    </div>
+  </div>`;
+
+  $('wish-chips').innerHTML = WISH_TEMPLATES.map((t, i) =>
+    `<span class="chip" data-tpl="${i}">${esc(t.k)}</span>`).join('');
+
+  const fill = i => {
+    const t = WISH_TEMPLATES[i].t
+      .replace(/\{name\}/g, String(b.name).split(' ')[0])
+      .replace(/\{age\}/g, age || '');
+    $('wish-msg').value = t;
+    $('wish-chips').querySelectorAll('.chip').forEach(c =>
+      c.classList.toggle('on', +c.dataset.tpl === i));
+  };
+  $('wish-chips').querySelectorAll('[data-tpl]').forEach(c => c.onclick = () => fill(+c.dataset.tpl));
+
+  fill(b.type === 'Anniversary' ? 6 : (age && MILESTONES.includes(age) ? 3 : 0));
+  $('wish-mo').classList.add('open');
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BULK IMPORT
+   ═══════════════════════════════════════════════════════════════ */
+function parseLine(line){
+  const parts = line.split(',').map(s => s.trim()).filter((s, i) => i === 0 || s !== '');
+  if (parts.length < 2) return null;
+  const name = parts[0];
+  let rel = '', ds = '';
+  const dateIdx = parts.findIndex((p, i) => i > 0 && /\d/.test(p));
+  if (dateIdx < 0) return null;
+  ds = parts[dateIdx];
+  rel = parts.filter((p, i) => i !== 0 && i !== dateIdx).join(' ').trim();
+
+  let d = 0, m = 0, y = '';
+  let mt = ds.match(/^(\d{1,2})[-\/.](\d{1,2})(?:[-\/.](\d{2,4}))?$/);
+  if (mt){ d = +mt[1]; m = +mt[2]; y = mt[3] ? +mt[3] : ''; }
+  else {
+    mt = ds.match(/^(\d{1,2})\s*([A-Za-z]{3,9})\.?\s*(\d{2,4})?$/);
+    if (mt){ d = +mt[1]; m = MN.findIndex(x => x.toLowerCase() === mt[2].slice(0,3).toLowerCase()) + 1; y = mt[3] ? +mt[3] : ''; }
+    else {
+      mt = ds.match(/^([A-Za-z]{3,9})\.?\s*(\d{1,2}),?\s*(\d{2,4})?$/);
+      if (mt){ m = MN.findIndex(x => x.toLowerCase() === mt[1].slice(0,3).toLowerCase()) + 1; d = +mt[2]; y = mt[3] ? +mt[3] : ''; }
+      else return null;
+    }
+  }
+  if (y && y < 100) y = y > 30 ? 1900 + y : 2000 + y;
+  if (!d || !m || m > 12 || d > 31) return null;
+
+  return { name, relation: rel || 'Other', type: 'Birthday', day: d, month: m, year: y || '',
+    phone: '', email: '', lead: '', gift: '', notes: '', vip: false, wishedYears: [] };
+}
+
+async function bulkImport(){
+  const lines = ($('bulk').value || '').split('\n').map(s => s.trim()).filter(Boolean);
+  if (!lines.length){ toast('❌ Nothing to import', 'error'); return; }
+
+  const good = [], bad = [];
+  lines.forEach(l => { const o = parseLine(l); if (o) good.push(o); else bad.push(l); });
+
+  if (!good.length){
+    $('bulk-out').innerHTML = `<div class="ibx errb">Could not read any line. Use <b>Name, DD-MM-YYYY, Relation</b>.</div>`;
+    return;
+  }
+
+  $('bulk-out').innerHTML =
+    `<div class="ibx okb">✅ Parsed <b>${good.length}</b> line(s)${bad.length ? ` · ⚠️ skipped ${bad.length}` : ''}</div>
+     <div class="tw"><table><thead><tr><th>Name</th><th>Date</th><th>Relation</th><th>Next</th></tr></thead><tbody>
+       ${good.map(o => `<tr><td><b>${esc(o.name)}</b></td><td>${dateLabel(o)}</td><td class="dc">${esc(o.relation)}</td><td class="dc">${cdLabel(daysUntil(o))}</td></tr>`).join('')}
+     </tbody></table></div>
+     ${bad.length ? `<div class="ibx warnb" style="margin-top:10px">Skipped: ${bad.map(b => esc(b)).join(' · ')}</div>` : ''}`;
+
+  showConfirm(
+    '📥 Confirm Import',
+    `<div class="ibx">Add <b>${good.length}</b> people to Firestore?</div>`,
+    'Import',
+    async () => {
+      try {
+        for (let i = 0; i < good.length; i += 400){
+          const batch = writeBatch(db);
+          good.slice(i, i + 400).forEach(o => batch.set(doc(collection(db, COL.BIRTHDAY)), o));
+          await batch.commit();
+        }
+        await logHistory(ACT.IMPORT, { kind: 'birthday_bulk', count: good.length });
+        pill('Imported ' + good.length + ' people', '📥');
+        $('bulk').value = '';
+        $('bulk-out').innerHTML = '';
+      } catch (e){
+        toast('❌ Import failed: ' + (e.message || e), 'error');
+      }
+    }
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   REMINDERS / NOTIFICATIONS
+   ═══════════════════════════════════════════════════════════════ */
+function notifState(){
+  const p = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+  return p === 'granted' ? '✅ On'
+       : p === 'denied'  ? '🚫 Blocked'
+       : p === 'unsupported' ? '— N/A'
+       : '⚠️ Off';
+}
+
+async function askPerm(){
+  if (typeof Notification === 'undefined' || !Notification.requestPermission){
+    toast('❌ Notifications not supported', 'error');
+    return;
+  }
+  try {
+    const r = await Notification.requestPermission();
+    toast(r === 'granted' ? '🔔 Alerts enabled' : '⚠️ Permission: ' + r,
+          r === 'granted' ? 'success' : 'error');
+    renderPrefsUI();
+    runReminders();
+    renderDash();
+  } catch (e){ toast('❌ ' + e.message, 'error'); }
+}
+
+function fire(title, body, tag){
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
+  try {
+    const n = new Notification(title, {
+      body, tag,
+      icon: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text y="52" font-size="52">🎂</text></svg>')
+    });
+    n.onclick = () => { window.focus(); n.close(); };
+    return true;
+  } catch (e){ return false; }
+}
+
+function dueReminders(){
+  const out = [];
+  PEOPLE.forEach(b => {
+    const d = daysUntil(b);
+    leadsFor(b).forEach(L => { if (d === L) out.push({ b, lead: L, d }); });
+    if (isCeleb(b)){
+      const lo = lastOccur(b);
+      const ago = Math.round((startOfToday() - lo) / 86400000);
+      if (ago > 0 && ago <= 3 && !wished(b, lo.getFullYear())){
+        out.push({ b, lead: -1, d: -ago });
+      }
+    }
+  });
+  return out.sort((x,y) => x.d - y.d || (y.b.vip ? 1 : 0) - (x.b.vip ? 1 : 0));
+}
+
+function runReminders(){
+  const due = dueReminders();
+  const nd = $('nd');
+  if (nd) nd.classList.toggle('show', due.length > 0);
+
+  const list = $('nlist');
+  if (list){
+    list.innerHTML = due.length
+      ? due.map(x => {
+          const b = x.b, age = turningAge(b);
+          const icon = x.d === 0 ? '🎂' : x.d < 0 ? '💌' : x.lead <= 1 ? '⏰' : '📅';
+          const line = x.d === 0 ? `<b>Today is ${esc(b.name)}'s ${esc((b.type || 'birthday').toLowerCase())}!</b>`
+                    : x.d < 0 ? `<b>${esc(b.name)}</b> — you haven't wished yet (${Math.abs(x.d)} day(s) ago)`
+                    : `<b>${esc(b.name)}</b> in ${x.d} day(s)`;
+          return `<div class="nitem">
+            <div class="nx">${icon}</div>
+            <div class="nt">${line}
+              <div class="dc">${esc(b.relation || '—')} · ${fmtFull(nextOccur(b))}${age ? ' · turns ' + age : ''}</div>
+              <div class="na">
+                ${isCeleb(b) ? `<button class="btn bw bxs" data-act="wish" data-id="${b.id}" type="button">💬 Wish</button>` : ''}
+                <button class="btn bo bxs" data-act="view" data-id="${b.id}" type="button">👤 Profile</button>
+                ${isCeleb(b) ? `<button class="btn bg2 bxs" data-act="markwish" data-id="${b.id}" type="button">✅ Done</button>` : ''}
+              </div>
+            </div>
+          </div>`;
+        }).join('')
+      : '<div class="es" style="padding:26px"><div class="ei">🌙</div>Nothing due. You are all caught up.</div>';
+  }
+
+  const p = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+  const nperm = $('nperm');
+  if (nperm) nperm.textContent = p === 'granted' ? 'Alerts are on' : p === 'denied' ? 'Blocked in browser' : 'Alerts are off';
+  const btnN = $('btn-nperm');
+  if (btnN) btnN.style.display = p === 'granted' ? 'none' : '';
+
+  // Desktop notification once per person/year/lead
+  const stamp = startOfToday().toISOString().slice(0,10);
+  if (FIRED.__day !== stamp) FIRED = { __day: stamp };
+  due.forEach(x => {
+    const key = x.b.id + '_' + nextOccur(x.b).getFullYear() + '_' + x.lead;
+    if (FIRED[key]) return;
+    const age = turningAge(x.b);
+    const title = x.d === 0 ? `🎂 ${x.b.name}'s ${x.b.type || 'Birthday'} is today!`
+                : x.d < 0 ? `💌 You haven't wished ${x.b.name} yet`
+                : `🔔 ${x.b.name}'s ${x.b.type || 'birthday'} in ${x.d} day(s)`;
+    const body = `${x.b.relation || ''} · ${fmtFull(nextOccur(x.b))}${age ? ' · turning ' + age : ''}`;
+    if (fire(title, body, key)){ FIRED[key] = 1; saveFired(); }
+  });
+
+  // Confetti for today's birthdays
+  const t = todayList().filter(isCeleb);
+  if (PREFS.confetti && t.length && FIRED.__conf !== stamp){
+    FIRED.__conf = stamp;
+    saveFired();
+    party();
+  }
+}
+
+function party(){
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2500;overflow:hidden';
+  document.body.appendChild(host);
+  const E = ['🎉','🎊','🎂','🥳','🎈','✨','🎁','🍰'];
+  for (let i = 0; i < 70; i++){
+    const s = document.createElement('div');
+    s.textContent = E[i % E.length];
+    s.style.cssText = `position:absolute;top:-24px;font-size:${0.9 + Math.random()*1.2}rem;
+      left:${Math.random()*100}vw;animation:bd-fall ${2.6 + Math.random()*2.4}s linear forwards;
+      animation-delay:${Math.random()*1.2}s;`;
+    host.appendChild(s);
+  }
+  const style = document.createElement('style');
+  style.textContent = '@keyframes bd-fall{to{transform:translateY(105vh) rotate(540deg);opacity:.25}}';
+  document.head.appendChild(style);
+  setTimeout(() => host.remove(), 6500);
+}
+
+function saveFired(){
+  try { localStorage.setItem('bd_fired', JSON.stringify(FIRED)); } catch (e) {}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PREFERENCES UI
+   ═══════════════════════════════════════════════════════════════ */
+function renderPrefsUI(){
+  const chips = $('lead-chips');
+  if (chips){
+    chips.innerHTML = LEAD_CHOICES.map(n =>
+      `<span class="chip ${PREFS.lead.includes(n) ? 'on' : ''}" data-lead="${n}">${n === 0 ? 'On the day' : n + ' d'}</span>`).join('');
+    chips.querySelectorAll('[data-lead]').forEach(c => c.onclick = () => {
+      const n = +c.dataset.lead;
+      PREFS.lead = PREFS.lead.includes(n) ? PREFS.lead.filter(x => x !== n) : [...PREFS.lead, n].sort((a,b) => b - a);
+      if (!PREFS.lead.length) PREFS.lead = [0];
+      renderPrefsUI();
+    });
+  }
+
+  const st = $('s-time'); if (st) st.value = PREFS.time || '09:00';
+  const sc = $('s-cc');   if (sc) sc.value = PREFS.cc || '91';
+  const sl = $('s-leap'); if (sl) sl.value = PREFS.leap || 'feb28';
+  const sconf = $('s-confetti'); if (sconf) sconf.checked = !!PREFS.confetti;
+
+  const p = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+  const perm = $('perm-box');
+  if (perm){
+    perm.innerHTML = p === 'granted'
+      ? '<div class="ibx okb">✅ Browser notifications are <b>enabled</b> for this site.</div>'
+      : p === 'denied'
+      ? '<div class="ibx errb">🚫 Notifications are <b>blocked</b>. Enable them from your browser settings.</div>'
+      : '<div class="ibx warnb">⚠️ Notifications are off. <button class="btn bp bxs" id="btn-perm2" type="button" style="margin-left:6px">Enable now</button></div>';
+    const b2 = $('btn-perm2');
+    if (b2) b2.onclick = askPerm;
+  }
+
+  // Theme
+  const theme = localStorage.getItem('hh_theme_mode') || 'light';
+  const lt = $('th-light'), dk = $('th-dark');
+  if (lt && dk){
+    lt.classList.toggle('active', theme === 'light');
+    dk.classList.toggle('active', theme === 'dark');
+  }
+  renderThemeGallery('pal-grid', renderPrefsUI);
+}
+
+async function savePrefs(){
+  PREFS.time = $('s-time').value || '09:00';
+  PREFS.cc = $('s-cc').value.replace(/[^\d]/g, '') || '91';
+  PREFS.leap = $('s-leap').value;
+  PREFS.confetti = $('s-confetti').checked;
+
+  const ok = await saveHouseholdSettings({ birthdayPrefs: PREFS })
+    .catch(() => false);
+  try {
+    await setRecord(COL.BIRTHDAY_PREFS, 'prefs', PREFS, { pillMsg: 'Preferences saved', pillIcon: '💾' });
+  } catch (e) { /* best-effort */ }
+
+  runReminders();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ICS EXPORT
+   ═══════════════════════════════════════════════════════════════ */
+function icsEsc(s){
+  return String(s == null ? '' : s)
+    .replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+function fold(line){
+  const out = [];
+  let s = line;
+  while (s.length > 73){ out.push(s.slice(0, 73)); s = ' ' + s.slice(73); }
+  out.push(s);
+  return out.join('\r\n');
+}
+function buildICS(list){
+  const L = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Birthday Tracker//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Birthdays'];
+  const stampNow = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+
+  list.forEach(b => {
+    const o = nextOccur(b);
+    const y = o.getFullYear();
+    const d1 = `${y}${String(o.getMonth()+1).padStart(2,'0')}${String(o.getDate()).padStart(2,'0')}`;
+    const e = new Date(o);
+    e.setDate(e.getDate() + 1);
+    const d2 = `${e.getFullYear()}${String(e.getMonth()+1).padStart(2,'0')}${String(e.getDate()).padStart(2,'0')}`;
+    const age = turningAge(b);
+    const ic = TYPE_ICON[b.type || 'Birthday'];
+    const title = `${ic} ${b.name}${b.year ? ' — ' + (b.type || 'Birthday') + ' (b. ' + b.year + ')' : ' — ' + (b.type || 'Birthday')}`;
+
+    L.push('BEGIN:VEVENT');
+    L.push('UID:bd-' + b.id + '@household-tracker');
+    L.push('DTSTAMP:' + stampNow);
+    L.push('DTSTART;VALUE=DATE:' + d1);
+    L.push('DTEND;VALUE=DATE:' + d2);
+    L.push('RRULE:FREQ=YEARLY');
+    L.push(fold('SUMMARY:' + icsEsc(title)));
+    L.push(fold('DESCRIPTION:' + icsEsc(
+      `${b.relation || ''}${age ? ' · turning ' + age + ' this year' : ''}` +
+      (b.phone ? `\nPhone: ${b.phone}` : '') +
+      (b.gift ? `\nGift ideas: ${b.gift}` : '') +
+      (b.notes ? `\nNotes: ${b.notes}` : '')
+    )));
+    L.push('CATEGORIES:' + icsEsc((b.type || 'Birthday') + ',' + (b.relation || 'Other')));
+
+    leadsFor(b).sort((x,y) => y - x).forEach(ld => {
+      L.push('BEGIN:VALARM');
+      L.push('ACTION:DISPLAY');
+      L.push(fold('DESCRIPTION:' + icsEsc(ld === 0 ? `Today: ${b.name}'s ${(b.type || 'birthday').toLowerCase()}!` : `${b.name}'s ${(b.type || 'birthday').toLowerCase()} in ${ld} day(s)`)));
+      L.push(ld === 0 ? 'TRIGGER:-PT9H' : 'TRIGGER:-P' + ld + 'D');
+      L.push('END:VALARM');
+    });
+    L.push('END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  return L.join('\r\n');
+}
+
+function exportICS(list, label){
+  if (!list.length){ toast('❌ Nothing to export', 'error'); return; }
+  download('birthdays-' + label + '.ics', buildICS(list), 'text/calendar;charset=utf-8');
+  pill(list.length + ' event(s) exported', '📆');
+}
+
+function gcalLink(b){
+  const o = nextOccur(b);
+  const e = new Date(o); e.setDate(e.getDate() + 1);
+  const f = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const age = turningAge(b);
+  const p = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `${TYPE_ICON[b.type || 'Birthday']} ${b.name} — ${b.type || 'Birthday'}`,
+    dates: f(o) + '/' + f(e),
+    details: `${b.relation || ''}${age ? ' · turning ' + age : ''}${b.gift ? '\nGift ideas: ' + b.gift : ''}${b.notes ? '\n' + b.notes : ''}`,
+    recur: 'RRULE:FREQ=YEARLY'
+  });
+  return 'https://calendar.google.com/calendar/render?' + p.toString();
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPORT CSV / BACKUP / RESTORE
+   ═══════════════════════════════════════════════════════════════ */
+function exportPeopleCSV(list, label){
+  if (!list.length){ toast('❌ Nothing to export', 'error'); return; }
+  const headers = [
+    { label:'Name', key:'name' },
+    { label:'Relation', key:'relation' },
+    { label:'Type', key:'type' },
+    { label:'Day', key:'day' },
+    { label:'Month', key:'month' },
+    { label:'Year', key:'year' },
+    { label:'Date', value: b => dateLabel(b) },
+    { label:'Current Age', value: b => currentAge(b) ?? '' },
+    { label:'Turning', value: b => turningAge(b) ?? '' },
+    { label:'Next Occurrence', value: b => fmtFull(nextOccur(b)) },
+    { label:'Days Until', value: b => daysUntil(b) },
+    { label:'Zodiac', value: b => zodiac(+b.month, +b.day) },
+    { label:'Birthstone', value: b => STONE[(+b.month) - 1] },
+    { label:'VIP', value: b => b.vip ? 'Yes' : 'No' },
+    { label:'Phone', key:'phone' },
+    { label:'Email', key:'email' },
+    { label:'Gift Ideas', key:'gift' },
+    { label:'Notes', key:'notes' }
+  ];
+  exportCSV('birthdays-' + label + '.csv', headers, list);
+}
+
+function backupPeople(){
+  backupJSON({ birthdays: PEOPLE, birthdayPrefs: PREFS },
+             'birthdays-backup-' + localDateStr() + '.json');
+}
+
+async function restorePeople(inp){
+  const file = inp.files[0];
+  if (!file) return;
+  try {
+    const d = await readJSONFile(file);
+    const arr = Array.isArray(d) ? d : (d.people || d.birthdays || null);
+    if (!arr){ toast('❌ Not a birthday backup', 'error'); inp.value = ''; return; }
+
+    showConfirm(
+      '📥 Restore Backup',
+      `<div class="ibx warnb">Replace all <b>${PEOPLE.length}</b> people with <b>${arr.length}</b> from the backup?</div>`,
+      'Restore',
+      async () => {
+        await restoreJSON({ birthdays: arr }, { birthdays: COL.BIRTHDAY }, { wipeFirst: true });
+        if (d.birthdayPrefs){
+          try { await setRecord(COL.BIRTHDAY_PREFS, 'prefs', d.birthdayPrefs); } catch (e) {}
+        }
+      }
+    );
+  } catch (e){
+    toast('❌ Invalid file', 'error');
+  }
+  inp.value = '';
+}
+
+function wipeBirthdays(){
+  showConfirm(
+    '🧨 Delete All Birthdays',
+    `<div class="ibx warnb">All <b>${PEOPLE.length}</b> people will be permanently deleted.</div>
+     <p class="hint">Take a JSON backup first.</p>`,
+    'Delete All',
+    async () => {
+      const n = await wipeCollection(COL.BIRTHDAY);
+      await logHistory(ACT.DELETE_ALL, { kind: 'birthdays', count: n });
+      pill('Deleted ' + n + ' people', '🧨');
+    }
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIRESTORE STATUS PANEL
+   ═══════════════════════════════════════════════════════════════ */
+function renderFbStatus(){
+  const el = $('fb-status');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="ibx okb">
+      ✅ Connected to Firestore<br>
+      Collection: <b>${COL.BIRTHDAY}</b> · Prefs doc: <b>${COL.BIRTHDAY_PREFS}/prefs</b>
+    </div>
+    <div class="tw"><table><thead><tr><th>Collection</th><th>Purpose</th><th>Docs</th></tr></thead><tbody>
+      <tr><td><b>${COL.BIRTHDAY}</b></td><td class="dc">One document per person</td><td>${PEOPLE.length}</td></tr>
+      <tr><td><b>${COL.BIRTHDAY_PREFS}/prefs</b></td><td class="dc">Reminder &amp; display preferences</td><td>${READY.s ? 1 : 0}</td></tr>
+    </tbody></table></div>
+    <p class="hint" style="margin-top:10px">Offline persistence is on — edits made without internet are queued locally and pushed on reconnect.</p>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   EVENT WIRING
+   ═══════════════════════════════════════════════════════════════ */
+function wire(){
+  // Sidebar tabs
+  const nav = $('side-nav');
+  if (nav){
+    nav.addEventListener('click', e => {
+      const btn = e.target.closest('.tb[data-tab]');
+      if (!btn) return;
+      e.preventDefault();
+      switchTab(btn.dataset.tab, btn);
+    });
+  }
+
+  // Topbar buttons
+  $('btn-add-top').onclick = goAdd;
+  $('bell').onclick = () => { $('npanel').classList.toggle('open'); runReminders(); };
+  $('btn-nclose').onclick = () => $('npanel').classList.remove('open');
+  $('btn-nperm').onclick = askPerm;
+
+  // Global click delegate
+  document.addEventListener('click', e => {
+    // Notification panel click-away
+    if (!e.target.closest('#npanel') && !e.target.closest('#bell')){
+      $('npanel').classList.remove('open');
+    }
+
+    // action delegate
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    const id = el.dataset.id;
+    const act = el.dataset.act;
+
+    if (act === 'view') openView(id);
+    else if (act === 'edit') openEdit(id);
+    else if (act === 'del') delPerson(id);
+    else if (act === 'vip') toggleVip(id);
+    else if (act === 'wish'){ openWish(id); $('npanel').classList.remove('open'); }
+    else if (act === 'markwish') markWished(id);
+    else if (act === 'gcal'){ const b = PEOPLE.find(x => x.id === id); if (b) window.open(gcalLink(b), '_blank'); }
+    else if (act === 'ics1'){ const b = PEOPLE.find(x => x.id === id); if (b) exportICS([b], String(b.name).replace(/\s+/g, '-').toLowerCase()); }
+    else if (act === 'party') party();
+    else if (act === 'closeview') closeMo('view-mo');
+  });
+
+  // Add tab
+  $('btn-save').onclick = () => addPerson(false);
+  $('btn-save2').onclick = () => addPerson(true);
+  $('btn-clear').onclick = resetForm;
+  ['f-name','f-day','f-month','f-year'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('input', showAddInfo);
+  });
+  ['f-day','f-month'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('change', showAddInfo);
+  });
+  $('f-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('f-relation').focus();
+  });
+  $('btn-bulk').onclick = bulkImport;
+  $('btn-bulkclr').onclick = () => { $('bulk').value = ''; $('bulk-out').innerHTML = ''; };
+
+  // Upcoming
+  $('up-seg').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    UPWIN = +b.dataset.w;
+    $('up-seg').querySelectorAll('button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderUpcoming();
+  });
+  $('chip-vip').onclick = () => { UPVIP = !UPVIP; $('chip-vip').classList.toggle('on', UPVIP); renderUpcoming(); };
+  $('chip-unwished').onclick = () => { UPUNW = !UPUNW; $('chip-unwished').classList.toggle('on', UPUNW); renderUpcoming(); };
+
+  // All People filters
+  ['q','fl-rel','fl-type','fl-month','fl-sort','fl-view'].forEach(i => {
+    const el = $(i);
+    if (el) el.addEventListener('input', () => { PAGE = 1; renderAllPeople(); });
+  });
+  $('btn-clearf').onclick = clearFilters;
+  $('btn-expcsv').onclick = () => exportPeopleCSV(filteredPeople(), 'filtered');
+  $('btn-expics').onclick = () => exportICS(filteredPeople(), 'filtered');
+
+  // Calendar
+  $('cal-prev').onclick = () => { CAL.setMonth(CAL.getMonth() - 1); renderCalendar(); };
+  $('cal-next').onclick = () => { CAL.setMonth(CAL.getMonth() + 1); renderCalendar(); };
+  $('cal-today').onclick = () => { CAL = new Date(); CAL.setDate(1); renderCalendar(); };
+
+  // Edit modal
+  $('btn-esave').onclick = saveEdit;
+  $('btn-ecancel').onclick = () => closeMo('edit-mo');
+
+  // Wish modal
+  $('btn-wclose').onclick = () => closeMo('wish-mo');
+  $('btn-wa').onclick = () => {
+    const b = PEOPLE.find(x => x.id === $('wish-id').value);
+    if (!b) return;
+    const p = phoneOf(b);
+    const msg = encodeURIComponent($('wish-msg').value);
+    const url = p ? `https://wa.me/${p}?text=${msg}` : `https://wa.me/?text=${msg}`;
+    window.open(url, '_blank');
+  };
+  $('btn-sms').onclick = () => {
+    const b = PEOPLE.find(x => x.id === $('wish-id').value);
+    if (!b) return;
+    window.open(`sms:${phoneOf(b)}?&body=${encodeURIComponent($('wish-msg').value)}`, '_self');
+  };
+  $('btn-call').onclick = () => {
+    const b = PEOPLE.find(x => x.id === $('wish-id').value);
+    if (!b) return;
+    const p = phoneOf(b);
+    if (!p){ toast('❌ No phone number', 'error'); return; }
+    window.open('tel:+' + p, '_self');
+  };
+  $('btn-copy').onclick = async () => {
+    try { await navigator.clipboard.writeText($('wish-msg').value); toast('📋 Copied', 'success'); }
+    catch (e){ const t = $('wish-msg'); t.select(); document.execCommand('copy'); toast('📋 Copied', 'success'); }
+  };
+  $('btn-markwished').onclick = () => markWished($('wish-id').value);
+
+  // Settings — reminder engine
+  $('btn-saveprefs').onclick = savePrefs;
+  $('btn-test').onclick = () => {
+    if (typeof Notification === 'undefined'){ toast('❌ Not supported', 'error'); return; }
+    if (Notification.permission !== 'granted'){ askPerm(); return; }
+    fire('🎂 Birthday Tracker test', 'Alerts are working. You will be notified ' + PREFS.lead.join(', ') + ' day(s) before each birthday.', 'test');
+    toast('🔔 Test notification sent', 'success');
+  };
+  $('btn-recheck').onclick = () => {
+    FIRED = {};
+    saveFired();
+    runReminders();
+    toast('🔄 Reminder check re-run', 'success');
+  };
+  $('btn-icsall').onclick = () => exportICS(PEOPLE, 'all');
+  $('btn-icsvip').onclick = () => exportICS(PEOPLE.filter(b => b.vip), 'vip');
+
+  // Settings — appearance
+  $('th-light').onclick = () => { setThemeMode('light'); renderPrefsUI(); };
+  $('th-dark').onclick = () => { setThemeMode('dark'); renderPrefsUI(); };
+
+  // Settings — data
+  $('btn-expall').onclick = () => exportPeopleCSV(PEOPLE, 'all');
+  $('btn-backup').onclick = backupPeople;
+  $('btn-restore').onclick = () => $('imp').click();
+  $('imp').addEventListener('change', e => restorePeople(e.target));
+  $('btn-wipe').onclick = wipeBirthdays;
+
+  // Modal click-outside
+  document.querySelectorAll('.mo').forEach(m => {
+    m.addEventListener('click', e => {
+      if (e.target === m) m.classList.remove('open');
+    });
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){
+      document.querySelectorAll('.mo.open').forEach(m => m.classList.remove('open'));
+    }
+    if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){
+      e.preventDefault();
+      const b = document.querySelector('.tb[data-tab="all"]');
+      if (b) switchTab('all', b);
+      setTimeout(() => $('q')?.focus(), 200);
+    }
+    if (e.key.toLowerCase() === 'n' && (e.ctrlKey || e.metaKey)){
+      e.preventDefault();
+      goAdd();
+    }
+  });
+
+  // Escape closes notification panel
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') $('npanel').classList.remove('open');
+  });
+}
+
+function goAdd(){
+  const b = document.querySelector('.tb[data-tab="add"]');
+  switchTab('add', b);
+  setTimeout(() => $('f-name')?.focus(), 200);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PERIODIC TICKS
+   ═══════════════════════════════════════════════════════════════ */
+
+// Every minute: refresh reminders + badge
+setInterval(() => {
+  runReminders();
+  updateBadges();
+}, 60 * 1000);
+
+// Every half hour: full re-render (handles day rollover)
+setInterval(() => {
+  if (READY.b) renderAll();
+}, 30 * 60 * 1000);
+
+// On visibility change: re-run reminders
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) runReminders();
+});
+
+
+/* ═══════════════════════════════════════════════════════════════
+   END OF PAGE SCRIPT
+   ═══════════════════════════════════════════════════════════════ */
+
+</script>
+</body>
+</html>
