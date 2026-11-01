@@ -24,7 +24,8 @@
 </style>
 </head>
 <body>
-
+<div id="global-loader" class="global-loader"></div>
+<div id="mobile-backdrop" class="mobile-backdrop" onclick="toggleMobileMenu()"></div>
 <!-- ═══════════════════════════════════════════════════════════════
      LOGIN OVERLAY
      Shown when session is not active. Password: 1432
@@ -34,11 +35,10 @@
   <div class="login-blob b2"></div>
   <div class="login-blob b3"></div>
   <div class="login-box">
-    <div class="login-mark" aria-hidden="true">
-      <svg viewBox="0 0 48 48" width="26" height="26" fill="none">
-        <path d="M14 12h20M14 20h20M14 12c0 8 3 12 10 16l-10 8M24 28h10"
-              stroke="currentColor" stroke-width="2.6"
-              stroke-linecap="round" stroke-linejoin="round"/>
+    <div class="login-mark" aria-hidden="true" style="background: linear-gradient(135deg, #6c63ff, #3b82f6); color: #fff; box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
       </svg>
     </div>
     <h1>Household Tracker</h1>
@@ -88,11 +88,11 @@
   <!-- ═══════════ SIDEBAR ═══════════ -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 48 48" width="18" height="18" fill="none">
-          <path d="M14 12h20M14 20h20M14 12c0 8 3 12 10 16l-10 8M24 28h10"
-                stroke="currentColor" stroke-width="2.8"
-                stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- A modern, vibrant house icon -->
+      <div class="brand-mark" aria-hidden="true" style="background: linear-gradient(135deg, #6c63ff, #3b82f6); color: #fff; box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
       </div>
       <span class="brand-name">Household Tracker</span>
@@ -146,6 +146,33 @@
         <span class="tb-lbl">Analytics</span>
       </button>
 
+      <!-- ══ Utilities ══ -->
+      <div class="side-group-label">Utilities</div>
+      <button class="tb" data-tab="rent" data-title="Room Rent">
+        <svg class="ti" viewBox="0 0 24 24">
+          <path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/>
+        </svg>
+        <span class="tb-lbl">Room Rent</span>
+      </button>
+      <button class="tb" data-tab="electricity" data-title="Electricity Bill">
+        <svg class="ti" viewBox="0 0 24 24" style="stroke-linejoin:round">
+          <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>
+        </svg>
+        <span class="tb-lbl">Electricity Bill</span>
+      </button>
+      <button class="tb" data-tab="water" data-title="Water Bill">
+        <svg class="ti" viewBox="0 0 24 24">
+          <path d="M12 3s7 7.4 7 12.1A7 7 0 0 1 5 15.1C5 10.4 12 3 12 3Z"/>
+        </svg>
+        <span class="tb-lbl">Water Bill</span>
+      </button>
+      <button class="tb" data-tab="milk" data-title="Milk Bill">
+        <svg class="ti" viewBox="0 0 24 24">
+          <path d="M8 2h8M9 2v3l-2 4v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9l-2-4V2M7 9h10"/>
+        </svg>
+        <span class="tb-lbl">Milk Bill</span>
+      </button>
+
       <!-- ══ Manage ══ -->
       <div class="side-group-label">Manage</div>
       <button class="tb" data-tab="categories" data-title="Categories">
@@ -170,27 +197,6 @@
         <span class="tb-lbl">Export</span>
       </button>
 
-      <!-- ══ Utilities ══ -->
-      <div class="side-group-label">Utilities</div>
-      <button class="tb" data-tab="rent" data-title="Room Rent">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/>
-        </svg>
-        <span class="tb-lbl">Room Rent</span>
-      </button>
-      <button class="tb" data-tab="electricity" data-title="Electricity Bill">
-        <svg class="ti" viewBox="0 0 24 24" style="stroke-linejoin:round">
-          <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>
-        </svg>
-        <span class="tb-lbl">Electricity Bill</span>
-      </button>
-      <button class="tb" data-tab="water" data-title="Water Bill">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M12 3s7 7.4 7 12.1A7 7 0 0 1 5 15.1C5 10.4 12 3 12 3Z"/>
-        </svg>
-        <span class="tb-lbl">Water Bill</span>
-      </button>
-
       <!-- ══ Account ══ -->
       <div class="side-group-label">Account</div>
       <button class="tb" data-tab="settings" data-title="Settings">
@@ -202,7 +208,9 @@
       </button>
       <button class="tb" type="button"
               onclick="window.__householdLogout && window.__householdLogout('manual')">
-        <span>🚪</span>
+        <svg class="ti" viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
         <span class="tb-lbl">Logout</span>
       </button>
 
@@ -213,8 +221,15 @@
   <div class="app-content">
 
     <!-- ══ TOPBAR ══ -->
-        <header class="topbar">
-      <h2 class="topbar-title" id="topbar-title">Dashboard</h2>
+            <header class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" type="button">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <h2 class="topbar-title" id="topbar-title" style="margin-right: auto;">Dashboard</h2>
       <div class="topbar-actions">
         <button class="ib" onclick="focusAdd()" type="button">
           ➕ <span class="ib-lbl">Add Expense</span>
@@ -241,7 +256,8 @@
           <div class="dc-pill"><span>📂</span> <strong id="dc-cat">0</strong> Categories</div>
           <div class="dc-pill"><span>🏠</span> <strong id="dc-rent">0</strong> Rent</div>
           <div class="dc-pill"><span>⚡</span> <strong id="dc-elec">0</strong> Electricity</div>
-          <div class="dc-pill"><span>💧</span> <strong id="dc-water">0</strong> Water</div>
+      <div class="dc-pill"><span>💧</span> <strong id="dc-water">0</strong> Water</div>
+      <div class="dc-pill"><span>🥛</span> <strong id="dc-milk">0</strong> Milk</div>
         </div>
 
         <!-- ══ TILES (navigate to each module) ══ -->
@@ -282,12 +298,21 @@
             </div>
             <div class="dash-tile-arrow">→</div>
           </a>
+          <a class="dash-tile t-milk" href="#" onclick="switchTab('milk',document.querySelector('[data-tab=\'milk\']'));return false">
+            <div class="dash-tile-icon">🥛</div>
+            <div class="dash-tile-body">
+              <div class="dash-tile-lbl">Milk Bill</div>
+              <div class="dash-tile-amt" id="tile-milk-amt">₹0.00</div>
+              <div class="dash-tile-sub" id="tile-milk-sub">This month</div>
+            </div>
+            <div class="dash-tile-arrow">→</div>
+          </a>
         </div>
 
         <!-- ══ COMBINED REPORT (Rent + Electricity + Water) ══ -->
         <div class="fc">
           <div class="fct" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-            <span>📄 Combined Report (Rent + Electricity + Water)</span>
+			<span>📄 Combined Report (Rent + Electricity + Water + Milk)</span>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <select id="combo-month" class="fc2" style="width:auto;padding:6px 10px;font-size:.78rem">
                 <option value="">Whole Year</option>
@@ -309,7 +334,8 @@
               <button class="btn bo bsm" onclick="printCombinedReport()" type="button">🖨️ Print / PDF</button>
             </div>
           </div>
-          <div id="combo-report-body"></div>
+          <div id="combo-report-body-desktop" class="desktop-only-table"></div>
+          <div id="combo-report-body-mobile" class="mobile-only-cards"></div>
         </div>
 
         <!-- ══ RECENT EXPENSES ══ -->
@@ -350,8 +376,8 @@
   <span>📋 Total Records: <strong id="daily-rec-count" style="color:var(--p)">0</strong></span>
 </div>
 
-        <!-- ══ SUMMARY CARDS ══ -->
-        <div class="grid g4 mb">
+        <!-- ══ SUMMARY CARDS (2x2 Mobile Grid) ══ -->
+        <div class="grid mb" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
           <div class="sc t">
             <div class="lbl">Today</div>
             <div class="amt" id="s-today">₹0.00</div>
@@ -375,17 +401,17 @@
         </div>
 
         <div style="display:grid;grid-template-columns:1fr;gap:20px;align-items:start">
-          <div class="dash-grid" style="display:grid;grid-template-columns:minmax(320px, 400px) minmax(0, 1fr);gap:20px;align-items:start">
+          <div class="dash-grid" style="display:grid; grid-template-columns: 1fr; gap:20px; align-items:start;">
 
             <!-- ══ ADD EXPENSE FORM ══ -->
-                        <!-- ══ ADD EXPENSE FORM ══ -->
             <div class="fc">
               <div class="fct" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
   <span>➕ Add Expense</span>
   <span class="rb" id="add-date-count" style="font-size:.75rem">0 records on this day</span>
 </div>
-              <div class="grid" style="grid-template-columns:1fr;gap:14px">
-                <div class="fg2" style="margin-bottom:0">
+              <div class="grid mobile-form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+                
+                <div class="fg2" style="margin-bottom:4px; gap:4px;">
                   <label style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                     <span>Date</span>
                     <button type="button" id="date-lock-btn" class="date-lock-pill"
@@ -394,34 +420,35 @@
                       🔓 Lock date
                     </button>
                   </label>
-                  <div style="display:flex;gap:8px;align-items:center">
+                  <div style="display:flex;gap:4px;align-items:center">
                     <input type="date" id="f-date" class="fc2"
        oninput="updateDateDayLabel('f-date','f-date-day'); updateAddDateCount();"
-       style="flex:1"/>
-                    <span class="date-day-badge" id="f-date-day"></span>
+       style="flex:1; height: 38px; padding: 6px 10px;"/>
+                    <span class="date-day-badge" id="f-date-day" style="height: 38px; min-width: 45px; font-size:0.75rem; padding:0 8px;"></span>
                   </div>
                   <div class="date-lock-hint" id="date-lock-hint"></div>
                 </div>
 
-                <div class="fg2" style="margin-bottom:0">
+                <div class="fg2" style="margin-bottom:4px; gap:4px;">
                   <label>Amount (₹)</label>
                   <input type="number" id="f-amount" class="fc2"
-                         min="0" step="0.01" placeholder="0.00"/>
+                         min="0" step="0.01" placeholder="0.00" style="height: 38px; padding: 6px 10px;"/>
                 </div>
 
-                <div class="fg2" style="margin-bottom:0">
+                  <div class="fg2" style="margin-bottom:0; grid-column: span 1;">
                   <label>Paid Via</label>
                   <select id="f-pay" class="fc2">
                     <option value="UPI">UPI</option>
                     <option value="Cash">Cash</option>
                     <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Card">Card</option>
                   </select>
                 </div>
 
-                <div class="fg2" style="margin-bottom:0">
+                                <div class="fg2" style="margin-bottom:0; grid-column: span 1;">
                   <label>Category</label>
                   <div class="cdw" id="cdw-add">
-                    <div class="csd" id="csd-add" onclick="toggleDrop('add')">
+                    <div class="csd" id="csd-add" onclick="toggleDrop('add')" style="min-height: 38px; padding: 8px 10px;">
                       <span id="ct-add" class="ph">Select Category</span>
                       <span class="ca">▼</span>
                     </div>
@@ -438,10 +465,10 @@
                   </div>
                 </div>
 
-                <div class="fg2" style="margin-bottom:0">
+                  <div class="fg2" style="margin-bottom:0; grid-column: 1 / -1;">
                   <label>Note</label>
                   <textarea id="f-note" class="fc2"
-                            placeholder="Optional note…" rows="3"></textarea>
+                            placeholder="Optional note…" rows="2"></textarea>
                 </div>
               </div>
               <div class="ba" style="margin-top:18px">
@@ -451,13 +478,13 @@
             </div>
 
             <!-- ══ RECENT EXPENSES (today's) ══ -->
-            <div class="tc">
+            <div class="tc" id="today-entries-card">
               <div class="th2">
                 <h3>🕐 Today's Entries</h3>
                 <span class="rb" id="rec-badge">0 of 0</span>
               </div>
               <div class="tw">
-                <table>
+                <table id="today-entries-table">
                   <thead>
                     <tr>
                       <th>#</th>
@@ -487,9 +514,12 @@
 
         <!-- ══ FILTERS ══ -->
         <div class="fb">
-          <div class="fbt">🔎 Filter Records</div>
-          <div class="fgrid grid g3">
-            <div class="fg2">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="fbt" style="margin:0;">🔎 Filter Records</div>
+            <button class="btn bo bxs" onclick="toggleAllRecordsDetails()" type="button" id="btn-toggle-records">⬇️ Expand All</button>
+          </div>
+          <div class="fgrid responsive-filter-grid">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Search</label>
               <div class="sw">
                 <span class="si2">🔎</span>
@@ -497,13 +527,13 @@
                        placeholder="Search…" oninput="applyFilters()"/>
               </div>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Year</label>
               <select id="r-year" class="fc2" onchange="applyFilters()">
                 <option value="">All Years</option>
               </select>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Month</label>
               <select id="r-month" class="fc2" onchange="applyFilters()">
                 <option value="">All Months</option>
@@ -521,14 +551,14 @@
                 <option value="12">December</option>
               </select>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Day</label>
               <input type="date" id="r-day" class="fc2" onchange="applyFilters()"/>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Category</label>
               <div class="cdw" id="cdw-filter">
-                <div class="csd" id="csd-filter" onclick="toggleDrop('filter')" style="min-height:39px">
+                <div class="csd" id="csd-filter" onclick="toggleDrop('filter')" style="min-height:41px; padding: 10px 13px;">
                   <span id="ct-filter" class="ph">All Categories</span>
                   <span class="ca">▼</span>
                 </div>
@@ -545,80 +575,88 @@
               </div>
             </div>
           </div>
-          <div class="ff">
+          <div class="ff" style="margin-top: 14px;">
             <button class="btn bp bsm" onclick="applyFilters()" type="button">Apply</button>
             <button class="btn bg2 bsm" onclick="clearFilters()" type="button">✕ Clear</button>
             <span class="fs2" id="f-summary"></span>
           </div>
         </div>
 
-        <!-- ══ CALENDAR ══ -->
-        <div class="fc" style="overflow:hidden">
-          <div class="fct" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-                        <span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <!-- ══ CALENDAR (Collapsible) ══ -->
+        <details class="fc" ontoggle="if(this.open) renderCalendar()" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="display:flex; align-items:center; gap:12px; margin-right:auto;">
               <span>📅 Calendar View</span>
-              <span class="rb" id="cal-total" style="font-size:.75rem">—</span>
-            </span>
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span class="rb" id="cal-total" style="font-weight:700;">—</span>
+            </div>
+          </summary>
+
+          <div style="padding: 16px;">
+            <!-- Navigation Controls -->
+            <div style="display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
               <div class="cal-nav">
                 <button class="btn bo bxs" onclick="changeCalMonth(-1)" type="button">◀</button>
-                <select id="cal-sel-month" class="fc2"
-                        style="width:auto;padding:5px 7px;font-size:.78rem"
-                        onchange="calSelChange()"></select>
-                <select id="cal-sel-year" class="fc2"
-                        style="width:auto;padding:5px 7px;font-size:.78rem"
-                        onchange="calSelChange()"></select>
+                <select id="cal-sel-month" class="fc2" style="width:auto; padding:5px 7px; font-size:.78rem" onchange="calSelChange()"></select>
+                <select id="cal-sel-year" class="fc2" style="width:auto; padding:5px 7px; font-size:.78rem" onchange="calSelChange()"></select>
                 <button class="btn bo bxs" onclick="changeCalMonth(1)" type="button">▶</button>
               </div>
-              <button class="btn bo bxs" onclick="jumpCalToday()" type="button"
-                      style="font-size:.74rem">📍 Today</button>
+              <button class="btn bo bxs" onclick="jumpCalToday()" type="button" style="font-size:.74rem">📍 Today</button>
             </div>
-          </div>
-          <div class="cal-grid" id="cal-grid"></div>
-          <div class="cal-legend" id="cal-legend">
-            Tap a day to view its records · <strong>N/A</strong> = no records ·
-            🔒 Lock keeps calendar still while adding backdated entries
-          </div>
-        </div>
 
-        <!-- ══ ALL RECORDS TABLE ══ -->
-        <div class="tc">
-          <div class="th2" style="flex-wrap:wrap;gap:10px">
-            <div style="display:flex;align-items:center;gap:10px">
-              <h3>📋 All Records</h3>
-              <span class="rb" id="all-badge">0</span>
+            <!-- Calendar Grid -->
+            <div class="cal-grid" id="cal-grid"></div>
+            
+            <!-- Legend -->
+            <div class="cal-legend">
+              Tap a day to view its records · <strong>N/A</strong> = no records ·
+              🔒 Lock keeps calendar still while adding backdated entries
             </div>
-                        <div id="bulk-toolbar" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
-              <span class="bulk-count" id="bulk-count">0 selected</span>
+          </div>
+        </details>
+
+                <!-- ══ ALL RECORDS TABLE (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="display:flex; align-items:center; gap:10px; margin-right:auto;">
+              <span>📋 All Records</span>
+              <span class="rb" id="all-badge" style="font-weight:700;">0</span>
+            </div>
+            
+            <!-- Moved the bulk toolbar INSIDE the content area, not the summary -->
+          </summary>
+          
+          <div style="padding: 16px;">
+            <div id="bulk-toolbar" style="display:none; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom: 16px; background: var(--pl); padding: 10px; border-radius: var(--rs);">
+              <span class="bulk-count" id="bulk-count" style="font-weight:700; color:var(--p);">0 selected</span>
               <button class="btn bp bxs" onclick="openBulkReassign()" type="button">🔄 Reassign Category</button>
               <button class="btn bd bxs" onclick="openBulkDelete()" type="button">🗑️ Delete Selected</button>
               <button class="btn bo bxs" onclick="clearSelection()" type="button">✕ Deselect All</button>
             </div>
-          </div>
-          <div class="tw">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:36px">
-                    <input type="checkbox" id="sel-all"
-                           title="Select all on page"
-                           onchange="toggleSelAll(this)"/>
-                  </th>
-                  <th onclick="doSort('idx')">#</th>
-                  <th onclick="doSort('date')">Date ↕</th>
-                  <th onclick="doSort('category')">Category ↕</th>
-                  <th onclick="doSort('amount')">Amount ↕</th>
-                  <th>Paid Via</th>
-                  <th>Note</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="all-tbody"></tbody>
-            </table>
-          </div>
-          <div class="pag" id="pagination"></div>
-        </div>
 
+            <div class="tw" style="margin: 0 -16px; border-top: 1px solid var(--bdr); border-bottom: 1px solid var(--bdr);">
+              <table style="margin:0;">
+                <thead style="position: sticky; top: 0; z-index: 10; background: var(--sec);">
+                  <tr>
+                    <th style="width:36px">
+                      <input type="checkbox" id="sel-all" title="Select all on page" onchange="toggleSelAll(this)"/>
+                    </th>
+                    <th onclick="doSort('idx')">#</th>
+                    <th onclick="doSort('date')">Date ↕</th>
+                    <th onclick="doSort('category')">Category ↕</th>
+                    <th onclick="doSort('amount')">Amount ↕</th>
+                    <th>Paid Via</th>
+                    <th>Note</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="all-tbody"></tbody>
+              </table>
+            </div>
+            
+            <div class="pag" id="pagination" style="margin-top: 16px;"></div>
+          </div>
+        </details>
       </section>
 	  
       <!-- ═══════════════════════════════════════════════════════════
@@ -639,18 +677,18 @@
 
         <!-- ══ Sub-tab: Overview ══ -->
         <div id="an-overview" class="an-panel active">
-          <div class="fb">
-            <div class="fbt">⚙️ Filter Period</div>
-            <div class="fgrid grid g3">
-              <div class="fg2">
-                <label>Year</label>
-                <select id="a-year" class="fc2" onchange="renderOverview()">
+        <div class="fb" style="padding: 12px 16px; margin-bottom: 16px;">
+            <div class="fbt" style="margin-bottom: 8px;">⚙️ Filter Period</div>
+            <div class="fgrid" style="display:grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items:end;">
+              <div class="fg2" style="margin-bottom: 0; gap: 2px;">
+                <label style="font-size: .65rem;">Year</label>
+                <select id="a-year" class="fc2" style="padding: 8px; height: 36px; font-size: .8rem;" onchange="renderOverview()">
                   <option value="">All Years</option>
                 </select>
               </div>
-              <div class="fg2">
-                <label>Month</label>
-                <select id="a-month" class="fc2" onchange="renderOverview()">
+              <div class="fg2" style="margin-bottom: 0; gap: 2px;">
+                <label style="font-size: .65rem;">Month</label>
+                <select id="a-month" class="fc2" style="padding: 8px; height: 36px; font-size: .8rem;" onchange="renderOverview()">
                   <option value="">All Months</option>
                   <option value="1">January</option>
                   <option value="2">February</option>
@@ -666,13 +704,13 @@
                   <option value="12">December</option>
                 </select>
               </div>
-              <div class="fg2" style="align-self:end">
-                <button class="btn bp" style="width:100%;justify-content:center"
-                        onclick="renderOverview()" type="button">🔍 Apply Filter</button>
+              <div class="fg2" style="margin-bottom: 0;">
+                <button class="btn bp" style="height: 36px; padding: 0 16px; font-size: .8rem;"
+                        onclick="renderOverview()" type="button">🔍 Apply</button>
               </div>
             </div>
-          </div>
-                    <div class="ag grid g3">
+        </div>
+             <div class="ag grid g3">
             <div class="ac"><h3>🏷️ By Category</h3><div id="ac-cat"></div></div>
             <div class="ac"><h3>🗓️ By Month</h3><div id="ac-mon"></div></div>
             <div class="ac"><h3>📆 Top Days</h3><div id="ac-day"></div></div>
@@ -681,18 +719,18 @@
 
         <!-- ══ Sub-tab: Group Totals (Home, Saif, Saad, Shama) ══ -->
         <div id="an-groups" class="an-panel">
-          <div class="fb" style="margin-bottom:18px">
-            <div class="fbt">⚙️ Filter by Period (Optional)</div>
-            <div class="fgrid grid g3">
-              <div class="fg2">
-                <label>Year</label>
-                <select id="grp-year" class="fc2" onchange="renderGroupAnalytics()">
+        <div class="fb" style="margin-bottom:16px; padding: 12px 16px;">
+            <div class="fbt" style="margin-bottom: 8px;">⚙️ Filter by Period (Optional)</div>
+            <div class="fgrid" style="display:grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items:end;">
+              <div class="fg2" style="margin-bottom: 0; gap: 2px;">
+                <label style="font-size: .65rem;">Year</label>
+                <select id="grp-year" class="fc2" style="padding: 8px; height: 36px; font-size: .8rem;" onchange="renderGroupAnalytics()">
                   <option value="">All Years</option>
                 </select>
               </div>
-              <div class="fg2">
-                <label>Month</label>
-                <select id="grp-month" class="fc2" onchange="renderGroupAnalytics()">
+              <div class="fg2" style="margin-bottom: 0; gap: 2px;">
+                <label style="font-size: .65rem;">Month</label>
+                <select id="grp-month" class="fc2" style="padding: 8px; height: 36px; font-size: .8rem;" onchange="renderGroupAnalytics()">
                   <option value="">All Months</option>
                   <option value="1">January</option>
                   <option value="2">February</option>
@@ -708,14 +746,12 @@
                   <option value="12">December</option>
                 </select>
               </div>
-              <div class="fg2" style="align-self:end">
-                <button class="btn bp" style="width:100%;justify-content:center" onclick="renderGroupAnalytics()" type="button">🔍 Apply Filter</button>
+              <div class="fg2" style="margin-bottom: 0;">
+                <button class="btn bp" style="height: 36px; padding: 0 16px; font-size: .8rem;" onclick="renderGroupAnalytics()" type="button">🔍 Apply</button>
               </div>
             </div>
-          </div>
-
-                    <div class="grid g3 mb" id="grp-cards"></div>
-
+        </div>
+		<div class="grid g3 mb" id="grp-cards"></div>
           <div class="pct-card">
             <h3>Group Share of Total Spend</h3>
             <div id="grp-bars"></div>
@@ -751,16 +787,16 @@
         <div id="an-daterange" class="an-panel">
           <div class="fb">
             <div class="fbt">🗓️ Date Range</div>
-            <div class="fgrid grid g3">
-              <div class="fg2">
+            <div class="fgrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+              <div class="fg2" style="margin-bottom: 0;">
                 <label>From</label>
                 <input type="date" id="dr-from" class="fc2" onchange="renderDateRange()"/>
               </div>
-              <div class="fg2">
+              <div class="fg2" style="margin-bottom: 0;">
                 <label>To</label>
                 <input type="date" id="dr-to" class="fc2" onchange="renderDateRange()"/>
               </div>
-              <div class="fg2" style="align-self:end">
+              <div class="fg2" style="margin-bottom: 0; align-self:end">
                 <button class="btn bp" style="width:100%;justify-content:center"
                         onclick="renderDateRange()" type="button">🔍 Show</button>
               </div>
@@ -899,8 +935,8 @@
         <div id="an-catmon" class="an-panel">
           <div class="catmon-setup">
             <h3>🏷️ Category × Month Comparison</h3>
-            <div class="catmon-controls grid g3">
-              <div class="fg2">
+            <div class="catmon-controls" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 0;">
+              <div class="fg2" style="margin-bottom: 0;">
                 <label>Year *</label>
                 <select id="cm-year" class="fc2" onchange="renderCatMon()">
                   <option value="">Select Year</option>
@@ -1087,10 +1123,13 @@
            ═══════════════════════════════════════════════════════════ -->
             <section id="tab-rent" class="tp">
 
-        <div class="hint" style="margin-bottom:10px">🕐 Last activity: <strong id="last-rent">—</strong></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+          <div class="hint">🕐 Last activity: <strong id="last-rent">—</strong></div>
+          <button class="btn bo bxs" onclick="toggleAllRentDetails()" type="button" id="btn-toggle-rent">⬇️ Expand All</button>
+        </div>
 
-        <!-- ══ SUMMARY CARDS ══ -->
-        <div class="grid g4 mb">
+        <!-- ══ SUMMARY CARDS (2x2 Mobile Grid) ══ -->
+        <div class="grid mb" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
           <div class="sc t">
             <div class="lbl">This Month</div>
             <div class="amt" id="rent-month-amt">₹0.00</div>
@@ -1116,7 +1155,7 @@
         <!-- ══ ADD RENT PAYMENT ══ -->
         <div class="fc">
           <div class="fct">🏠 Add Rent Payment</div>
-          <div class="grid g3">
+          <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
             <div class="fg2">
               <label>Amount (₹)</label>
               <input type="number" id="rent-amount" class="fc2"
@@ -1135,7 +1174,8 @@
               <select id="rent-pay" class="fc2">
                 <option value="UPI">UPI</option>
                 <option value="Cash">Cash</option>
-                <option value="Bank Transfer">Bank Transfer</option>
+				<option value="Bank Transfer">Bank Transfer</option>
+				<option value="Card">Card</option>
               </select>
             </div>
           </div>
@@ -1145,15 +1185,19 @@
           </div>
         </div>
 
-        <!-- ══ RENT HISTORY ══ -->
-        <div class="tc">
-          <div class="th2">
-            <h3>📜 Rent Payment History</h3>
-            <span class="rb" id="rent-badge">0 entries</span>
-          </div>
-          <div class="tw">
-            <table>
-              <thead>
+        <!-- ══ RENT HISTORY (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-right: auto;">
+              📜 Rent Payment History
+              <span class="rb" id="rent-badge" style="font-weight:700;">0 entries</span>
+            </div>
+          </summary>
+
+          <!-- Desktop View -->
+          <div class="tw desktop-only-table">
+            <table style="margin:0;">
+              <thead style="position: sticky; top: 0; z-index: 10; background: var(--sec);">
                 <tr>
                   <th>Month</th>
                   <th>Amount</th>
@@ -1165,28 +1209,34 @@
               <tbody id="rent-tbody"></tbody>
             </table>
           </div>
-        </div>
 
-        <!-- ══ MONTHLY REPORT ══ -->
-        <div class="fc">
-          <div class="fct">📊 Monthly Report</div>
-          <div class="filter-bar">
-            <div class="fg2">
-              <label>Year</label>
-              <select id="rent-rep-year" class="fc2"
-                      style="width:auto" onchange="onRentYearChange()"></select>
+          <!-- Mobile View (Stacked Cards) -->
+          <div class="mobile-only-cards" id="rent-mobile-list" style="padding: 10px;"></div>
+        </details>
+
+        <!-- ══ MONTHLY REPORT (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="margin-right: auto;">📊 Monthly Report</div>
+          </summary>
+          <div style="padding: 16px;">
+            <div class="filter-bar" style="margin-bottom: 16px;">
+              <div class="fg2">
+                <label>Year</label>
+                <select id="rent-rep-year" class="fc2" style="width:auto" onchange="onRentYearChange()"></select>
+              </div>
+              <div class="fg2">
+                <label>Month</label>
+                <select id="rent-rep-month" class="fc2" style="width:auto" onchange="renderRentReport()">
+                  <option value="">Whole Year</option>
+                </select>
+              </div>
+              <button class="btn bp" onclick="event.stopPropagation(); printRentReport()" type="button" style="align-self: flex-end; height: 41px;">🖨️ Print / PDF</button>
             </div>
-            <div class="fg2">
-              <label>Month</label>
-              <select id="rent-rep-month" class="fc2"
-                      style="width:auto" onchange="renderRentReport()">
-                <option value="">Whole Year</option>
-              </select>
-            </div>
-            <button class="btn bp" onclick="printRentReport()" type="button">🖨️ Print / PDF</button>
+            <div id="rent-report-body-desktop" class="desktop-only-table"></div>
+            <div id="rent-report-body-mobile" class="mobile-only-cards"></div>
           </div>
-          <div id="rent-report-body"></div>
-        </div>
+        </details>
 
       </section>
 
@@ -1196,10 +1246,13 @@
            ═══════════════════════════════════════════════════════════ -->
             <section id="tab-electricity" class="tp">
 
-        <div class="hint" style="margin-bottom:10px">🕐 Last activity: <strong id="last-elec">—</strong></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+          <div class="hint">🕐 Last activity: <strong id="last-elec">—</strong></div>
+          <button class="btn bo bxs" onclick="toggleAllElecDetails()" type="button" id="btn-toggle-elec">⬇️ Expand All</button>
+        </div>
 
         <!-- ══ SUMMARY CARDS ══ -->
-        <div class="grid g4 mb">
+        <div class="grid mb" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
           <div class="sc">
             <div class="lbl">Meter No.</div>
             <div class="amt" id="elec-meter-no" style="font-size:1.05rem">—</div>
@@ -1225,53 +1278,58 @@
         <!-- ══ ADD READING ══ -->
         <div class="fc">
           <div class="fct">⚡ Add Monthly Reading</div>
-          <div class="grid g3">
-            <div class="fg2">
+                    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Month</label>
               <input type="month" id="elec-month" class="fc2"/>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Date Recorded</label>
-              <div style="display:flex;gap:8px;align-items:center">
+              <div style="display:flex;gap:4px;align-items:center">
                 <input type="date" id="elec-date" class="fc2"
                        oninput="updateDateDayLabel('elec-date','elec-date-day')"
-                       style="flex:1"/>
-                <span class="date-day-badge" id="elec-date-day"></span>
+                       style="flex:1; padding-left:8px; padding-right:4px;"/>
+                <span class="date-day-badge" id="elec-date-day" style="min-width:42px; padding:0 8px; font-size:.7rem;"></span>
               </div>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Meter Reading</label>
               <input type="number" id="elec-reading" class="fc2"
                      min="0" step="1" placeholder="e.g. 15200"/>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Paid Via</label>
               <select id="elec-payment" class="fc2">
                 <option value="UPI">UPI</option>
                 <option value="Cash">Cash</option>
                 <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Card">Card</option>
               </select>
             </div>
-            <div class="fg2">
+            <div class="fg2" style="margin-bottom:0;">
               <label>Paid On Date</label>
               <input type="date" id="elec-paid-date" class="fc2"/>
             </div>
           </div>
-          <div class="ba">
+          <div class="ba" style="margin-top: 12px;">
             <button class="btn bp" onclick="saveElecReading()" type="button">💾 Save Reading</button>
             <button class="btn bg2" onclick="clearElecForm()" type="button">✕ Clear</button>
           </div>
         </div>
 
-        <!-- ══ READING HISTORY ══ -->
-        <div class="tc">
-          <div class="th2">
-            <h3>📜 Reading History</h3>
-            <span class="rb" id="elec-badge">0 entries</span>
-          </div>
-          <div class="tw">
-            <table>
-              <thead>
+        <!-- ══ READING HISTORY (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-right: auto;">
+              📜 Reading History
+              <span class="rb" id="elec-badge" style="font-weight:700;">0 entries</span>
+            </div>
+          </summary>
+          
+          <!-- Desktop View -->
+          <div class="tw desktop-only-table">
+            <table style="margin:0;">
+              <thead style="position: sticky; top: 0; z-index: 10; background: var(--sec);">
                 <tr>
                   <th>Month</th>
                   <th>Date Recorded</th>
@@ -1286,28 +1344,34 @@
               <tbody id="elec-tbody"></tbody>
             </table>
           </div>
-        </div>
 
-        <!-- ══ MONTHLY REPORT ══ -->
-        <div class="fc">
-          <div class="fct">📊 Monthly Report</div>
-          <div class="filter-bar">
-            <div class="fg2">
-              <label>Year</label>
-              <select id="elec-rep-year" class="fc2"
-                      style="width:auto" onchange="onElecYearChange()"></select>
+          <!-- Mobile View (Stacked Cards) -->
+          <div class="mobile-only-cards" id="elec-mobile-list" style="padding: 10px;"></div>
+        </details>
+
+        <!-- ══ MONTHLY REPORT (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="margin-right: auto;">📊 Monthly Report</div>
+          </summary>
+          <div style="padding: 16px;">
+            <div class="filter-bar" style="margin-bottom: 16px;">
+              <div class="fg2">
+                <label>Year</label>
+                <select id="elec-rep-year" class="fc2" style="width:auto" onchange="onElecYearChange()"></select>
+              </div>
+              <div class="fg2">
+                <label>Month</label>
+                <select id="elec-rep-month" class="fc2" style="width:auto" onchange="renderElecReport()">
+                  <option value="">Whole Year</option>
+                </select>
+              </div>
+              <button class="btn bp" onclick="event.stopPropagation(); printElecReport()" type="button" style="align-self: flex-end; height: 41px;">🖨️ Print / PDF</button>
             </div>
-            <div class="fg2">
-              <label>Month</label>
-              <select id="elec-rep-month" class="fc2"
-                      style="width:auto" onchange="renderElecReport()">
-                <option value="">Whole Year</option>
-              </select>
-            </div>
-            <button class="btn bp" onclick="printElecReport()" type="button">🖨️ Print / PDF</button>
+            <div id="elec-report-body-desktop" class="desktop-only-table"></div>
+            <div id="elec-report-body-mobile" class="mobile-only-cards"></div>
           </div>
-          <div id="elec-report-body"></div>
-        </div>
+        </details>
 
       </section>
 
@@ -1317,10 +1381,13 @@
            ═══════════════════════════════════════════════════════════ -->
             <section id="tab-water" class="tp">
 
-        <div class="hint" style="margin-bottom:10px">🕐 Last activity: <strong id="last-water">—</strong></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+          <div class="hint">🕐 Last activity: <strong id="last-water">—</strong></div>
+          <button class="btn bo bxs" onclick="toggleAllWaterDetails()" type="button" id="btn-toggle-water">⬇️ Expand All</button>
+        </div>
 
         <!-- ══ SUMMARY CARDS ══ -->
-        <div class="grid g3 mb">
+        <div class="grid mb" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
           <div class="sc t">
             <div class="lbl">This Month</div>
             <div class="amt" id="water-month-amt">₹0.00</div>
@@ -1338,47 +1405,62 @@
           </div>
         </div>
 
-        <!-- ══ ADD WATER PURCHASE ══ -->
+        <!-- ══ ADD WATER PURCHASE (Responsive) ══ -->
         <div class="fc">
           <div class="fct">💧 Add Water Purchase</div>
+          
           <div class="grid g3">
-  <div class="fg2">
-    <label>Date</label>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input type="date" id="water-date" class="fc2"
-             oninput="updateDateDayLabel('water-date','water-date-day')"
-             style="flex:1"/>
-      <span class="date-day-badge" id="water-date-day"></span>
-    </div>
-  </div>
-  <div class="fg2">
-    <label>Amount (₹)</label>
-    <input type="number" id="water-amount" class="fc2"
-           min="0" step="0.01" placeholder="0.00"/>
-  </div>
-  <div class="fg2">
-    <label>Expense Type</label>
-    <input type="text" class="fc2" value="Water Jar" disabled/>
-  </div>
-</div>
+            <div class="fg2">
+              <label>Date</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="date" id="water-date" class="fc2"
+                       oninput="updateDateDayLabel('water-date','water-date-day')"
+                       style="flex:1; padding-left:10px; padding-right:4px;"/>
+                <span class="date-day-badge" id="water-date-day" style="min-width:45px; padding:0 8px; font-size:.72rem;"></span>
+              </div>
+            </div>
+            
+            <div class="fg2">
+              <label>Amount (₹)</label>
+              <input type="number" id="water-amount" class="fc2"
+                     min="0" step="0.01" placeholder="0.00"/>
+            </div>
+            
+            <div class="fg2">
+              <label>Notes (Optional)</label>
+              <input type="text" id="water-note" class="fc2" placeholder="e.g. Extra cans for guests"/>
+            </div>
+          </div>
+
           <div class="ba">
             <button class="btn bp" onclick="saveWaterExp()" type="button">💾 Save</button>
             <button class="btn bg2" onclick="clearWaterForm()" type="button">✕ Clear</button>
           </div>
         </div>
 
-        <!-- ══ RECENT PURCHASES ══ -->
-        <div class="tc">
-          <div class="th2">
-            <h3>🕐 Recent Purchases</h3>
-            <span class="rb" id="water-badge">0 entries</span>
-          </div>
-          <div class="tw">
-            <table>
-              <thead>
+        <!-- ══ RECENT PURCHASES (Refactored & Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 16px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-right: auto;">
+              🕐 Recent Purchases
+              <span class="rb" id="water-badge" style="font-weight:700;">0 entries</span>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;" onclick="event.stopPropagation()">
+              <select id="water-filt-month" class="fc2" style="padding:4px 8px; font-size:.75rem; width:auto; height:32px;" onchange="filterWaterTable()">
+                <option value="">All Months</option>
+              </select>
+              <select id="water-filt-year" class="fc2" style="padding:4px 8px; font-size:.75rem; width:auto; height:32px;" onchange="filterWaterTable()">
+                <option value="">All Years</option>
+              </select>
+            </div>
+          </summary>
+          <!-- Desktop View -->
+          <div class="tw desktop-only-table" style="max-height: 420px; overflow-y: auto;">
+            <table style="margin:0;">
+              <thead style="position: sticky; top: 0; z-index: 10; background: var(--sec);">
                 <tr>
                   <th>Date</th>
-                  <th>Type</th>
+                  <th>Notes</th>
                   <th>Amount</th>
                   <th>Actions</th>
                 </tr>
@@ -1386,41 +1468,236 @@
               <tbody id="water-tbody"></tbody>
             </table>
           </div>
-        </div>
+          
+          <!-- Mobile View (Stacked Cards) -->
+          <div class="mobile-only-cards" id="water-mobile-list" style="padding: 10px;"></div>
+        </details>
 
-        <!-- ══ MONTHLY PAYMENT MODE ══ -->
-        <div class="fc">
-          <div class="fct">💳 Monthly Payment Mode</div>
-          <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">
-            Record how the water bill was settled for each month — this is what gets printed
-            on the report. Only months with purchases are shown.
-          </p>
-          <div id="water-pay-list"></div>
-        </div>
-
-        <!-- ══ MONTHLY REPORT & COMPARISON ══ -->
-        <div class="fc">
-          <div class="fct">📊 Monthly Report &amp; Comparison</div>
-          <div class="filter-bar">
-            <div class="fg2">
-              <label>Year</label>
-              <select id="water-rep-year" class="fc2"
-                      style="width:auto" onchange="onWaterYearChange()"></select>
-            </div>
-            <div class="fg2">
-              <label>Month</label>
-              <select id="water-rep-month" class="fc2"
-                      style="width:auto" onchange="renderWaterReport()">
-                <option value="">Whole Year</option>
-              </select>
-            </div>
-            <button class="btn bp" onclick="printWaterReport()" type="button">🖨️ Print / PDF</button>
+        <!-- ══ MONTHLY PAYMENT MODE (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="margin-right: auto;">💳 Monthly Payment Mode</div>
+          </summary>
+          <div style="padding: 16px;">
+            <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">
+              Record how the water bill was settled for each month — this is what gets printed
+              on the report. Only months with purchases are shown.
+            </p>
+            <div id="water-pay-list"></div>
           </div>
-          <div id="water-report-body"></div>
-        </div>
+        </details>
+
+        <!-- ══ WATER CALENDAR VIEW (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="display:flex; align-items:center; gap:8px; margin-right: auto;">
+              📅 View Calendar
+              <span class="rb" id="water-cal-total" style="font-weight:700;">—</span>
+            </div>
+          </summary>
+          <div style="padding: 16px;">
+            <div class="cal-nav" style="justify-content:space-between; margin-bottom:12px;" onclick="event.stopPropagation()">
+              <div class="ba">
+                <button class="btn bo bxs" onclick="changeWaterCalMonth(-1)" type="button">◀</button>
+                <select id="water-cal-sel-month" class="fc2" style="width:auto; padding:5px 7px; font-size:.75rem;" onchange="waterCalSelChange()"></select>
+                <select id="water-cal-sel-year" class="fc2" style="width:auto; padding:5px 7px; font-size:.75rem;" onchange="waterCalSelChange()"></select>
+                <button class="btn bo bxs" onclick="changeWaterCalMonth(1)" type="button">▶</button>
+              </div>
+              <button class="btn bo bxs" onclick="jumpWaterCalToday()" type="button" style="font-size:.74rem">📍 Today</button>
+            </div>
+            <div class="cal-grid" id="water-cal-grid"></div>
+            <div class="cal-legend">Tap a day to view or add water records for that date.</div>
+          </div>
+        </details>
+		
+        <!-- ══ MONTHLY REPORT & COMPARISON (Collapsible) ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="margin-right: auto;">📊 Monthly Report & Comparison</div>
+          </summary>
+          <div style="padding: 16px;">
+            <div class="filter-bar" style="margin-bottom: 16px;">
+              <div class="fg2">
+                <label>Year</label>
+                <select id="water-rep-year" class="fc2"
+                        style="width:auto" onchange="onWaterYearChange()"></select>
+              </div>
+              <div class="fg2">
+                <label>Month</label>
+                <select id="water-rep-month" class="fc2"
+                        style="width:auto" onchange="renderWaterReport()">
+                  <option value="">Whole Year</option>
+                </select>
+              </div>
+              <button class="btn bp" onclick="event.stopPropagation(); printWaterReport()" type="button" style="align-self: flex-end; height: 41px;">🖨️ Print / PDF</button>
+            </div>
+            <div id="water-report-body-desktop" class="desktop-only-table"></div>
+            <div id="water-report-body-mobile" class="mobile-only-cards"></div>
+          </div>
+        </details>
 
       </section>
 
+            <!-- ═══════════════════════════════════════════════════════════
+           TAB: MILK TRACKER (Refactored Mobile-First)
+           ═══════════════════════════════════════════════════════════ -->
+      <section id="tab-milk" class="tp">
+        
+        <!-- Last Activity Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+          <div class="hint" style="display:flex; gap:16px; align-items:center;">
+            <span>🕐 Last activity: <strong id="last-milk">—</strong></span>
+            <span>📋 Total Records: <strong id="milk-rec-count" style="color:var(--p)">0</strong></span>
+          </div>
+          <button class="btn bo bxs" onclick="toggleAllMilkDetails()" type="button" id="btn-toggle-milk">⬇️ Expand All</button>
+        </div>
+
+        <!-- 1. Summary Cards (Reusable Component) -->
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div class="sc t">
+            <div class="lbl">This Month</div>
+            <div class="amt" id="milk-month-amt">₹0.00</div>
+            <div class="sub" id="milk-month-qty">0.00 kg</div>
+          </div>
+          <div class="sc m">
+            <div class="lbl">Days Tracked</div>
+            <div class="amt" id="milk-month-days">0</div>
+            <div class="sub" id="milk-month-absent">0 absent</div>
+          </div>
+          <div class="sc">
+            <div class="lbl">All Time</div>
+            <div class="amt" id="milk-total-amt">₹0.00</div>
+            <div class="sub" id="milk-total-qty">0.00 kg</div>
+          </div>
+        </div>
+
+        <!-- 2. Quick Add Form (Reusable Component) -->
+        <div class="fc">
+          <div class="fct">➕ Add Milk Record</div>
+          <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+            <div class="fg2">
+              <label>Date</label>
+              <input type="date" id="milk-date" class="fc2" oninput="updateDateDayLabel('milk-date','milk-date-day')"/>
+            </div>
+            <div class="fg2">
+              <label>Quantity</label>
+              <select id="milk-unit" class="fc2" onchange="recalcMilk()">
+                <option value="0.25">250 gm</option>
+                <option value="0.5" selected>500 gm</option>
+                <option value="0.75">750 gm</option>
+                <option value="1">1 KG</option>
+                <option value="extra">Other</option>
+                <option value="0">Absent</option>
+              </select>
+            </div>
+            <div class="fg2">
+              <label>Amount (₹)</label>
+              <input type="number" id="milk-amount" class="fc2" readonly style="background:var(--sec); font-weight:bold; color:var(--p);" step="0.01"/>
+            </div>
+            <div class="fg2">
+              <label>Notes (Optional)</label>
+              <input type="text" id="milk-note" class="fc2" placeholder="e.g. Extra thick"/>
+            </div>
+          </div>
+          <div class="ba">
+            <button class="btn bp" onclick="saveMilk()" type="button">💾 Save Record</button>
+            <button class="btn bg2" onclick="clearMilkForm()" type="button">✕ Clear</button>
+          </div>
+        </div>
+
+        <!-- 3. Recent Records Table (Refactored & Collapsible) -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              🕐 Recent Milk Records
+              <span class="rb" id="milk-badge" style="font-weight:700;">0 entries</span>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;" onclick="event.stopPropagation()">
+              <select id="milk-filt-month" class="fc2" style="padding:4px 8px; font-size:.75rem; width:auto; height:32px;" onchange="filterMilkTable()">
+                <option value="">All Months</option>
+              </select>
+              <select id="milk-filt-year" class="fc2" style="padding:4px 8px; font-size:.75rem; width:auto; height:32px;" onchange="filterMilkTable()">
+                <option value="">All Years</option>
+              </select>
+            </div>
+          </summary>
+          
+          <!-- Mobile-First Scrollable Container -->
+          <div class="tw" style="max-height: 450px; overflow-y: auto;">
+            <table style="margin:0;">
+              <thead style="position: sticky; top: 0; z-index: 10; background: var(--sec);">
+                <tr>
+                  <th>Date</th>
+                  <th>Quantity</th>
+                  <th>Amount</th>
+                  <th>Notes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="milk-tbody"></tbody>
+            </table>
+          </div>
+        </details>
+
+        <!-- 4. Calendar & Reports (Collapsed by default to save space) -->
+        <details class="fc" style="cursor:pointer;">
+          <summary style="font-weight:800; font-size:.9rem; color:var(--p); margin:-10px 0; display:flex; align-items:center; justify-content:flex-start;">
+            <div style="margin-right:auto;">📅 View Calendar</div>
+          </summary>
+          <div style="padding-top:16px;">
+            <!-- Calendar controls -->
+            <div class="cal-nav" style="justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+              <div class="ba" style="gap:4px;">
+                <button class="btn bo bxs" onclick="changeMilkCalMonth(-1)" type="button">◀</button>
+                <select id="milk-cal-sel-month" class="fc2" style="width:auto; padding:4px 8px; font-size:.75rem;" onchange="milkCalSelChange()"></select>
+                <select id="milk-cal-sel-year" class="fc2" style="width:auto; padding:4px 8px; font-size:.75rem;" onchange="milkCalSelChange()"></select>
+                <button class="btn bo bxs" onclick="changeMilkCalMonth(1)" type="button">▶</button>
+                <button class="btn bo bxs" onclick="jumpMilkCalToday()" type="button" style="font-size:.74rem;">📍 Today</button>
+              </div>
+              <span class="rb" id="milk-cal-total" style="font-size:.75rem">—</span>
+            </div>
+            <div class="cal-grid" id="milk-cal-grid"></div>
+          </div>
+        </details>
+
+        <!-- 5. Monthly Report (Collapsible) -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="margin-right: auto;">📊 Monthly Report</div>
+          </summary>
+          <div style="padding: 16px;">
+             <div class="filter-bar" style="margin-bottom: 16px;">
+              <div class="fg2">
+                <label>Year</label>
+                <select id="milk-rep-year" class="fc2" style="width:auto" onchange="onMilkYearChange()"></select>
+              </div>
+              <div class="fg2">
+                <label>Month</label>
+                <select id="milk-rep-month" class="fc2" style="width:auto" onchange="renderMilkReport()">
+                  <option value="">Whole Year</option>
+                </select>
+              </div>
+              <button class="btn bp" onclick="event.stopPropagation(); printMilkReport()" type="button" style="align-self: flex-end; height: 41px;">🖨️ Print</button>
+            </div>
+            <div id="milk-report-body-desktop" class="desktop-only-table"></div>
+            <div id="milk-report-body-mobile" class="mobile-only-cards"></div>
+          </div>
+        </details>
+
+        <!-- 6. Monthly Payment Mode (Collapsible) -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="margin-right: auto;">💳 Monthly Payment Mode</div>
+          </summary>
+          <div style="padding: 16px;">
+            <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">
+              Record how the milk bill was settled for each month.
+            </p>
+            <div id="milk-pay-list"></div>
+          </div>
+        </details>
+
+      </section>
 
       <!-- ═══════════════════════════════════════════════════════════
            TAB: SETTINGS
@@ -1516,7 +1793,8 @@
         <select id="m-pay" class="fc2">
           <option value="UPI">UPI</option>
           <option value="Cash">Cash</option>
-          <option value="Bank Transfer">Bank Transfer</option>
+		<option value="Bank Transfer">Bank Transfer</option>
+		<option value="Card">Card</option>
         </select>
       </div>
       <div class="fg2" style="grid-column:1/-1">
@@ -1577,6 +1855,7 @@
           <option value="UPI">UPI</option>
           <option value="Cash">Cash</option>
           <option value="Bank Transfer">Bank Transfer</option>
+		  <option value="Card">Card</option>
         </select>
       </div>
     </div>
@@ -1613,7 +1892,8 @@
         <select id="elec-e-payment" class="fc2">
           <option value="UPI">UPI</option>
           <option value="Cash">Cash</option>
-          <option value="Bank Transfer">Bank Transfer</option>
+		  <option value="Bank Transfer">Bank Transfer</option>
+		  <option value="Card">Card</option>
         </select>
       </div>
       <div class="fg2">
@@ -1645,6 +1925,10 @@
         <label>Amount (₹)</label>
         <input type="number" id="water-e-amount" class="fc2" min="0" step="0.01"/>
       </div>
+      <div class="fg2" style="grid-column: 1 / -1;">
+        <label>Notes</label>
+        <input type="text" id="water-e-note" class="fc2" placeholder="Optional note"/>
+      </div>
     </div>
     <input type="hidden" id="water-e-id"/>
     <div class="mf">
@@ -1654,6 +1938,44 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     EDIT MILK MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="milk-edit-mo" onclick="closeMo('milk-edit-mo',event)">
+  <div class="md">
+    <div class="mt">✏️ Edit Milk Record</div>
+    <div class="grid g2">
+      <div class="fg2">
+        <label>Date</label>
+        <input type="date" id="milk-e-date" class="fc2"/>
+      </div>
+      <div class="fg2">
+        <label>Quantity</label>
+        <select id="milk-e-unit" class="fc2" onchange="recalcMilkEdit()">
+          <option value="0.25">250 gm</option>
+          <option value="0.5">500 gm</option>
+          <option value="0.75">750 gm</option>
+          <option value="1">1 KG</option>
+          <option value="extra">Other</option>
+          <option value="0">Absent</option>
+        </select>
+      </div>
+      <div class="fg2">
+        <label>Amount (₹)</label>
+        <input type="number" id="milk-e-amount" class="fc2" step="0.01"/>
+      </div>
+      <div class="fg2">
+        <label>Notes</label>
+        <input type="text" id="milk-e-note" class="fc2"/>
+      </div>
+    </div>
+    <input type="hidden" id="milk-e-id"/>
+    <div class="mf">
+      <button class="btn bg2" onclick="closeMo('milk-edit-mo')" type="button">Cancel</button>
+      <button class="btn bp" onclick="updateMilk()" type="button">💾 Update</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════
      BULK DELETE MODAL
@@ -1844,6 +2166,7 @@ import {
 
 // Data stores — populated by Firestore listeners
 let expenses        = [];
+let milkRecords     = []; // ADDED HERE to prevent initialization errors
 let categories      = [];
 let history         = [];
 let elecReadings    = [];
@@ -1909,7 +2232,8 @@ initPage({
     { id:'cats',      icon:'📂', label:'cat',  value: 0 },
     { id:'rent',      icon:'🏠', label:'rent', value: 0 },
     { id:'elec',      icon:'⚡', label:'elec', value: 0 },
-    { id:'water',     icon:'💧', label:'H2O',  value: 0 }
+    { id:'water',     icon:'💧', label:'H2O',  value: 0 },
+    { id:'milk',      icon:'🥛', label:'milk', value: 0 }
   ],
   onReady: () => {
     // Wire tabs after login
@@ -1971,6 +2295,16 @@ import {
    PAGE LISTENERS — live Firestore subscriptions
    ═══════════════════════════════════════════════════════════════ */
 async function loadExpenses() {
+  const loader = document.getElementById('global-loader');
+  
+  // 1. Start the loader animation
+  if (loader) {
+    loader.classList.add('active');
+    loader.style.width = '20%';
+    setTimeout(() => { loader.style.width = '50%'; }, 300);
+    setTimeout(() => { loader.style.width = '80%'; }, 800);
+  }
+
   try {
     const snap = await getDocs(collection(db, COL.EXPENSE));
     expenses = snap.docs.map(d => Object.assign({ id: d.id }, d.data()))
@@ -1979,9 +2313,19 @@ async function loadExpenses() {
     setSyncStatus('live');
     renderAll();
     renderCombinedReport();
+    renderDashRecent();
     populateYearSelectors();
   } catch (e) {
     console.error('Failed to load expenses:', e);
+  } finally {
+    // 2. Finish the loader once data is fully downloaded
+    if (loader) {
+      loader.style.width = '100%';
+      setTimeout(() => {
+        loader.classList.remove('active');
+        setTimeout(() => { loader.style.width = '0%'; }, 300);
+      }, 400); // Natural finish
+    }
   }
 }
 
@@ -2106,12 +2450,14 @@ function renderLastActivity(){
   const rentIso  = latestActivity(rentPayments);
   const elecIso  = latestActivity(elecReadings);
   const waterIso = latestActivity(waterPurchases);
+  const milkIso  = latestActivity(milkRecords); // ADD THIS
 
   // Update the record counts
   if ($('daily-rec-count')) $('daily-rec-count').textContent = expenses.length;
   if ($('rent-rec-count'))  $('rent-rec-count').textContent = rentPayments.length;
   if ($('elec-rec-count'))  $('elec-rec-count').textContent = elecReadings.length;
   if ($('water-rec-count')) $('water-rec-count').textContent = waterPurchases.length;
+  if ($('milk-rec-count'))  $('milk-rec-count').textContent = milkRecords.length; // ADD THIS
 
   // Per-module badges
   const setBadge = (id, iso) => {
@@ -2124,13 +2470,15 @@ function renderLastActivity(){
   setBadge('last-rent',  rentIso);
   setBadge('last-elec',  elecIso);
   setBadge('last-water', waterIso);
+  setBadge('last-milk',  milkIso); // ADD THIS
 
-  // Header global pill = newest across all four modules
+  // Header global pill = newest across all modules
   const globalIso = latestActivity([
     { createdAt: dailyIso },
     { createdAt: rentIso },
     { createdAt: elecIso },
-    { createdAt: waterIso }
+    { createdAt: waterIso },
+    { createdAt: milkIso } // ADD THIS
   ]);
   setHeaderLastActivity(globalIso);
 }
@@ -2147,6 +2495,7 @@ function renderTabContent(tabId){
     case 'rent':        renderRentTab(); break;
     case 'electricity': renderElectricityTab(); break;
     case 'water':       renderWaterTab(); break;
+    case 'milk':        renderMilkTab(); break;
     case 'settings':    renderSettingsUI(); break;
   }
 }
@@ -2172,6 +2521,7 @@ function renderDashboardTiles(){
     $('dc-rent').textContent = rentPayments.length;
     $('dc-elec').textContent = elecReadings.length;
     $('dc-water').textContent = waterPurchases.length;
+    $('dc-milk').textContent = milkRecords.length;
   }
 
   const now = new Date();
@@ -2219,6 +2569,16 @@ function renderDashboardTiles(){
   $('tile-water-amt').textContent = '₹' + fmtAmt(waterMAmt);
   $('tile-water-sub').textContent = `${waterMCount} cans this month · YTD ₹${fmtAmt(waterYAmt)}`;
 
+  // Milk
+  let milkMAmt = 0, milkMCount = 0, milkYAmt = 0, milkQty = 0;
+  milkRecords.forEach(m => {
+    const amt = +m.amount || 0;
+    if (String(m.date).startsWith(curY)) milkYAmt += amt;
+    if (String(m.date).startsWith(curYM)) { milkMAmt += amt; milkMCount++; milkQty += (+m.unit || 0); }
+  });
+  $('tile-milk-amt').textContent = '₹' + fmtAmt(milkMAmt);
+  $('tile-milk-sub').textContent = `${fmtAmt(milkQty)} kg this month · YTD ₹${fmtAmt(milkYAmt)}`;
+
   // Combined monthly summary elements removed from dashboard
   
   // Note: c-grand and c-grand-year removed from UI
@@ -2236,7 +2596,7 @@ function renderDashRecent(){
         <td data-label="Date" class="dc">${fmtDate(e.date)}</td>
         <td data-label="Category"><span class="cb">${esc(e.category)}</span></td>
         <td data-label="Amount" class="amc">₹${fmtAmt(e.amount)}</td>
-        <td data-label="Mode">${pmBadge(e.paymentMode)}</td>
+        <td data-label="Mode">${e.category === 'No Expense' ? '<span class="dc">—</span>' : pmBadge(e.paymentMode)}</td>
         <td data-label="Note" class="nc">${esc(e.note || '—')}</td>
         <td data-label="Actions"><div class="ab">
           <button class="btn bo bxs" onclick="openEditMo('${e.id}')" type="button">✏️</button>
@@ -2344,12 +2704,17 @@ function applyFilters(){
   const sumEl = $('f-summary');
   if (sumEl) sumEl.textContent = `${filtered.length} records | ₹${total.toLocaleString('en-IN',{minimumFractionDigits:2})}`;
 
-  curPage = 1;
+  // Only reset to page 1 if we explicitly clicked a filter or applied a new search.
+  // We use a global flag to know if this is a data refresh or a manual filter.
+  if (!window.__isDataRefresh) {
+    curPage = 1;
+  }
   renderRecPage();
-}
+};
 
 function renderRecPage(){
   const total = filtered.length;
+  window.__isDataRefresh = false; // Reset flag after rendering
   const pages = Math.ceil(total / PG) || 1;
   if (curPage > pages) curPage = pages;
   const start = (curPage - 1) * PG;
@@ -2605,16 +2970,45 @@ window.focusAdd = function(){
 
 window.saveExp = async function(force){
   const date    = $('f-date').value;
-  const amount  = parseFloat($('f-amount').value);
+  let amount    = parseFloat($('f-amount').value);
   const cat     = $('f-cat').value;
   const note    = ($('f-note').value || '').trim();
-  const payMode = $('f-pay').value;
+  let payMode   = $('f-pay').value;
 
   if (!date){ toast('Select a date.', 'error'); return; }
   if (!cat){ toast('Select a category.', 'error'); return; }
-  if (isNaN(amount) || amount < 0){ toast('Enter a valid amount.', 'error'); return; }
 
   const isNoExpense = cat === 'No Expense';
+
+  // 1. Force amount to 0 and payMode to empty for "No Expense"
+  if (isNoExpense) {
+    amount = 0;
+    payMode = '';
+  } else {
+    // Only validate amount if it's NOT "No Expense"
+    if (isNaN(amount) || amount < 0){ 
+      toast('Enter a valid amount.', 'error'); 
+      return; 
+    }
+  }
+
+  // 2. Prevent duplicates and conflicts
+  const dayEntries = expenses.filter(e => e.date === date);
+  if (isNoExpense) {
+    if (dayEntries.some(e => e.category !== 'No Expense')) {
+      toast('❌ Cannot mark as "No Expense" because other expenses already exist on this date.', 'error');
+      return;
+    }
+    if (dayEntries.some(e => e.category === 'No Expense')) {
+      toast('❌ This date is already marked as "No Expense".', 'error');
+      return;
+    }
+  } else {
+    if (dayEntries.some(e => e.category === 'No Expense')) {
+      toast('❌ This date is marked as "No Expense". Please delete that entry first.', 'error');
+      return;
+    }
+  }
 
   if (!force && !isNoExpense){
     const dup = expenses.find(e =>
@@ -2652,7 +3046,12 @@ window.openEditMo = function(id){
   $('m-date').value   = e.date;
   $('m-amount').value = e.amount;
   $('m-note').value   = e.note || '';
-  $('m-pay').value    = e.paymentMode || 'UPI';
+  
+  const isNoExp = e.category === 'No Expense';
+  $('m-pay').value    = isNoExp ? '' : (e.paymentMode || 'UPI');
+  $('m-pay').disabled = isNoExp;
+  $('m-amount').disabled = isNoExp; // Disable amount field too
+  
   setCat('edit', e.category);
   $('edit-mo').classList.add('open');
 };
@@ -2660,14 +3059,26 @@ window.openEditMo = function(id){
 window.updateExp = async function(){
   const id      = $('m-id').value;
   const date    = $('m-date').value;
-  const amount  = parseFloat($('m-amount').value);
+  let amount    = parseFloat($('m-amount').value);
   const cat     = $('m-cat').value;
   const note    = ($('m-note').value || '').trim();
-  const payMode = $('m-pay').value;
+  let payMode   = $('m-pay').value;
 
-  if (!date || !cat || isNaN(amount) || amount < 0){
+  if (!date || !cat){
     toast('Fill all required fields.', 'error');
     return;
+  }
+
+  const isNoExpense = cat === 'No Expense';
+
+  if (isNoExpense) {
+    amount = 0;
+    payMode = '';
+  } else {
+    if (isNaN(amount) || amount < 0){
+      toast('Enter a valid amount.', 'error');
+      return;
+    }
   }
 
   const old = expenses.find(e => e.id === id);
@@ -2690,7 +3101,11 @@ window.updateExp = async function(){
       historyData: { id, changes }
     });
 
-    if (res.ok) { closeMo('edit-mo'); loadExpenses(); }
+    if (res.ok) { 
+      window.__isDataRefresh = true; // Set flag
+      closeMo('edit-mo'); 
+      loadExpenses(); 
+    }
 };
 
 window.deleteExp = function(id){
@@ -2716,7 +3131,10 @@ window.deleteExp = function(id){
         historyAction: ACT.DELETE,
         historyData: { id: rec.id, date: rec.date, amount: rec.amount, category: rec.category, reason }
       });
-      if (res.ok) loadExpenses();
+      if (res.ok) {
+        window.__isDataRefresh = true; // Set flag
+        loadExpenses();
+      }
     },
     'bd'
   );
@@ -2816,9 +3234,10 @@ window.executeBulkDelete = async function(){
       bulk: true, count: ids.length, totalAmount: total, reason,
       records: selected.map(e => ({ id: e.id, date: e.date, category: e.category, amount: e.amount }))
     });
-        closeMo('bulk-del-mo');
+    closeMo('bulk-del-mo');
     selectedIds.clear();
     updateBulkToolbar();
+    window.__isDataRefresh = true; // <--- ADD THIS LINE
     pill(`${ids.length} record(s) deleted`, '🗑️');
   } catch (err){
     toast('❌ Bulk delete failed: ' + err.message, 'error');
@@ -2929,6 +3348,8 @@ window.executeBulkReassign = async function(){
         /* Clear the master checkbox in the header, if present */
     const sa = $('sel-all');
     if (sa){ sa.checked = false; sa.indeterminate = false; }
+    
+    window.__isDataRefresh = true; // <--- ADD THIS LINE
     loadExpenses();
   } catch (err){
     setSyncStatus('error');
@@ -3033,6 +3454,24 @@ window.selectCat = function(ctx, val, label){
     if (p) p.classList.remove('open');
     if (d) d.classList.remove('open');
   });
+
+  // Disable "Paid Via" and "Amount" if "No Expense" is selected
+  if (ctx === 'add' || ctx === 'edit') {
+    const isNoExp = val === 'No Expense';
+    const payField = $(ctx === 'add' ? 'f-pay' : 'm-pay');
+    const amtField = $(ctx === 'add' ? 'f-amount' : 'm-amount');
+    
+    if (payField) {
+      payField.disabled = isNoExp;
+      if (isNoExp) payField.value = ''; 
+      else if (!payField.value) payField.value = 'UPI'; 
+    }
+    
+    if (amtField) {
+      amtField.disabled = isNoExp;
+      if (isNoExp) amtField.value = '0.00';
+    }
+  }
 
   if (ctx === 'filter') applyFilters();
   if (ctx === 'catmon') renderCatMon();
@@ -3771,9 +4210,6 @@ window.renderCombinedReport = function(){
   const monthKey = m ? `${y}-${String(m).padStart(2,'0')}` : null;
   const matchesYM = ds => monthKey ? ds.startsWith(monthKey) : ds.startsWith(y);
 
-  const body = $('combo-report-body');
-  if (!body) return;
-
   const rentRows = rentPayments
     .filter(r => { const rm = rentMonthOf(r); return monthKey ? rm === monthKey : rm.startsWith(y); })
     .sort((a,b) => rentMonthOf(a).localeCompare(rentMonthOf(b)));
@@ -3784,7 +4220,11 @@ window.renderCombinedReport = function(){
   const rentTotal = rentRows.reduce((s,r) => s + (+r.amount || 0), 0);
   const elecTotal = elecRows.reduce((s,r) => s + r.amount, 0);
   const waterCansX20 = waterRows.length * WATER_RATE_PER_CAN;
-  const grandTotal = rentTotal + elecTotal + waterCansX20;
+  
+  const milkRows = milkRecords.filter(m => matchesYM(String(m.date))).sort((a,b) => String(a.date).localeCompare(String(b.date)));
+  const milkTotalAmt = milkRows.reduce((s,m) => s + (+m.amount || 0), 0);
+  const milkTotalQty = milkRows.reduce((s,m) => s + (+m.unit || 0), 0);
+  const grandTotal = rentTotal + elecTotal + waterCansX20 + milkTotalAmt;
 
   const periodLabel = monthKey ? monthLabel(monthKey) : y;
 
@@ -3799,22 +4239,30 @@ window.renderCombinedReport = function(){
   else Object.keys(waterPayModes).forEach(mm => { if (mm.startsWith(y)) waterModesSet.add(waterPayModes[mm]); });
   if (allWaterPaidOns.length){ allWaterPaidOns.sort(); waterPaidOn = allWaterPaidOns[allWaterPaidOns.length - 1]; }
 
-    let sharedUsed = false, sharedMode = null, sharedPaidOn = null;
-  if (rentRows.length && elecRows.length && waterRows.length){
+  const milkModesSet = new Set();
+  let milkPaidOn = null;
+  const allMilkPaidOns = [];
+  milkRows.forEach(m => {
+    if (monthKey && milkPayModes[monthKey]) milkModesSet.add(milkPayModes[monthKey]);
+    else Object.keys(milkPayModes).forEach(mm => { if (mm.startsWith(y)) milkModesSet.add(milkPayModes[mm]); });
+    if (monthKey && milkPayDates[monthKey]) allMilkPaidOns.push(milkPayDates[monthKey]);
+    else Object.keys(milkPayDates).forEach(mm => { if (mm.startsWith(y)) allMilkPaidOns.push(milkPayDates[mm]); });
+  });
+  if (allMilkPaidOns.length){ allMilkPaidOns.sort(); milkPaidOn = allMilkPaidOns[allMilkPaidOns.length - 1]; }
+
+  let sharedUsed = false, sharedMode = null, sharedPaidOn = null;
+  if (rentRows.length && elecRows.length && waterRows.length && milkRows.length){
     const rentModes    = [...new Set(rentRows.map(r => r.paymentMode).filter(Boolean))];
     const elecModes    = [...new Set(elecRows.map(r => r.paymentMode).filter(Boolean))];
     const waterModes   = [...waterModesSet].filter(Boolean);
+    const milkModes    = [...milkModesSet].filter(Boolean);
     const rentPaidOns  = [...new Set(rentRows.map(r => rentPaidOnOf(r)).filter(Boolean))];
     const elecPaidOns  = [...new Set(elecRows.map(r => elecPaidOnOf(r)).filter(Boolean))];
     const waterPaidOns = [...new Set(allWaterPaidOns.filter(Boolean))];
+    const milkPaidOns  = [...new Set(allMilkPaidOns.filter(Boolean))];
 
-    const modesAllSame =
-      rentModes.length === 1 && elecModes.length === 1 && waterModes.length === 1 &&
-      rentModes[0] === elecModes[0] && elecModes[0] === waterModes[0];
-
-    const paidOnAllSame =
-      rentPaidOns.length === 1 && elecPaidOns.length === 1 && waterPaidOns.length === 1 &&
-      rentPaidOns[0] === elecPaidOns[0] && elecPaidOns[0] === waterPaidOns[0];
+    const modesAllSame = rentModes.length === 1 && elecModes.length === 1 && waterModes.length === 1 && milkModes.length === 1 && rentModes[0] === elecModes[0] && elecModes[0] === waterModes[0] && waterModes[0] === milkModes[0];
+    const paidOnAllSame = rentPaidOns.length === 1 && elecPaidOns.length === 1 && waterPaidOns.length === 1 && milkPaidOns.length === 1 && rentPaidOns[0] === elecPaidOns[0] && elecPaidOns[0] === waterPaidOns[0] && waterPaidOns[0] === milkPaidOns[0];
 
     if (modesAllSame && paidOnAllSame){
       sharedUsed = true;
@@ -3823,14 +4271,17 @@ window.renderCombinedReport = function(){
     }
   }
 
-  let html = `<div>
+  /* ═══════════════════════════════════════════════════════════════
+     1. BUILD DESKTOP TABLE HTML
+     ═══════════════════════════════════════════════════════════════ */
+  let desktopHtml = `<div>
     <div style="text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--bdr)">
       <div style="font-family:var(--fontd);font-size:1.15rem;font-weight:800;color:var(--p)">📄 Combined Report</div>
-      <div style="font-size:.82rem;color:var(--muted);margin-top:4px">${periodLabel} · Room Rent + Electricity + Water</div>
+      <div style="font-size:.82rem;color:var(--muted);margin-top:4px">${periodLabel} · Room Rent + Electricity + Water + Milk</div>
     </div>`;
 
-  /* RENT */
-  html += `<div style="margin-bottom:22px">
+  // Rent Table
+  desktopHtml += `<div style="margin-bottom:22px">
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px dashed var(--bdr)">
       <div style="font-size:.92rem;font-weight:800;color:var(--acc)">🏠 Room Rent</div>
       <div style="font-size:.78rem;color:var(--muted)">${rentRows.length} month(s) · Total <strong style="color:var(--err)">₹${fmtAmt(rentTotal)}</strong></div>
@@ -3854,8 +4305,8 @@ window.renderCombinedReport = function(){
     </table></div>
   </div>`;
 
-  /* ELECTRICITY */
-  html += `<div style="margin-bottom:22px">
+  // Electricity Table
+  desktopHtml += `<div style="margin-bottom:22px">
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px dashed var(--bdr)">
       <div style="font-size:.92rem;font-weight:800;color:var(--warn)">⚡ Electricity Bill</div>
       <div style="font-size:.78rem;color:var(--muted)">${elecRows.length} month(s) · Total <strong style="color:var(--err)">₹${fmtAmt(elecTotal)}</strong></div>
@@ -3885,8 +4336,8 @@ window.renderCombinedReport = function(){
     </table></div>
   </div>`;
 
-  /* WATER */
-  html += `<div style="margin-bottom:22px">
+  // Water Table
+  desktopHtml += `<div style="margin-bottom:22px">
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px dashed var(--bdr)">
       <div style="font-size:.92rem;font-weight:800;color:var(--info)">💧 Water Bill</div>
       <div style="font-size:.78rem;color:var(--muted)">${waterRows.length} can(s) · Total <strong style="color:var(--err)">₹${fmtAmt(waterCansX20)}</strong> · (${waterRows.length} × ₹${WATER_RATE_PER_CAN})</div>
@@ -3913,23 +4364,106 @@ window.renderCombinedReport = function(){
     </table></div>
   </div>`;
 
-  /* GRAND TOTAL */
-  html += `<div style="background:var(--pl);border-radius:var(--rs);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border:1.5px solid var(--p)">
+  // Milk Table
+  desktopHtml += `<div style="margin-bottom:22px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px dashed var(--bdr)">
+      <div style="font-size:.92rem;font-weight:800;color:var(--warn)">🥛 Milk Bill</div>
+      <div style="font-size:.78rem;color:var(--muted)">${milkRows.length} days · Total <strong style="color:var(--err)">₹${fmtAmt(milkTotalAmt)}</strong></div>
+    </div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
+      <thead><tr style="background:var(--sec)">
+        <th style="padding:9px 12px;text-align:left;font-size:.68rem;color:var(--muted);text-transform:uppercase">Month</th>
+        <th style="padding:9px 12px;text-align:right;font-size:.68rem;color:var(--muted);text-transform:uppercase">Total Days</th>
+        <th style="padding:9px 12px;text-align:right;font-size:.68rem;color:var(--muted);text-transform:uppercase">Total Qty</th>
+        ${!sharedUsed ? '<th style="padding:9px 12px;text-align:left;font-size:.68rem;color:var(--muted);text-transform:uppercase">Paid Via</th><th style="padding:9px 12px;text-align:left;font-size:.68rem;color:var(--muted);text-transform:uppercase">Paid On</th>' : ''}
+        <th style="padding:9px 12px;text-align:right;font-size:.68rem;color:var(--muted);text-transform:uppercase">Amount</th>
+      </tr></thead><tbody>
+      ${milkRows.length ? `<tr style="border-bottom:1px solid var(--bdr)">
+        <td style="padding:9px 12px;font-weight:700">${monthKey ? monthLabel(monthKey) : y}</td>
+        <td style="padding:9px 12px;text-align:right;font-weight:700">${milkRows.length}</td>
+        <td style="padding:9px 12px;text-align:right;font-weight:700">${fmtAmt(milkTotalQty)} kg</td>
+        ${!sharedUsed ? `<td style="padding:9px 12px">${[...milkModesSet].filter(Boolean).map(m => pmBadge(m)).join(' ') || '<span class="pm-badge pm-none">—</span>'}</td>
+        <td style="padding:9px 12px;color:var(--muted);white-space:nowrap">${milkPaidOn ? fmtDate(milkPaidOn) : '—'}</td>` : ''}
+        <td style="padding:9px 12px;text-align:right;font-weight:800;color:var(--err);white-space:nowrap">₹${fmtAmt(milkTotalAmt)}</td>
+      </tr>` : `<tr><td colspan="${sharedUsed ? 4 : 6}" style="padding:14px;text-align:center;color:var(--muted);font-style:italic">No milk purchases in this period</td></tr>`}
+      </tbody>
+    </table></div>
+  </div>`;
+
+  // Desktop Grand Total
+  desktopHtml += `<div style="background:var(--pl);border-radius:var(--rs);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border:1.5px solid var(--p)">
     <div>
       <div style="font-family:var(--fontd);font-size:.85rem;font-weight:700;color:var(--p);opacity:.75;text-transform:uppercase;letter-spacing:.5px">GRAND TOTAL</div>
-      <div style="font-size:.78rem;color:var(--muted);margin-top:3px">${periodLabel} · Room Rent + Electricity + Water</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-top:3px">${periodLabel} · Room Rent + Electricity + Water + Milk</div>
       ${sharedUsed ? `<div style="margin-top:9px;font-size:.78rem;color:var(--txt)"><strong>Paid Via:</strong> ${pmBadge(sharedMode)} &nbsp;·&nbsp; <strong>Paid On:</strong> ${sharedPaidOn ? fmtDate(sharedPaidOn) : '—'}</div>` : ''}
     </div>
     <div style="font-family:var(--fontd);font-size:1.6rem;font-weight:800;color:var(--p)">₹${fmtAmt(grandTotal)}</div>
   </div>
   <div style="font-size:.74rem;color:var(--muted);margin-top:10px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding-top:8px;border-top:1px dashed var(--bdr)">
     <span>🏠 Rent: <strong>₹${fmtAmt(rentTotal)}</strong></span>
-    <span>⚡ Electricity: <strong>₹${fmtAmt(elecTotal)}</strong></span>
-    <span>💧 Water: <strong>₹${fmtAmt(waterCansX20)}</strong></span>
+    ${elecTotal > 0 ? `<span>⚡ Electricity: <strong>₹${fmtAmt(elecTotal)}</strong></span>` : ''}
+    ${waterCansX20 > 0 ? `<span>💧 Water: <strong>₹${fmtAmt(waterCansX20)}</strong></span>` : ''}
+    ${milkTotalAmt > 0 ? `<span>🥛 Milk: <strong>₹${fmtAmt(milkTotalAmt)}</strong></span>` : ''}
   </div>
   </div>`;
 
-  body.innerHTML = html;
+  $('combo-report-body-desktop').innerHTML = desktopHtml;
+
+  /* ═══════════════════════════════════════════════════════════════
+     2. BUILD MOBILE CARDS HTML
+     ═══════════════════════════════════════════════════════════════ */
+  let mobileHtml = `<div>
+    <div style="text-align:center;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--bdr)">
+      <div style="font-size:1.05rem;font-weight:800;color:var(--p)">📄 Combined Report</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-top:4px">${periodLabel}</div>
+    </div>`;
+
+  mobileHtml += `
+    <div style="background:var(--card); border:1px solid var(--bdr); border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:var(--sh);">
+      <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:8px;">
+        <span style="color:var(--acc)">🏠 Room Rent</span>
+        <span style="color:var(--err)">₹${fmtAmt(rentTotal)}</span>
+      </div>
+      <div style="font-size:.75rem; color:var(--muted);">${rentRows.length} month(s) recorded</div>
+    </div>`;
+
+  mobileHtml += `
+    <div style="background:var(--card); border:1px solid var(--bdr); border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:var(--sh);">
+      <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:8px;">
+        <span style="color:var(--warn)">⚡ Electricity Bill</span>
+        <span style="color:var(--err)">₹${fmtAmt(elecTotal)}</span>
+      </div>
+      <div style="font-size:.75rem; color:var(--muted);">${elecRows.length} month(s) recorded</div>
+    </div>`;
+
+  mobileHtml += `
+    <div style="background:var(--card); border:1px solid var(--bdr); border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:var(--sh);">
+      <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:8px;">
+        <span style="color:var(--info)">💧 Water Bill</span>
+        <span style="color:var(--err)">₹${fmtAmt(waterCansX20)}</span>
+      </div>
+      <div style="font-size:.75rem; color:var(--muted);">${waterRows.length} cans</div>
+    </div>`;
+
+  mobileHtml += `
+    <div style="background:var(--card); border:1px solid var(--bdr); border-radius:12px; padding:14px; margin-bottom:12px; box-shadow:var(--sh);">
+      <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:8px;">
+        <span style="color:var(--warn)">🥛 Milk Bill</span>
+        <span style="color:var(--err)">₹${fmtAmt(milkTotalAmt)}</span>
+      </div>
+      <div style="font-size:.75rem; color:var(--muted);">${milkRows.length} days</div>
+    </div>`;
+
+  mobileHtml += `
+    <div style="background:var(--pl); border:1.5px solid var(--p); border-radius:12px; padding:16px; margin-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:.85rem; font-weight:800; color:var(--p);">GRAND TOTAL</div>
+        <div style="font-size:1.3rem; font-weight:800; color:var(--p);">₹${fmtAmt(grandTotal)}</div>
+      </div>
+      <div style="font-size:.7rem; color:var(--muted); margin-top:4px;">${periodLabel} · Rent + Elec + Water + Milk</div>
+    </div></div>`;
+
+  $('combo-report-body-mobile').innerHTML = mobileHtml;
 };
 
 window.printCombinedReport = function(){
@@ -3969,8 +4503,11 @@ window.printCombinedReport = function(){
     ? [...allWaterPaidOns].sort()[allWaterPaidOns.length - 1]
     : null;
 
+  // ── Milk (MUST be declared before shared logic) ──
+  const milkRowsPrint = milkRecords.filter(m => matchesYM(String(m.date))).sort((a,b) => String(a.date).localeCompare(String(b.date)));
+
   let sharedUsed = false, sharedMode = null, sharedPaidOn = null;
-  if (rentRows.length && elecRows.length && waterRows.length){
+  if (rentRows.length && elecRows.length && waterRows.length && milkRowsPrint.length){
     const rentModes   = [...new Set(rentRows.map(r => r.paymentMode).filter(Boolean))];
     const elecModes   = [...new Set(elecRows.map(r => r.paymentMode).filter(Boolean))];
     const waterModes  = [...waterModesSet].filter(Boolean);
@@ -4035,11 +4572,42 @@ window.printCombinedReport = function(){
         : `<tr><td colspan="${sharedUsed ? 5 : 7}" style="padding:12px;text-align:center;color:#888;font-style:italic">No electricity readings in this period</td></tr>`}
       </tbody></table>`;
 
+  // ── Milk ──
+  const milkTotalPrint = milkRowsPrint.reduce((s,m) => s + (+m.amount || 0), 0);
+  const milkQtyPrint = milkRowsPrint.reduce((s,m) => s + (+m.unit || 0), 0);
+
+  const milkModesPrintSet = new Set();
+  const milkPaidOnsPrint = [];
+  if (monthKey && milkPayModes[monthKey]) milkModesPrintSet.add(milkPayModes[monthKey]);
+  else Object.keys(milkPayModes).forEach(mm => { if (mm.startsWith(y)) milkModesPrintSet.add(milkPayModes[mm]); });
+  if (monthKey && milkPayDates[monthKey]) milkPaidOnsPrint.push(milkPayDates[monthKey]);
+  else Object.keys(milkPayDates).forEach(mm => { if (mm.startsWith(y)) milkPaidOnsPrint.push(milkPayDates[mm]); });
+  
+  const milkPaidOnPrint = milkPaidOnsPrint.length ? milkPaidOnsPrint.sort().pop() : null;
+
+  body += `<h3 style="font-size:1rem;margin:14px 0 8px;font-weight:800">🥛 Milk Bill</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:20px">
+      <thead><tr style="background:#f7f7f9">
+        <th style="text-align:left;padding:8px 10px">Month</th>
+        <th style="text-align:right;padding:8px 10px">Total Days</th>
+        <th style="text-align:right;padding:8px 10px">Total Qty</th>
+        ${!sharedUsed ? '<th style="text-align:left;padding:8px 10px">Paid Via</th><th style="text-align:left;padding:8px 10px">Paid On</th>' : ''}
+        <th style="text-align:right;padding:8px 10px">Amount</th>
+      </tr></thead><tbody>
+      ${milkRowsPrint.length ? `<tr>
+        <td style="padding:8px 10px">${periodLabel}</td>
+        <td style="text-align:right;padding:8px 10px">${milkRowsPrint.length}</td>
+        <td style="text-align:right;padding:8px 10px">${fmtAmt(milkQtyPrint)} kg</td>
+        ${!sharedUsed ? `<td style="padding:8px 10px">${[...milkModesPrintSet].filter(Boolean).join(', ') || '—'}</td><td style="padding:8px 10px">${milkPaidOnPrint ? fmtDate(milkPaidOnPrint) : '—'}</td>` : ''}
+        <td style="text-align:right;padding:8px 10px">₹${fmtAmt(milkTotalPrint)}</td>
+      </tr>` : `<tr><td colspan="${sharedUsed ? 4 : 6}" style="padding:12px;text-align:center;color:#888;font-style:italic">No milk records in this period</td></tr>`}
+      </tbody></table>`;
+
   // ── Totals ──
   const rentTotalPrint  = rentRows.reduce((s,r) => s + (+r.amount || 0), 0);
   const elecTotalPrint  = elecRows.reduce((s,r) => s + r.amount, 0);
   const waterTotalPrint = waterRows.length * WATER_RATE_PER_CAN;
-  const grandTotalPrint = rentTotalPrint + elecTotalPrint + waterTotalPrint;
+  const grandTotalPrint = rentTotalPrint + elecTotalPrint + waterTotalPrint + milkTotalPrint;
 
   // ── Water ──
   body += `<h3 style="font-size:1rem;margin:14px 0 8px;font-weight:800">💧 Water Bill</h3>
@@ -4063,15 +4631,16 @@ window.printCombinedReport = function(){
     <div style="margin-top:20px;padding:16px 18px;border:2px solid #333;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
       <div>
         <div style="font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#555">GRAND TOTAL</div>
-        <div style="font-size:.78rem;color:#555;margin-top:3px">${periodLabel} · Room Rent + Electricity + Water</div>
+        <div style="font-size:.78rem;color:#555;margin-top:3px">${periodLabel} · Room Rent + Electricity + Water + Milk</div>
         ${sharedUsed ? `<div style="font-size:.78rem;color:#333;margin-top:6px"><strong>Paid Via:</strong> ${esc(sharedMode || '—')} &nbsp;·&nbsp; <strong>Paid On:</strong> ${sharedPaidOn ? fmtDate(sharedPaidOn) : '—'}</div>` : ''}
       </div>
       <div style="font-size:1.5rem;font-weight:800">₹${fmtAmt(grandTotalPrint)}</div>
     </div>
     <div style="margin-top:10px;font-size:.78rem;color:#555;display:flex;gap:18px;flex-wrap:wrap;justify-content:center;padding-top:8px;border-top:1px dashed #ccc">
       <span>🏠 Rent: <strong>₹${fmtAmt(rentTotalPrint)}</strong></span>
-      <span>⚡ Electricity: <strong>₹${fmtAmt(elecTotalPrint)}</strong></span>
-      <span>💧 Water: <strong>₹${fmtAmt(waterTotalPrint)}</strong></span>
+      ${elecTotalPrint > 0 ? `<span>⚡ Electricity: <strong>₹${fmtAmt(elecTotalPrint)}</strong></span>` : ''}
+      ${waterTotalPrint > 0 ? `<span>💧 Water: <strong>₹${fmtAmt(waterTotalPrint)}</strong></span>` : ''}
+      ${milkTotalPrint > 0 ? `<span>🥛 Milk: <strong>₹${fmtAmt(milkTotalPrint)}</strong></span>` : ''}
     </div>`;
 
   openPrintWindow('Combined Report - ' + periodLabel, body);
@@ -4107,9 +4676,13 @@ function renderRentTab(){
   $('rent-badge').textContent = rentPayments.length + ' entries';
 
   const tbody = $('rent-tbody');
+  const mobileList = $('rent-mobile-list');
+
   if (!rentPayments.length){
     tbody.innerHTML = `<tr><td colspan="5"><div class="es"><div class="ei">🏠</div><p>No rent payments recorded.</p></div></td></tr>`;
+    mobileList.innerHTML = `<div class="es"><div class="ei">🏠</div><p>No rent payments recorded.</p></div>`;
   } else {
+    // Desktop Table
     tbody.innerHTML = rentPayments.map(r => `<tr>
       <td data-label="Month" style="font-weight:700">${monthLabel(rentMonthOf(r))}</td>
       <td data-label="Amount" class="amc">₹${fmtAmt(r.amount)}</td>
@@ -4120,6 +4693,25 @@ function renderRentTab(){
         <button class="btn bd bxs" onclick="deleteRentPayment('${r.id}')" type="button">🗑️</button>
       </div></td>
     </tr>`).join('');
+
+    // Mobile Cards
+    mobileList.innerHTML = rentPayments.map(r => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 8px; border-bottom:1px solid var(--bdr);">
+        <div>
+          <div style="font-weight:700; font-size:.85rem; color:var(--txt);">${monthLabel(rentMonthOf(r))}</div>
+          <div style="font-size:.7rem; color:var(--muted); margin-top:2px;">
+            ${pmBadge(r.paymentMode)} ${rentPaidOnOf(r) ? '· ' + fmtDate(rentPaidOnOf(r)) : ''}
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="font-weight:800; color:var(--err); font-size:.85rem;">₹${fmtAmt(r.amount)}</div>
+          <div class="ab" style="gap:6px;">
+            <button class="btn bo bxs" onclick="openRentEdit('${r.id}')" type="button">✏️</button>
+            <button class="btn bd bxs" onclick="deleteRentPayment('${r.id}')" type="button">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
   }
 
   populateRentReportYears();
@@ -4221,15 +4813,21 @@ window.onRentYearChange = function(){
 window.renderRentReport = function(){
   const ySel = $('rent-rep-year');
   const mSel = $('rent-rep-month');
-  if (!ySel || !ySel.value){ $('rent-report-body').innerHTML = ''; return; }
+  const desktopEl = $('rent-report-body-desktop');
+  const mobileEl = $('rent-report-body-mobile');
+  
+  if (!ySel || !ySel.value){ desktopEl.innerHTML = ''; mobileEl.innerHTML = ''; return; }
   const y = ySel.value, m = mSel.value;
-  const body = $('rent-report-body');
 
   if (m){
     const rows = rentPayments.filter(r => rentMonthOf(r) === m);
-    if (!rows.length){ body.innerHTML = `<div class="es"><div class="ei">🏠</div><p>No rent payments for ${monthLabel(m)}.</p></div>`; return; }
+    if (!rows.length){ 
+      const empty = `<div class="es"><div class="ei">🏠</div><p>No rent payments for ${monthLabel(m)}.</p></div>`;
+      desktopEl.innerHTML = empty; mobileEl.innerHTML = empty; return; 
+    }
     const total = rows.reduce((s,r) => s + (+r.amount || 0), 0);
-    body.innerHTML = `<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">${rows.length} payment(s) · Total: <strong>₹${fmtAmt(total)}</strong></div>
+    
+    desktopEl.innerHTML = `<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">${rows.length} payment(s) · Total: <strong>₹${fmtAmt(total)}</strong></div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
         <thead><tr style="border-bottom:2px solid var(--bdr)">
           <th style="text-align:left;padding:6px 8px;color:var(--muted)">Month</th>
@@ -4248,6 +4846,17 @@ window.renderRentReport = function(){
           <td style="text-align:right;padding:7px 8px;font-weight:800;color:var(--p)">₹${fmtAmt(total)}</td>
         </tr></tfoot>
       </table></div>`;
+
+    mobileEl.innerHTML = `
+      <div style="background:var(--pl); padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid var(--p);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+          <b style="color:var(--p);">${monthLabel(m)}</b>
+          <b style="color:var(--p);">₹${fmtAmt(total)}</b>
+        </div>
+        <div style="font-size:.75rem; color:var(--txt);">
+          <b>${rows.length}</b> payment(s) recorded.
+        </div>
+      </div>`;
     return;
   }
 
@@ -4263,11 +4872,11 @@ window.renderRentReport = function(){
   const totalAmt = rows.reduce((s,r) => s + (+r.amount || 0), 0);
 
   if (!months.length){
-    body.innerHTML = `<div class="es"><div class="ei">🏠</div><p>No rent payments for ${y}.</p></div>`;
-    return;
+    const empty = `<div class="es"><div class="ei">🏠</div><p>No rent payments for ${y}.</p></div>`;
+    desktopEl.innerHTML = empty; mobileEl.innerHTML = empty; return;
   }
 
-  body.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
+  desktopEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
     <thead><tr style="border-bottom:2px solid var(--bdr)">
       <th style="text-align:left;padding:6px 8px;color:var(--muted)">Month</th>
       <th style="text-align:right;padding:6px 8px;color:var(--muted)">Payments</th>
@@ -4285,6 +4894,19 @@ window.renderRentReport = function(){
       <td style="text-align:right;padding:7px 8px;font-weight:800;color:var(--p)">₹${fmtAmt(totalAmt)}</td>
     </tr></tfoot>
   </table></div>`;
+
+  mobileEl.innerHTML = months.map(mm => `
+    <div style="background:var(--sec); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--bdr); display:flex; justify-content:space-between;">
+      <b style="font-size:.9rem; color:var(--p);">${monthLabel(mm)}</b>
+      <span style="font-weight:800; color:var(--p);">₹${fmtAmt(byMonth[mm].amt)}</span>
+    </div>
+  `).join('') + `
+    <div style="background:var(--pl); padding:12px; border-radius:8px; margin-top:16px; border:1px solid var(--p);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b style="font-size:.9rem; color:var(--p);">TOTAL (${y})</b>
+        <span style="font-weight:800; color:var(--p);">₹${fmtAmt(totalAmt)}</span>
+      </div>
+    </div>`;
 }
 
 window.printRentReport = function(){
@@ -4367,10 +4989,16 @@ function renderElectricityTab(){
   $('elec-badge').textContent = computed.length + ' entries';
 
   const tbody = $('elec-tbody');
+  const mobileList = $('elec-mobile-list');
+
   if (!computed.length){
     tbody.innerHTML = `<tr><td colspan="8"><div class="es"><div class="ei">⚡</div><p>No readings yet.</p></div></td></tr>`;
+    mobileList.innerHTML = `<div class="es"><div class="ei">⚡</div><p>No readings yet.</p></div>`;
   } else {
-    tbody.innerHTML = [...computed].reverse().map(r => `<tr>
+    const revComputed = [...computed].reverse();
+    
+    // Desktop Table
+    tbody.innerHTML = revComputed.map(r => `<tr>
       <td data-label="Month">${monthLabel(r.month)}</td>
       <td data-label="Date Recorded">${fmtDate(r.enteredDate)}</td>
       <td data-label="Reading">${(+r.reading || 0).toLocaleString('en-IN')}</td>
@@ -4383,6 +5011,23 @@ function renderElectricityTab(){
         <button class="btn bd bxs" onclick="deleteElecReading('${r.id}')" type="button">🗑️</button>
       </div></td>
     </tr>`).join('');
+
+    // Mobile Cards
+    mobileList.innerHTML = revComputed.map(r => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 8px; border-bottom:1px solid var(--bdr);">
+        <div>
+          <div style="font-weight:700; font-size:.85rem; color:var(--txt);">${monthLabel(r.month)}</div>
+          <div style="font-size:.7rem; color:var(--muted); margin-top:2px;">Read: ${(+r.reading || 0).toLocaleString('en-IN')} · Used: <b style="color:var(--txt)">${r.consumed}</b></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="font-weight:800; color:var(--err); font-size:.85rem;">₹${fmtAmt(r.amount)}</div>
+          <div class="ab" style="gap:6px;">
+            <button class="btn bo bxs" onclick="openElecEdit('${r.id}')" type="button">✏️</button>
+            <button class="btn bd bxs" onclick="deleteElecReading('${r.id}')" type="button">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
   }
 
   populateElecReportYears();
@@ -4495,14 +5140,21 @@ window.onElecYearChange = function(){
 window.renderElecReport = function(){
   const y = $('elec-rep-year').value;
   const m = $('elec-rep-month').value;
-  if (!y){ $('elec-report-body').innerHTML = ''; return; }
+  const desktopEl = $('elec-report-body-desktop');
+  const mobileEl = $('elec-report-body-mobile');
+  
+  if (!y){ desktopEl.innerHTML = ''; mobileEl.innerHTML = ''; return; }
+
   const computed = getElecComputed().filter(r => r.month.startsWith(y));
-  const body = $('elec-report-body');
 
   if (m){
     const r = computed.find(x => x.month === m);
-    if (!r){ body.innerHTML = `<div class="es"><div class="ei">⚡</div><p>No reading for ${monthLabel(m)}.</p></div>`; return; }
-    body.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.85rem">
+    if (!r){ 
+      const empty = `<div class="es"><div class="ei">⚡</div><p>No reading for ${monthLabel(m)}.</p></div>`;
+      desktopEl.innerHTML = empty; mobileEl.innerHTML = empty; return; 
+    }
+
+    desktopEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.85rem">
       <tr><td style="padding:6px 4px;color:var(--muted)">Meter No.</td><td style="padding:6px 4px;font-weight:700">${ELEC_METER_NO}</td></tr>
       <tr><td style="padding:6px 4px;color:var(--muted)">Billing Month</td><td style="padding:6px 4px;font-weight:700">${monthLabel(r.month)}</td></tr>
       <tr><td style="padding:6px 4px;color:var(--muted)">Date Recorded</td><td style="padding:6px 4px">${fmtDate(r.enteredDate)}</td></tr>
@@ -4515,6 +5167,21 @@ window.renderElecReport = function(){
       <tr><td style="padding:6px 4px;color:var(--muted)">Paid Via</td><td style="padding:6px 4px">${esc(r.paymentMode || '—')}</td></tr>
       <tr><td style="padding:6px 4px;color:var(--muted)">Paid On</td><td style="padding:6px 4px">${r.paidOnDate ? fmtDate(r.paidOnDate) : '—'}</td></tr>
     </table>`;
+
+    mobileEl.innerHTML = `
+      <div style="background:var(--pl); padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid var(--p);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+          <b style="color:var(--p);">${monthLabel(r.month)}</b>
+          <b style="color:var(--p);">₹${fmtAmt(r.amount)}</b>
+        </div>
+        <div style="font-size:.75rem; color:var(--txt); display:flex; justify-content:space-between;">
+          <span>Used: <b>${r.consumed} units</b></span>
+          <span>Read: <b>${(+r.reading || 0).toLocaleString('en-IN')}</b></span>
+        </div>
+        <div style="font-size:.7rem; color:var(--muted); margin-top:4px;">
+          Paid: ${esc(r.paymentMode || '—')} ${r.paidOnDate ? `on ${fmtDate(r.paidOnDate)}` : ''}
+        </div>
+      </div>`;
     return;
   }
 
@@ -4522,11 +5189,11 @@ window.renderElecReport = function(){
   const totalAmt = computed.reduce((s,r) => s + r.amount, 0);
 
   if (!computed.length){
-    body.innerHTML = `<div class="es"><div class="ei">⚡</div><p>No readings for ${y}.</p></div>`;
-    return;
+    const empty = `<div class="es"><div class="ei">⚡</div><p>No readings for ${y}.</p></div>`;
+    desktopEl.innerHTML = empty; mobileEl.innerHTML = empty; return;
   }
 
-  body.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.78rem">
+  desktopEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.78rem">
     <thead><tr style="border-bottom:2px solid var(--bdr)">
       <th style="text-align:left;padding:6px 8px;color:var(--muted)">Month</th>
       <th style="text-align:right;padding:6px 8px;color:var(--muted)">Last Reading</th>
@@ -4552,6 +5219,28 @@ window.renderElecReport = function(){
       <td></td>
     </tr></tfoot>
   </table></div>`;
+
+  mobileEl.innerHTML = computed.map(r => `
+    <div style="background:var(--sec); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--bdr);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <b style="font-size:.9rem; color:var(--p);">${monthLabel(r.month)}</b>
+        <span style="font-weight:800; color:var(--p);">₹${fmtAmt(r.amount)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:.75rem; color:var(--muted);">
+        <span>Used: <b style="color:var(--txt)">${r.consumed}</b></span>
+        <span>Reading: <b style="color:var(--txt)">${(+r.reading || 0).toLocaleString('en-IN')}</b></span>
+      </div>
+    </div>
+  `).join('') + `
+    <div style="background:var(--pl); padding:12px; border-radius:8px; margin-top:16px; border:1px solid var(--p);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b style="font-size:.9rem; color:var(--p);">TOTAL (${y})</b>
+        <span style="font-weight:800; color:var(--p);">₹${fmtAmt(totalAmt)}</span>
+      </div>
+      <div style="font-size:.75rem; color:var(--txt); margin-top:4px;">
+        Total units: <b>${totalUnits.toLocaleString('en-IN')}</b>
+      </div>
+    </div>`;
 }
 
 window.printElecReport = function(){
@@ -4595,13 +5284,85 @@ window.printElecReport = function(){
 };
 
 
-/* ═══════════════════════════════════════════════════════════════
-   WATER TAB
-   ═══════════════════════════════════════════════════════════════ */
+window.filterWaterTable = function() {
+  const mFilter = $('water-filt-month');
+  const yFilter = $('water-filt-year');
+  const selM = mFilter ? mFilter.value : '';
+  const selY = yFilter ? yFilter.value : '';
+  
+  let displayedWater = waterPurchases;
+  if (selM) displayedWater = displayedWater.filter(w => String(w.date).startsWith(selM));
+  else if (selY) displayedWater = displayedWater.filter(w => String(w.date).startsWith(selY));
+
+  const badge = $('water-badge');
+  if (badge) badge.textContent = displayedWater.length + ' entries';
+
+  const tbody = $('water-tbody');
+  if (!tbody) return;
+
+  if (!displayedWater.length){
+    $('water-tbody').innerHTML = `<tr><td colspan="4"><div class="es"><div class="ei">💧</div><p>No water purchases recorded for this filter.</p></div></td></tr>`;
+    $('water-mobile-list').innerHTML = `<div class="es"><div class="ei">💧</div><p>No water purchases recorded for this filter.</p></div>`;
+    return;
+  }
+
+  // 1. Desktop Table Render
+  $('water-tbody').innerHTML = displayedWater.map(w => `<tr>
+    <td data-label="Date" class="dc">${fmtDate(w.date)}</td>
+    <td data-label="Notes" class="nc">${esc(w.note || '—')}</td>
+    <td data-label="Amount" class="amc">₹${fmtAmt(w.amount)}</td>
+    <td data-label="Actions"><div class="ab">
+      <button class="btn bo bxs" onclick="openWaterEdit('${w.id}')" type="button">✏️</button>
+      <button class="btn bd bxs" onclick="deleteWaterExp('${w.id}')" type="button">🗑️</button>
+    </div></td>
+  </tr>`).join('');
+
+  // 2. Mobile Card Render
+  $('water-mobile-list').innerHTML = displayedWater.map(w => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 8px; border-bottom:1px solid var(--bdr);">
+      <div>
+        <div style="font-weight:700; font-size:.85rem; color:var(--txt);">${fmtDate(w.date)}</div>
+        <div style="font-size:.7rem; color:var(--muted); margin-top:2px;">
+          ${w.note ? esc(w.note) : '💧 Water Jar'}
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="font-weight:800; color:var(--err); font-size:.85rem;">₹${fmtAmt(w.amount)}</div>
+        <div class="ab" style="gap:6px;">
+          <button class="btn bo bxs" onclick="openWaterEdit('${w.id}')" type="button">✏️</button>
+          <button class="btn bd bxs" onclick="deleteWaterExp('${w.id}')" type="button">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
 function renderWaterTab(){
   const dEl = $('water-date');
   if (dEl && !dEl.value) dEl.value = localDateStr();
   updateDateDayLabel('water-date','water-date-day');
+
+  // Populate Filter Dropdowns
+  const mFilter = $('water-filt-month');
+  const yFilter = $('water-filt-year');
+  if (mFilter && yFilter) {
+    const prevM = mFilter.value;
+    const prevY = yFilter.value;
+    const months = new Set();
+    const years = new Set();
+    waterPurchases.forEach(w => {
+      if (w.date) {
+        months.add(w.date.slice(0, 7));
+        years.add(w.date.slice(0, 4));
+      }
+    });
+    
+    mFilter.innerHTML = '<option value="">All Months</option>' + [...months].sort().reverse().map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('');
+    yFilter.innerHTML = '<option value="">All Years</option>' + [...years].sort().reverse().map(y => `<option value="${y}">${y}</option>`).join('');
+    
+    if (months.has(prevM)) mFilter.value = prevM;
+    if (years.has(prevY)) yFilter.value = prevY;
+  }
 
   const todayStr = localDateStr();
   const curYM = todayStr.slice(0,7);
@@ -4620,23 +5381,7 @@ function renderWaterTab(){
   $('water-total-amt').textContent = '₹' + fmtAmt(totalAmt);
   $('water-total-c').textContent = waterPurchases.length + ' cans';
 
-  $('water-badge').textContent = waterPurchases.length + ' entries';
-
-  const tbody = $('water-tbody');
-  if (!waterPurchases.length){
-    tbody.innerHTML = `<tr><td colspan="4"><div class="es"><div class="ei">💧</div><p>No water purchases recorded.</p></div></td></tr>`;
-  } else {
-    tbody.innerHTML = waterPurchases.map(w => `<tr>
-      <td data-label="Date" class="dc">${fmtDate(w.date)}</td>
-      <td data-label="Type"><span class="cb">Water Jar</span></td>
-      <td data-label="Amount" class="amc">₹${fmtAmt(w.amount)}</td>
-      <td data-label="Actions"><div class="ab">
-        <button class="btn bo bxs" onclick="openWaterEdit('${w.id}')" type="button">✏️</button>
-        <button class="btn bd bxs" onclick="deleteWaterExp('${w.id}')" type="button">🗑️</button>
-      </div></td>
-    </tr>`).join('');
-  }
-
+  filterWaterTable();
   renderWaterPayList();
   populateWaterReportYears();
   onWaterYearChange();
@@ -4645,13 +5390,14 @@ function renderWaterTab(){
 window.saveWaterExp = async function(){
   const date = $('water-date').value;
   const amount = parseFloat($('water-amount').value);
+  const note = ($('water-note').value || '').trim();
   if (!date){ toast('Select a date.', 'error'); return; }
   if (isNaN(amount) || amount < 0){ toast('Enter a valid amount.', 'error'); return; }
 
   const res = await addRecord(COL.WATER,
-    { date, amount, expenseType: 'Water Jar' },
+    { date, amount, note },
     { pillMsg: 'Water purchase saved', pillIcon: '💧',
-      historyAction: ACT.CREATE, historyData: { date, amount } });
+      historyAction: ACT.CREATE, historyData: { date, amount, note } });
 
   if (res.ok) clearWaterForm();
 };
@@ -4676,6 +5422,7 @@ window.openWaterEdit = function(id){
   $('water-e-id').value = w.id;
   $('water-e-date').value = w.date;
   $('water-e-amount').value = w.amount;
+  $('water-e-note').value = w.note || '';
   $('water-edit-mo').classList.add('open');
 };
 
@@ -4683,10 +5430,11 @@ window.updateWaterExp = async function(){
   const id = $('water-e-id').value;
   const date = $('water-e-date').value;
   const amount = parseFloat($('water-e-amount').value);
+  const note = ($('water-e-note').value || '').trim();
   if (!date || isNaN(amount) || amount < 0){ toast('Fill all fields correctly.', 'error'); return; }
 
   const res = await updateRecord(COL.WATER, id,
-    { date, amount },
+    { date, amount, note },
     { pillMsg: 'Purchase updated', pillIcon: '✏️',
       historyAction: ACT.UPDATE, historyData: { id } });
 
@@ -4766,30 +5514,50 @@ window.onWaterYearChange = function(){
 window.renderWaterReport = function(){
   const y = $('water-rep-year').value;
   const m = $('water-rep-month').value;
-  if (!y){ $('water-report-body').innerHTML = ''; return; }
-  const body = $('water-report-body');
+  const desktopEl = $('water-report-body-desktop');
+  const mobileEl = $('water-report-body-mobile');
+  
+  if (!y){ desktopEl.innerHTML = ''; mobileEl.innerHTML = ''; return; }
 
   if (m){
     const rows = waterPurchases.filter(w => String(w.date).startsWith(m));
-    if (!rows.length){ body.innerHTML = `<div class="es"><div class="ei">💧</div><p>No purchases for ${monthLabel(m)}.</p></div>`; return; }
+    if (!rows.length){ 
+      const empty = `<div class="es"><div class="ei">💧</div><p>No purchases for ${monthLabel(m)}.</p></div>`;
+      desktopEl.innerHTML = empty; mobileEl.innerHTML = empty; return; 
+    }
     const mode = waterPayModes[m] || '—';
+    const date = waterPayDates[m] ? fmtDate(waterPayDates[m]) : '—';
     const amount = rows.length * WATER_RATE_PER_CAN;
-    body.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
+
+    desktopEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
       <thead><tr style="border-bottom:2px solid var(--bdr)">
-  <th style="text-align:left;padding:8px;color:var(--muted)">Month</th>
-  <th style="text-align:right;padding:8px;color:var(--muted)">Total Cans</th>
-  <th style="text-align:left;padding:8px;color:var(--muted)">Paid Via</th>
-  <th style="text-align:left;padding:8px;color:var(--muted)">Paid On</th>
-  <th style="text-align:right;padding:8px;color:var(--muted)">Amount</th>
-</tr></thead><tbody>
+        <th style="text-align:left;padding:8px;color:var(--muted)">Month</th>
+        <th style="text-align:right;padding:8px;color:var(--muted)">Total Cans</th>
+        <th style="text-align:left;padding:8px;color:var(--muted)">Paid Via</th>
+        <th style="text-align:left;padding:8px;color:var(--muted)">Paid On</th>
+        <th style="text-align:right;padding:8px;color:var(--muted)">Amount</th>
+      </tr></thead><tbody>
       <tr style="border-bottom:1px solid var(--bdr)">
-  <td style="padding:8px;font-weight:600">${monthLabel(m)}</td>
-  <td style="text-align:right;padding:8px;font-weight:700">${rows.length}</td>
-  <td style="padding:8px">${esc(mode)}</td>
-  <td style="padding:8px">${waterPayDates[m] ? fmtDate(waterPayDates[m]) : '—'}</td>
-  <td style="text-align:right;padding:8px;font-weight:700;color:var(--p)">₹${fmtAmt(amount)}</td>
-</tr></tbody>
+        <td style="padding:8px;font-weight:600">${monthLabel(m)}</td>
+        <td style="text-align:right;padding:8px;font-weight:700">${rows.length}</td>
+        <td style="padding:8px">${esc(mode)}</td>
+        <td style="padding:8px">${date}</td>
+        <td style="text-align:right;padding:8px;font-weight:700;color:var(--p)">₹${fmtAmt(amount)}</td>
+      </tr></tbody>
     </table></div>`;
+
+    mobileEl.innerHTML = `
+      <div style="background:var(--pl); padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid var(--p);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+          <b style="color:var(--p);">${monthLabel(m)}</b>
+          <b style="color:var(--p);">₹${fmtAmt(amount)}</b>
+        </div>
+        <div style="font-size:.75rem; color:var(--txt); display:flex; justify-content:space-between;">
+          <span><b>${rows.length}</b> cans</span>
+          <span>Paid via: <b>${esc(mode)}</b></span>
+        </div>
+        ${date !== '—' ? `<div style="font-size:.7rem; color:var(--muted); margin-top:4px;">Paid on: ${date}</div>` : ''}
+      </div>`;
     return;
   }
 
@@ -4804,34 +5572,56 @@ window.renderWaterReport = function(){
   const totalAmt = rows.length * WATER_RATE_PER_CAN;
 
   if (!months.length){
-    body.innerHTML = `<div class="es"><div class="ei">💧</div><p>No water purchases for ${y}.</p></div>`;
-    return;
+    const empty = `<div class="es"><div class="ei">💧</div><p>No water purchases for ${y}.</p></div>`;
+    desktopEl.innerHTML = empty; mobileEl.innerHTML = empty; return;
   }
 
-  body.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
+  desktopEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
     <thead><tr style="border-bottom:2px solid var(--bdr)">
-  <th style="text-align:left;padding:8px;color:var(--muted)">Month</th>
-  <th style="text-align:right;padding:8px;color:var(--muted)">Cans</th>
-  <th style="text-align:left;padding:8px;color:var(--muted)">Paid Via</th>
-  <th style="text-align:left;padding:8px;color:var(--muted)">Paid On</th>
-  <th style="text-align:right;padding:8px;color:var(--muted)">Amount</th>
-</tr></thead><tbody>
+      <th style="text-align:left;padding:8px;color:var(--muted)">Month</th>
+      <th style="text-align:right;padding:8px;color:var(--muted)">Cans</th>
+      <th style="text-align:left;padding:8px;color:var(--muted)">Paid Via</th>
+      <th style="text-align:left;padding:8px;color:var(--muted)">Paid On</th>
+      <th style="text-align:right;padding:8px;color:var(--muted)">Amount</th>
+    </tr></thead><tbody>
     ${months.map(mm => `<tr style="border-bottom:1px solid var(--bdr)">
-  <td style="padding:8px;font-weight:600">${monthLabel(mm)}</td>
-  <td style="text-align:right;padding:8px;font-weight:700">${byMonth[mm].cnt}</td>
-  <td style="padding:8px">${esc(waterPayModes[mm] || '—')}</td>
-  <td style="padding:8px">${waterPayDates[mm] ? fmtDate(waterPayDates[mm]) : '—'}</td>
-  <td style="text-align:right;padding:8px;font-weight:700;color:var(--p)">₹${fmtAmt(byMonth[mm].cnt * WATER_RATE_PER_CAN)}</td>
-</tr>`).join('')}
+      <td style="padding:8px;font-weight:600">${monthLabel(mm)}</td>
+      <td style="text-align:right;padding:8px;font-weight:700">${byMonth[mm].cnt}</td>
+      <td style="padding:8px">${esc(waterPayModes[mm] || '—')}</td>
+      <td style="padding:8px">${waterPayDates[mm] ? fmtDate(waterPayDates[mm]) : '—'}</td>
+      <td style="text-align:right;padding:8px;font-weight:700;color:var(--p)">₹${fmtAmt(byMonth[mm].cnt * WATER_RATE_PER_CAN)}</td>
+    </tr>`).join('')}
     </tbody>
     <tfoot><tr style="border-top:2px solid var(--p)">
-  <td style="padding:8px;font-weight:800">TOTAL</td>
-  <td style="text-align:right;padding:8px;font-weight:800">${rows.length}</td>
-  <td></td>
-  <td></td>
-  <td style="text-align:right;padding:8px;font-weight:800;color:var(--p)">₹${fmtAmt(totalAmt)}</td>
-</tr></tfoot>
+      <td style="padding:8px;font-weight:800">TOTAL</td>
+      <td style="text-align:right;padding:8px;font-weight:800">${rows.length}</td>
+      <td></td>
+      <td></td>
+      <td style="text-align:right;padding:8px;font-weight:800;color:var(--p)">₹${fmtAmt(totalAmt)}</td>
+    </tr></tfoot>
   </table></div>`;
+
+  mobileEl.innerHTML = months.map(mm => `
+    <div style="background:var(--sec); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--bdr);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <b style="font-size:.9rem; color:var(--p);">${monthLabel(mm)}</b>
+        <span style="font-weight:800; color:var(--p);">₹${fmtAmt(byMonth[mm].cnt * WATER_RATE_PER_CAN)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:.75rem; color:var(--muted);">
+        <span>Cans: <b style="color:var(--txt)">${byMonth[mm].cnt}</b></span>
+        <span>Via: <b style="color:var(--txt)">${esc(waterPayModes[mm] || '—')}</b></span>
+      </div>
+    </div>
+  `).join('') + `
+    <div style="background:var(--pl); padding:12px; border-radius:8px; margin-top:16px; border:1px solid var(--p);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b style="font-size:.9rem; color:var(--p);">TOTAL (${y})</b>
+        <span style="font-weight:800; color:var(--p);">₹${fmtAmt(totalAmt)}</span>
+      </div>
+      <div style="font-size:.75rem; color:var(--txt); margin-top:4px;">
+        Total cans: <b>${rows.length}</b>
+      </div>
+    </div>`;
 }
 
 window.printWaterReport = function(){
@@ -5551,6 +6341,586 @@ window.importDailyCSV = async function(){
 };
 
 /* ═══════════════════════════════════════════════════════════════
+   MILK TRACKER LOGIC
+   ═══════════════════════════════════════════════════════════════ */
+const MILK_RATE = 100; // ₹100 per KG
+
+// Live listener for Milk collection
+subscribeCollection('milk_records', rows => {
+  milkRecords = rows.sort((a,b) => String(b.date).localeCompare(String(a.date)));
+  setCounter('milk', rows.length); // Update top header badge
+  if ($('tab-milk').classList.contains('active')) renderMilkTab();
+  renderLastActivity(); // Update the "Last Activity" label
+});
+
+window.recalcMilk = function() {
+  const unit = $('milk-unit').value;
+  const amtInput = $('milk-amount');
+
+  if (unit === 'extra') {
+    // Unlock the input box so the user can type a manual amount
+    amtInput.readOnly = false;
+    amtInput.style.background = 'var(--card)'; 
+    amtInput.style.borderColor = 'var(--p)';
+    amtInput.value = ''; // Clear it for manual entry
+    amtInput.focus();    // Jump the cursor to the box
+    return;
+  }
+
+  // If NOT extra, lock the box and do the auto-calculation
+  amtInput.readOnly = true;
+  amtInput.style.background = 'var(--sec)';
+  amtInput.style.borderColor = 'var(--bdr)';
+
+  if (unit === '0') {
+    amtInput.value = '0.00';
+  } else {
+    const unitNum = parseFloat(unit);
+    const amt = unitNum * MILK_RATE;
+    amtInput.value = amt > 0 ? amt.toFixed(2) : '0.00';
+  }
+};
+window.recalcMilkEdit = function() {
+  const unit = $('milk-e-unit').value;
+  const amtInput = $('milk-e-amount');
+
+  if (unit === 'extra') {
+    amtInput.readOnly = false;
+    amtInput.style.background = 'var(--card)'; 
+    amtInput.style.borderColor = 'var(--p)';
+    return;
+  }
+
+  amtInput.readOnly = true;
+  amtInput.style.background = 'var(--sec)';
+  amtInput.style.borderColor = 'var(--bdr)';
+
+  if (unit === '0') {
+    amtInput.value = '0.00';
+  } else {
+    const unitNum = parseFloat(unit);
+    const amt = unitNum * 100;
+    amtInput.value = amt > 0 ? amt.toFixed(2) : '0.00';
+  }
+};
+
+window.openMilkEdit = function(id) {
+  const m = milkRecords.find(x => x.id === id);
+  if (!m) return;
+  
+  $('milk-e-id').value = m.id;
+  $('milk-e-date').value = m.date;
+  $('milk-e-unit').value = m.unit;
+  $('milk-e-note').value = m.note || '';
+  
+  // Set amount and trigger lock state
+  if (m.unit === 'extra') {
+    $('milk-e-amount').value = m.amount;
+    $('milk-e-amount').readOnly = false;
+  } else {
+    $('milk-e-amount').value = m.amount;
+    recalcMilkEdit();
+  }
+
+  $('milk-edit-mo').classList.add('open');
+};
+
+window.updateMilk = async function() {
+  const id = $('milk-e-id').value;
+  const date = $('milk-e-date').value;
+  const unitRaw = $('milk-e-unit').value;
+  const unit = unitRaw === 'extra' ? 'extra' : parseFloat(unitRaw);
+  const amount = parseFloat($('milk-e-amount').value);
+  const note = $('milk-e-note').value.trim();
+
+  if (unit === 'extra' && (!amount || amount <= 0)) {
+    toast('Please enter the manual amount for the extra milk.', 'error');
+    return;
+  }
+  if (!date) { toast('Select a date.', 'error'); return; }
+
+  const res = await updateRecord('milk_records', id, 
+    { date, unit, amount, note },
+    { pillMsg: 'Milk record updated', pillIcon: '✏️',
+      historyAction: ACT.UPDATE, historyData: { id, date, unit, amount, note } }
+  );
+
+  if (res.ok) closeMo('milk-edit-mo');
+};
+
+window.saveMilk = async function() {
+  const date = $('milk-date').value;
+  const unitRaw = $('milk-unit').value;
+  // Save as 'extra' string or a number
+  const unit = unitRaw === 'extra' ? 'extra' : parseFloat(unitRaw);
+  const amount = parseFloat($('milk-amount').value);
+  const note = $('milk-note').value.trim();
+  
+  if (unit === 'extra' && (!amount || amount <= 0)) {
+    toast('Please enter the manual amount for the extra milk.', 'error');
+    return;
+  }
+
+  if (!date) { toast('Select a date.', 'error'); return; }
+
+  const res = await addRecord('milk_records', 
+    { date, unit, amount, note },
+    { pillMsg: unit === 0 ? 'Marked as Absent' : 'Milk record saved', pillIcon: '🥛',
+      historyAction: ACT.CREATE, historyData: { date, unit, amount, note } }
+  );
+
+  if (res.ok) clearMilkForm();
+};
+
+window.clearMilkForm = function() {
+  $('milk-date').value = localDateStr();
+  $('milk-unit').value = '0.5'; // Resets to 500 gm
+  $('milk-note').value = '';
+  recalcMilk();
+};
+
+window.deleteMilk = function(id) {
+  const r = milkRecords.find(x => x.id === id);
+  if (!r) return;
+  showConfirm('🗑️ Delete Milk Record',
+    `<div class="ibx warnb">${fmtDate(r.date)} — ${r.unit} KG — ₹${fmtAmt(r.amount)}</div>`,
+    'Delete',
+    async () => {
+      await deleteRecord('milk_records', id, {
+        pillMsg: 'Record deleted', pillIcon: '🗑️',
+        historyAction: ACT.DELETE, historyData: { id }
+      });
+    }, 'bd');
+};
+
+window.filterMilkTable = function() {
+  const mFilter = $('milk-filt-month');
+  const yFilter = $('milk-filt-year');
+  const selM = mFilter ? mFilter.value : '';
+  const selY = yFilter ? yFilter.value : '';
+  
+  let displayedMilk = milkRecords;
+  if (selM) displayedMilk = displayedMilk.filter(m => String(m.date).startsWith(selM));
+  else if (selY) displayedMilk = displayedMilk.filter(m => String(m.date).startsWith(selY));
+
+  const badge = $('milk-badge');
+  if (badge) badge.textContent = displayedMilk.length + ' entries';
+
+  const tbody = $('milk-tbody');
+  if (!tbody) return;
+
+  if (!displayedMilk.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="es"><div class="ei">🥛</div><p>No milk records for this filter.</p></div></td></tr>`;
+  } else {
+        tbody.innerHTML = displayedMilk.map(m => {
+      const qtyLabel = m.unit === 'extra' ? '<span class="cb" style="background:var(--warn); color:#fff">Other</span>'
+                     : +m.unit === 0 ? '<span class="cb red">Absent</span>' 
+                     : +m.unit === 1 ? '1 KG' 
+                     : (+m.unit * 1000) + ' gm';
+                     
+      return `<tr>
+        <td data-label="Date" class="dc">${fmtDate(m.date)}</td>
+        <td data-label="Quantity">${qtyLabel}</td>
+        <td data-label="Amount" class="amc">₹${fmtAmt(m.amount)}</td>
+        <td data-label="Notes" class="nc">${esc(m.note || '—')}</td>
+        <td data-label="Actions"><div class="ab">
+          <button class="btn bo bxs" onclick="openMilkEdit('${m.id}')" type="button">✏️</button>
+          <button class="btn bd bxs" onclick="deleteMilk('${m.id}')" type="button">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+};
+
+window.filterMilkTable = function() {
+  const mFilter = $('milk-filt-month');
+  const yFilter = $('milk-filt-year');
+  const selM = mFilter ? mFilter.value : '';
+  const selY = yFilter ? yFilter.value : '';
+  
+  let displayedMilk = milkRecords;
+  if (selM) displayedMilk = displayedMilk.filter(m => String(m.date).startsWith(selM));
+  else if (selY) displayedMilk = displayedMilk.filter(m => String(m.date).startsWith(selY));
+
+  const badge = $('milk-badge');
+  if (badge) badge.textContent = displayedMilk.length + ' entries';
+
+  const tbody = $('milk-tbody');
+  if (!tbody) return;
+
+  if (!displayedMilk.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="es"><div class="ei">🥛</div><p>No milk records for this filter.</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = displayedMilk.map(m => {
+      const qtyLabel = m.unit === 'extra' ? '<span class="cb" style="background:var(--warn); color:#fff">Other</span>'
+                     : +m.unit === 0 ? '<span class="cb red">Absent</span>' 
+                     : +m.unit === 1 ? '1 KG' 
+                     : (+m.unit * 1000) + ' gm';
+                     
+      return `<tr>
+        <td data-label="Date" class="dc">${fmtDate(m.date)}</td>
+        <td data-label="Qty">${qtyLabel}</td>
+        <td data-label="Amount" class="amc">₹${fmtAmt(m.amount)}</td>
+        <td data-label="Notes" class="nc">${esc(m.note || '—')}</td>
+        <td data-label="Actions"><div class="ab">
+          <button class="btn bo bxs" onclick="openMilkEdit('${m.id}')" type="button">✏️</button>
+          <button class="btn bd bxs" onclick="deleteMilk('${m.id}')" type="button">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+};
+
+function renderMilkTab() {
+  if (!$('milk-date').value) $('milk-date').value = localDateStr();
+  recalcMilk();
+
+  // 1. Update Stat Cards
+  const todayStr = localDateStr();
+  const curYM = todayStr.slice(0, 7);
+  const curY = todayStr.slice(0, 4);
+
+  const monthRows = milkRecords.filter(m => String(m.date).startsWith(curYM));
+  const monthAmt = monthRows.reduce((s, m) => s + (+m.amount || 0), 0);
+  const monthQty = monthRows.reduce((s, m) => s + (+m.unit || 0), 0);
+  const monthAbsent = monthRows.filter(m => +m.unit === 0).length;
+  const totalAmt = milkRecords.reduce((s, m) => s + (+m.amount || 0), 0);
+  const totalQty = milkRecords.reduce((s, m) => s + (+m.unit || 0), 0);
+
+  $('milk-month-amt').textContent = '₹' + fmtAmt(monthAmt);
+  $('milk-month-qty').textContent = fmtAmt(monthQty) + ' kg';
+  $('milk-month-days').textContent = monthRows.length;
+  $('milk-month-absent').textContent = monthAbsent + ' absent days';
+  $('milk-total-amt').textContent = '₹' + fmtAmt(totalAmt);
+  $('milk-total-qty').textContent = fmtAmt(totalQty) + ' kg';
+  $('milk-rec-count').textContent = milkRecords.length + ' records';
+
+  // 2. Populate Filters
+  const mFilter = $('milk-filt-month');
+  const yFilter = $('milk-filt-year');
+  if (mFilter && yFilter) {
+    const prevM = mFilter.value;
+    const prevY = yFilter.value;
+    const months = new Set();
+    const years = new Set();
+    milkRecords.forEach(m => {
+      if (m.date) {
+        months.add(m.date.slice(0, 7));
+        years.add(m.date.slice(0, 4));
+      }
+    });
+    
+    mFilter.innerHTML = '<option value="">All Months</option>' + [...months].sort().reverse().map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('');
+    yFilter.innerHTML = '<option value="">All Years</option>' + [...years].sort().reverse().map(y => `<option value="${y}">${y}</option>`).join('');
+    
+    if (months.has(prevM)) mFilter.value = prevM;
+    if (years.has(prevY)) yFilter.value = prevY;
+  }
+
+  // 3. Render Table, Calendar, & Reports
+  filterMilkTable();
+  renderMilkCalendar();
+  populateMilkReportYears();
+  onMilkYearChange();
+  renderMilkPayList();
+}
+
+function populateMilkReportYears() {
+  const ySel = $('milk-rep-year');
+  if (!ySel) return;
+  const yrs = [...new Set(milkRecords.map(m => String(m.date).slice(0,4)))].sort((a,b) => b - a);
+  const cur = String(new Date().getFullYear());
+  if (!yrs.includes(cur)) yrs.unshift(cur);
+  const v = ySel.value;
+  ySel.innerHTML = yrs.map(y => `<option value="${y}">${y}</option>`).join('');
+  ySel.value = yrs.includes(v) ? v : cur;
+}
+
+window.onMilkYearChange = function() {
+  const y = $('milk-rep-year').value;
+  const mSel = $('milk-rep-month');
+  const months = [...new Set(milkRecords.filter(m => String(m.date).startsWith(y)).map(m => String(m.date).slice(0,7)))].sort();
+  const v = mSel.value;
+  mSel.innerHTML = '<option value="">Whole Year</option>' + months.map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('');
+  mSel.value = months.includes(v) ? v : '';
+  renderMilkReport();
+};
+
+window.renderMilkReport = function() {
+  const y = $('milk-rep-year').value;
+  const m = $('milk-rep-month').value;
+  if (!y) { 
+    $('milk-report-body-desktop').innerHTML = ''; 
+    $('milk-report-body-mobile').innerHTML = ''; 
+    return; 
+  }
+
+  // If a specific month is selected
+  if (m) {
+    const rows = milkRecords.filter(x => String(x.date).startsWith(m));
+    
+    if (!rows.length) {
+      const empty = `<div class="es"><div class="ei">🥛</div><p>No milk records for ${monthLabel(m)}.</p></div>`;
+      $('milk-report-body-desktop').innerHTML = empty;
+      $('milk-report-body-mobile').innerHTML = empty;
+      return;
+    }
+
+    const amt = rows.reduce((s,x) => s + (+x.amount || 0), 0);
+    const qty = rows.reduce((s,x) => s + (+x.unit || 0), 0);
+    const absent = rows.filter(x => +x.unit === 0).length;
+
+    // 1. Desktop Table View
+    const desktopHtml = `<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">
+      ${rows.length} days recorded · Total: <strong>₹${fmtAmt(amt)}</strong> (${fmtAmt(qty)} kg · ${absent} absent days)
+    </div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
+      <thead><tr style="border-bottom:2px solid var(--bdr)">
+        <th style="text-align:left;padding:6px 8px;color:var(--muted)">Date</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted)">Quantity</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted)">Amount</th>
+      </tr></thead><tbody>
+      ${rows.map(x => `<tr style="border-bottom:1px solid var(--bdr)">
+        <td style="padding:6px 8px">${fmtDate(x.date)}</td>
+        <td style="text-align:right;padding:6px 8px">${x.unit === 'extra' ? 'Other' : +x.unit === 0 ? 'Absent' : x.unit + ' KG'}</td>
+        <td style="text-align:right;padding:6px 8px;font-weight:700;color:var(--p)">₹${fmtAmt(x.amount)}</td>
+      </tr>`).join('')}</tbody>
+      <tfoot><tr style="border-top:2px solid var(--p)">
+        <td style="padding:7px 8px;font-weight:800">TOTAL</td>
+        <td style="text-align:right;padding:7px 8px;font-weight:800">${fmtAmt(qty)} kg</td>
+        <td style="text-align:right;padding:7px 8px;font-weight:800;color:var(--p)">₹${fmtAmt(amt)}</td>
+      </tr></tfoot>
+    </table></div>`;
+
+    // 2. Mobile Card View
+    const mobileHtml = `
+      <div style="background:var(--pl); padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid var(--p);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <b style="color:var(--p)">Total Bill:</b>
+          <b style="color:var(--p)">₹${fmtAmt(amt)}</b>
+        </div>
+        <div style="font-size:.75rem; color:var(--muted); display:flex; justify-content:space-between;">
+          <span>${fmtAmt(qty)} kg · ${rows.length} days</span>
+          <span>${absent} absent</span>
+        </div>
+      </div>
+      ${rows.map(x => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--bdr);">
+          <div>
+            <div style="font-weight:700; color:var(--txt); font-size:.85rem;">${fmtDate(x.date)}</div>
+            <div style="font-size:.75rem; color:var(--muted);">${x.unit === 'extra' ? 'Other' : +x.unit === 0 ? 'Absent' : x.unit + ' KG'}</div>
+          </div>
+          <div style="font-weight:800; color:var(--p);">₹${fmtAmt(x.amount)}</div>
+        </div>
+      `).join('')}
+    `;
+
+    $('milk-report-body-desktop').innerHTML = desktopHtml;
+    $('milk-report-body-mobile').innerHTML = mobileHtml;
+    return;
+  }
+
+  // If "Whole Year" is selected
+  const rows = milkRecords.filter(x => String(x.date).startsWith(y));
+  const byMonth = {};
+  
+  rows.forEach(x => {
+    const mm = String(x.date).slice(0,7);
+    if (!byMonth[mm]) byMonth[mm] = { amt: 0, qty: 0, absent: 0, cnt: 0 };
+    byMonth[mm].amt += (+x.amount || 0);
+    byMonth[mm].qty += (+x.unit || 0);
+    if (+x.unit === 0) byMonth[mm].absent++;
+    byMonth[mm].cnt++;
+  });
+  const months = Object.keys(byMonth).sort();
+  const totalAmt = rows.reduce((s,x) => s + (+x.amount || 0), 0);
+  const totalQty = rows.reduce((s,x) => s + (+x.unit || 0), 0);
+
+  if (!months.length) { body.innerHTML = `<div class="es"><div class="ei">🥛</div><p>No milk records for ${y}.</p></div>`; return; }
+
+  // --- DESKTOP TABLE ---
+  const desktopEl = $('milk-report-body-desktop');
+  if (desktopEl) {
+    desktopEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.8rem">
+      <thead><tr style="border-bottom:2px solid var(--bdr)">
+        <th style="text-align:left;padding:6px 8px;color:var(--muted)">Month</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted)">Days</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted)">Absent</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted)">Qty</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted)">Amount</th>
+      </tr></thead><tbody>
+      ${months.map(mm => `<tr style="border-bottom:1px solid var(--bdr)">
+        <td style="padding:6px 8px;font-weight:600">${monthLabel(mm)}</td>
+        <td style="text-align:right;padding:6px 8px">${byMonth[mm].cnt}</td>
+        <td style="text-align:right;padding:6px 8px">${byMonth[mm].absent}</td>
+        <td style="text-align:right;padding:6px 8px">${fmtAmt(byMonth[mm].qty)} kg</td>
+        <td style="text-align:right;padding:6px 8px;font-weight:700;color:var(--p)">₹${fmtAmt(byMonth[mm].amt)}</td>
+      </tr>`).join('')}
+      </tbody>
+      <tfoot><tr style="border-top:2px solid var(--p)">
+        <td style="padding:7px 8px;font-weight:800">TOTAL</td>
+        <td style="text-align:right;padding:7px 8px;font-weight:800">${rows.length}</td>
+        <td style="text-align:right;padding:7px 8px;font-weight:800">${rows.filter(x => +x.unit === 0).length}</td>
+        <td style="text-align:right;padding:7px 8px;font-weight:800">${fmtAmt(totalQty)} kg</td>
+        <td style="text-align:right;padding:7px 8px;font-weight:800;color:var(--p)">₹${fmtAmt(totalAmt)}</td>
+      </tr></tfoot>
+    </table></div>`;
+  }
+
+  // --- MOBILE CARDS ---
+  const mobileEl = $('milk-report-body-mobile');
+  if (mobileEl) {
+    mobileEl.innerHTML = months.map(mm => `
+      <div style="background:var(--sec); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--bdr);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <b style="font-size:.9rem; color:var(--p);">${monthLabel(mm)}</b>
+          <span style="font-weight:800; color:var(--p);">₹${fmtAmt(byMonth[mm].amt)}</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:.75rem; color:var(--muted);">
+          <div>Days: <b style="color:var(--txt)">${byMonth[mm].cnt}</b></div>
+          <div>Absent: <b style="color:var(--err)">${byMonth[mm].absent}</b></div>
+          <div>Qty: <b style="color:var(--txt)">${fmtAmt(byMonth[mm].qty)} kg</b></div>
+        </div>
+      </div>
+    `).join('') + `
+      <div style="background:var(--pl); padding:12px; border-radius:8px; margin-top:16px; border:1px solid var(--p);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <b style="font-size:.9rem; color:var(--p);">TOTAL (${y})</b>
+          <span style="font-weight:800; color:var(--p);">₹${fmtAmt(totalAmt)}</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:.75rem; color:var(--muted);">
+          <div>Total Days: <b style="color:var(--txt)">${rows.length}</b></div>
+          <div>Total Absent: <b style="color:var(--err)">${rows.filter(x => +x.unit === 0).length}</b></div>
+          <div>Total Qty: <b style="color:var(--txt)">${fmtAmt(totalQty)} kg</b></div>
+        </div>
+      </div>
+    `;
+  }
+};
+
+window.printMilkReport = function() {
+  const y = $('milk-rep-year').value;
+  const m = $('milk-rep-month').value;
+  if (!y) { toast('Select a year first.', 'error'); return; }
+
+  const rows = milkRecords.filter(x => m ? String(x.date).startsWith(m) : String(x.date).startsWith(y));
+  if (!rows.length) { toast('No data to print.', 'error'); return; }
+
+  const amt = rows.reduce((s,x) => s + (+x.amount || 0), 0);
+  const qty = rows.reduce((s,x) => s + (+x.unit || 0), 0);
+  const period = m ? monthLabel(m) : y;
+
+  let payInfo = '';
+  if (m && milkPayModes[m]) {
+    payInfo = `<div style="margin-top:10px; font-size:.9rem; color:#333;">
+      <strong>Paid Via:</strong> ${esc(milkPayModes[m])} 
+      ${milkPayDates[m] ? `&nbsp;·&nbsp; <strong>Paid On:</strong> ${fmtDate(milkPayDates[m])}` : ''}
+    </div>`;
+  } else if (!m) {
+    // If printing whole year, grab the latest payment mode/date
+    const modes = Object.keys(milkPayModes).filter(k => k.startsWith(y)).map(k => milkPayModes[k]);
+    const dates = Object.keys(milkPayDates).filter(k => k.startsWith(y)).map(k => milkPayDates[k]).sort();
+    if (modes.length) {
+      payInfo = `<div style="margin-top:10px; font-size:.9rem; color:#333;">
+        <strong>Paid Via:</strong> ${esc(modes[modes.length - 1])} 
+        ${dates.length ? `&nbsp;·&nbsp; <strong>Paid On:</strong> ${fmtDate(dates[dates.length - 1])}` : ''}
+      </div>`;
+    }
+  }
+
+  const body = printLetterhead('🥛 Milk Bill — ' + period) +
+    `<table style="width:100%;border-collapse:collapse;font-size:.9rem">
+      <thead><tr style="background:#f7f7f9">
+        <th style="text-align:left;padding:8px 10px">Date</th>
+        <th style="text-align:right;padding:8px 10px">Quantity</th>
+        <th style="text-align:right;padding:8px 10px">Amount</th>
+      </tr></thead><tbody>
+      ${rows.map(x => `<tr>
+        <td style="padding:8px 10px">${fmtDate(x.date)}</td>
+        <td style="text-align:right;padding:8px 10px">${+x.unit === 0 ? 'Absent' : x.unit + ' KG'}</td>
+        <td style="text-align:right;padding:8px 10px">₹${fmtAmt(x.amount)}</td>
+      </tr>`).join('')}
+      </tbody></table>
+    <div style="margin-top:16px;font-weight:800;font-size:1.1rem">
+      TOTAL DUE: ₹${fmtAmt(amt)} <span style="font-weight:400;font-size:.85rem;color:#555">(${fmtAmt(qty)} kg total)</span>
+    ${payInfo}`;
+openPrintWindow('Milk Bill - ' + period, body);
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   MILK PAYMENT MODES
+   ═══════════════════════════════════════════════════════════════ */
+let milkPayModes = {};
+let milkPayDates = {};
+
+// Listen to the payment modes collection
+subscribeCollection('milk_payment_modes', rows => {
+  milkPayModes = {};
+  milkPayDates = {};
+  rows.forEach(r => {
+    milkPayModes[r.id] = r.mode;
+    if (r.paidOn) milkPayDates[r.id] = r.paidOn;
+  });
+  if ($('tab-milk')?.classList.contains('active')) renderMilkPayList();
+});
+
+function renderMilkPayList() {
+  const el = $('milk-pay-list');
+  if (!el) return;
+  
+  // Find all unique months that have milk records
+  const byMonth = {};
+  milkRecords.forEach(m => {
+    const mm = String(m.date).slice(0,7);
+    if (!byMonth[mm]) byMonth[mm] = { cnt: 0 };
+    byMonth[mm].cnt++;
+  });
+  
+  const months = Object.keys(byMonth).sort((a,b) => b.localeCompare(a));
+  
+  if (!months.length) {
+    el.innerHTML = `<div class="es" style="padding:20px"><div class="ei">🥛</div><p>No milk records yet.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = months.map(m => {
+    const mode = milkPayModes[m] || '';
+    const paidOn = milkPayDates[m] || '';
+    const days = byMonth[m].cnt;
+    return `<div class="wpm-row">
+      <span class="wpm-month">${monthLabel(m)}</span>
+      <span class="wpm-cans">${days} days</span>
+      <div class="wpm-mode-wrap">
+        <select class="fc2" id="mpm-${m}" style="width:auto;padding:6px 10px;font-size:.78rem">
+          <option value="">— Select —</option>
+          <option value="UPI" ${mode==='UPI'?'selected':''}>UPI</option>
+          <option value="Cash" ${mode==='Cash'?'selected':''}>Cash</option>
+          <option value="Bank Transfer" ${mode==='Bank Transfer'?'selected':''}>Bank Transfer</option>
+        </select>
+        <input type="date" class="fc2" id="mpd-${m}" value="${paidOn}" style="width:auto;padding:6px 10px;font-size:.78rem"/>
+        <button class="btn bp bxs" onclick="saveMilkPayMode('${m}')" type="button">💾 Save</button>
+        ${mode ? pmBadge(mode) : '<span class="wpm-hint">not set</span>'}
+        ${paidOn ? `<span class="wpm-hint">· paid ${fmtDate(paidOn)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.saveMilkPayMode = async function(month) {
+  const sel = $('mpm-' + month);
+  const dateEl = $('mpd-' + month);
+  const mode = sel ? sel.value : '';
+  const paidOn = dateEl ? dateEl.value : '';
+  
+  if (!mode) { toast('Select UPI, Cash or Bank Transfer first.', 'error'); return; }
+  
+  await setRecord('milk_payment_modes', month, 
+    { mode, paidOn: paidOn || '', updatedAt: new Date().toISOString() },
+    { pillMsg: 'Payment info saved for ' + monthLabel(month), pillIcon: '💳' }
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════
    AUTO-CLEAR HISTORY CHECK (every page load)
    ═══════════════════════════════════════════════════════════════ */
 setTimeout(() => {
@@ -5720,6 +7090,314 @@ window.openTopExpensesModal = function(prefix, groupLabel) {
   // 5. Show it
   $('top-exp-mo').classList.add('open');
 };
+
+/* ═══════════════════════════════════════════════════════════════
+   WATER & MILK CALENDAR LOGIC (FINAL FIX)
+   ═══════════════════════════════════════════════════════════════ */
+
+let waterCalYear = new Date().getFullYear();
+let waterCalMonth = new Date().getMonth();
+
+let milkCalYear = new Date().getFullYear();
+let milkCalMonth = new Date().getMonth();
+
+function buildCalendarSelectors(mSelId, ySelId, currentMonth, currentYear, recordsArray) {
+  const mSel = $(mSelId), ySel = $(ySelId);
+  if (!mSel || !ySel) return;
+  
+  // 1. Find unique Year-Month pairs (e.g., "2026-09", "2026-11") from the SPECIFIC array passed in
+  const uniqueMonths = new Set();
+  if (recordsArray) {
+    recordsArray.forEach(r => {
+      const dateStr = r.date || r.month;
+      if (dateStr && dateStr.length >= 7) {
+        uniqueMonths.add(dateStr.slice(0, 7)); 
+      }
+    });
+  }
+
+  // 2. Fallback if database is empty
+  if (uniqueMonths.size === 0) {
+    const now = new Date();
+    uniqueMonths.add(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`);
+  }
+
+  const sortedPairs = Array.from(uniqueMonths).sort().reverse();
+  
+  const years = new Set();
+  const months = new Set();
+  sortedPairs.forEach(pair => {
+    years.add(pair.slice(0, 4));
+    months.add(parseInt(pair.slice(5, 7)) - 1);
+  });
+
+  // 3. Always rebuild the dropdowns based on data
+  ySel.innerHTML = Array.from(years).map(y => `<option value="${y}">${y}</option>`).join('');
+  mSel.innerHTML = Array.from(months).sort((a,b) => a-b).map(m => `<option value="${m}">${CAL_MONTHS[m]}</option>`).join('');
+  
+  // 4. Set the selected value
+  if (Array.from(mSel.options).some(o => parseInt(o.value) === currentMonth)) {
+    mSel.value = currentMonth;
+  } else if (mSel.options.length > 0) {
+    mSel.value = mSel.options[0].value;
+  }
+
+  if (Array.from(ySel.options).some(o => parseInt(o.value) === currentYear)) {
+    ySel.value = currentYear;
+  } else if (ySel.options.length > 0) {
+    ySel.value = ySel.options[0].value;
+  }
+}
+
+function renderWaterCalendar(){
+  const grid = $('water-cal-grid');
+  if(!grid) return;
+
+ buildCalendarSelectors('water-cal-sel-month', 'water-cal-sel-year', waterCalMonth, waterCalYear, waterPurchases);
+
+  const firstDow = new Date(waterCalYear, waterCalMonth, 1).getDay();
+  const daysInMonth = new Date(waterCalYear, waterCalMonth + 1, 0).getDate();
+  const todayStr = localDateStr();
+
+  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+  for (let i = 0; i < firstDow; i++) html += `<div class="cal-day empty"></div>`;
+
+  let monthTotalCans = 0;
+  let monthTotalAmt = 0;
+
+  for (let day = 1; day <= daysInMonth; day++){
+    const dateStr = `${waterCalYear}-${String(waterCalMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const dayPurchases = waterPurchases.filter(w => w.date === dateStr);
+    const isToday = dateStr === todayStr;
+    const isFuture = dateStr > todayStr;
+    
+    const cans = dayPurchases.length;
+    const amt = dayPurchases.reduce((s,w) => s + (+w.amount || 0), 0);
+    monthTotalCans += cans;
+    monthTotalAmt += amt;
+
+    html += `<div class="cal-day${isToday?' cd-today':''}${isFuture?' cd-future':''}" onclick="waterCalDayClick('${dateStr}')">
+      <div class="cd-num">${day}</div>
+      ${!isFuture && cans > 0 ? `<div class="cd-count">💧 ${cans} can${cans>1?'s':''}</div><div class="cd-amt">₹${fmtAmt(amt)}</div>` : ''}
+    </div>`;
+  }
+  grid.innerHTML = html;
+
+  const totalEl = $('water-cal-total');
+  if(totalEl) totalEl.textContent = monthTotalCans ? `${monthTotalCans} cans · ₹${fmtAmt(monthTotalAmt)}` : 'No records';
+}
+
+function renderMilkCalendar(){
+  const grid = $('milk-cal-grid');
+  if(!grid) return;
+
+buildCalendarSelectors('milk-cal-sel-month', 'milk-cal-sel-year', milkCalMonth, milkCalYear, milkRecords);
+
+  const firstDow = new Date(milkCalYear, milkCalMonth, 1).getDay();
+  const daysInMonth = new Date(milkCalYear, milkCalMonth + 1, 0).getDate();
+  const todayStr = localDateStr();
+
+  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+  for (let i = 0; i < firstDow; i++) html += `<div class="cal-day empty"></div>`;
+
+  let monthTotalAmt = 0;
+  let monthAbsent = 0;
+
+  for (let day = 1; day <= daysInMonth; day++){
+    const dateStr = `${milkCalYear}-${String(milkCalMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const dayRecord = milkRecords.find(m => m.date === dateStr);
+    const isToday = dateStr === todayStr;
+    const isFuture = dateStr > todayStr;
+    
+    let display = '';
+    if (dayRecord) {
+      if (+dayRecord.unit === 0) {
+        display = `<div class="cd-count" style="color:var(--err)">Absent</div>`;
+        monthAbsent++;
+      } else {
+        display = `<div class="cd-count" style="color:var(--p)">🥛 ${dayRecord.unit} kg</div><div class="cd-amt">₹${fmtAmt(dayRecord.amount)}</div>`;
+        monthTotalAmt += (+dayRecord.amount || 0);
+      }
+    }
+
+    html += `<div class="cal-day${isToday?' cd-today':''}${isFuture?' cd-future':''}" onclick="milkCalDayClick('${dateStr}')">
+      <div class="cd-num">${day}</div>
+      ${!isFuture ? display : ''}
+    </div>`;
+  }
+  grid.innerHTML = html;
+
+  const totalEl = $('milk-cal-total');
+  if(totalEl) totalEl.textContent = (monthTotalAmt || monthAbsent) ? `₹${fmtAmt(monthTotalAmt)} · ${monthAbsent} absent` : 'No records';
+}
+
+window.waterCalSelChange = function() {
+  waterCalMonth = parseInt($('water-cal-sel-month').value);
+  waterCalYear = parseInt($('water-cal-sel-year').value);
+  renderWaterCalendar();
+};
+window.changeWaterCalMonth = function(delta) {
+  waterCalMonth += delta;
+  if (waterCalMonth < 0) { waterCalMonth = 11; waterCalYear--; }
+  if (waterCalMonth > 11) { waterCalMonth = 0; waterCalYear++; }
+  renderWaterCalendar();
+};
+window.jumpWaterCalToday = function() {
+  const now = new Date();
+  waterCalYear = now.getFullYear();
+  waterCalMonth = now.getMonth();
+  renderWaterCalendar();
+};
+window.waterCalDayClick = function(dateStr) {
+  if (dateStr > localDateStr()) return;
+  $('water-date').value = dateStr;
+  updateDateDayLabel('water-date', 'water-date-day');
+  $('water-amount').focus();
+  toast(`📅 Date set to ${dateStr}`, 'info');
+};
+
+window.milkCalSelChange = function() {
+  milkCalMonth = parseInt($('milk-cal-sel-month').value);
+  milkCalYear = parseInt($('milk-cal-sel-year').value);
+  renderMilkCalendar();
+};
+window.changeMilkCalMonth = function(delta) {
+  milkCalMonth += delta;
+  if (milkCalMonth < 0) { milkCalMonth = 11; milkCalYear--; }
+  if (milkCalMonth > 11) { milkCalMonth = 0; milkCalYear++; }
+  renderMilkCalendar();
+};
+window.jumpMilkCalToday = function() {
+  const now = new Date();
+  milkCalYear = now.getFullYear();
+  milkCalMonth = now.getMonth();
+  renderMilkCalendar();
+};
+window.milkCalDayClick = function(dateStr) {
+  if (dateStr > localDateStr()) return;
+  $('milk-date').value = dateStr;
+  updateDateDayLabel('milk-date', 'milk-date-day');
+  $('milk-unit').focus();
+  toast(`📅 Date set to ${dateStr}`, 'info');
+};
+
+// Ensure they render when the tabs are opened or data changes
+const originalRenderWaterTab = window.renderWaterTab || function(){};
+window.renderWaterTab = function() {
+  originalRenderWaterTab();
+  renderWaterCalendar();
+};
+
+const originalRenderMilkTab = window.renderMilkTab || function(){};
+window.renderMilkTab = function() {
+  originalRenderMilkTab();
+  renderMilkCalendar();
+};
+
+// Direct hook into the Tab Switcher to guarantee first-load rendering
+const originalOnTabChange = window.__onTabChange || function(){};
+window.__onTabChange = function(tabId) {
+  originalOnTabChange(tabId);
+  if (tabId === 'water') renderWaterCalendar();
+  if (tabId === 'milk') renderMilkCalendar();
+};
+/* ═══════════════════════════════════════════════════════════════
+   MASTER EXPAND / COLLAPSE SWITCHES (Water & Milk)
+   ═══════════════════════════════════════════════════════════════ */
+window.toggleAllWaterDetails = function() {
+  const details = document.querySelectorAll('#tab-water details.fc');
+  const btn = document.getElementById('btn-toggle-water');
+  
+  // Check if ANY are currently closed
+  const anyClosed = Array.from(details).some(d => !d.open);
+  
+  details.forEach(d => {
+    if (anyClosed) d.setAttribute('open', ''); // Expand all
+    else d.removeAttribute('open');            // Collapse all
+  });
+  
+  btn.innerHTML = anyClosed ? '⬆️ Collapse All' : '⬇️ Expand All';
+};
+
+window.toggleAllMilkDetails = function() {
+  const details = document.querySelectorAll('#tab-milk details.fc');
+  const btn = document.getElementById('btn-toggle-milk');
+  
+  // Check if ANY are currently closed
+  const anyClosed = Array.from(details).some(d => !d.open);
+  
+  details.forEach(d => {
+    if (anyClosed) d.setAttribute('open', ''); // Expand all
+    else d.removeAttribute('open');            // Collapse all
+  });
+  
+  btn.innerHTML = anyClosed ? '⬆️ Collapse All' : '⬇️ Expand All';
+};
+window.toggleAllElecDetails = function() {
+  const details = document.querySelectorAll('#tab-electricity details.fc');
+  const btn = document.getElementById('btn-toggle-elec');
+  const anyClosed = Array.from(details).some(d => !d.open);
+  
+  details.forEach(d => {
+    if (anyClosed) d.setAttribute('open', '');
+    else d.removeAttribute('open');
+  });
+  
+  btn.innerHTML = anyClosed ? '⬆️ Collapse All' : '⬇️ Expand All';
+};
+window.toggleAllRentDetails = function() {
+  const details = document.querySelectorAll('#tab-rent details.fc');
+  const btn = document.getElementById('btn-toggle-rent');
+  const anyClosed = Array.from(details).some(d => !d.open);
+  
+  details.forEach(d => {
+    if (anyClosed) d.setAttribute('open', '');
+    else d.removeAttribute('open');
+  });
+  
+  btn.innerHTML = anyClosed ? '⬆️ Collapse All' : '⬇️ Expand All';
+};
+window.toggleAllRecordsDetails = function() {
+  const details = document.querySelectorAll('#tab-records details.fc');
+  const btn = document.getElementById('btn-toggle-records');
+  const anyClosed = Array.from(details).some(d => !d.open);
+  
+  details.forEach(d => {
+    if (anyClosed) d.setAttribute('open', '');
+    else d.removeAttribute('open');
+  });
+  
+  btn.innerHTML = anyClosed ? '⬆️ Collapse All' : '⬇️ Expand All';
+};
+
+window.toggleMobileMenu = function() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('mobile-backdrop');
+  
+  if (sidebar && backdrop) {
+    sidebar.classList.toggle('mobile-open');
+    backdrop.classList.toggle('show');
+  }
+};
+// Automatically close the menu when any link or button inside it is clicked
+document.addEventListener('DOMContentLoaded', () => {
+  const menuLinks = document.querySelectorAll('.side-nav .tb, .side-nav a');
+  
+  menuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      // Only trigger the close action if we are on a mobile screen (<= 900px)
+      if (window.innerWidth <= 900) {
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.getElementById('mobile-backdrop');
+        
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+          sidebar.classList.remove('mobile-open');
+          backdrop.classList.remove('show');
+        }
+      }
+    });
+  });
+});
 </script>
 </body>
 </html>

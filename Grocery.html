@@ -23,7 +23,8 @@
 </style>
 </head>
 <body>
-
+<div id="global-loader" class="global-loader"></div>
+<div id="mobile-backdrop" class="mobile-backdrop" onclick="toggleMobileMenu()"></div>
 <!-- ═══════════════════════════════════════════════════════════════
      LOGIN OVERLAY
      ═══════════════════════════════════════════════════════════════ -->
@@ -32,11 +33,11 @@
   <div class="login-blob b2"></div>
   <div class="login-blob b3"></div>
   <div class="login-box">
-    <div class="login-mark" aria-hidden="true">
-      <svg viewBox="0 0 48 48" width="26" height="26" fill="none">
-        <path d="M14 12h20M14 20h20M14 12c0 8 3 12 10 16l-10 8M24 28h10"
-              stroke="currentColor" stroke-width="2.6"
-              stroke-linecap="round" stroke-linejoin="round"/>
+    <div class="login-mark" aria-hidden="true" style="background: linear-gradient(135deg, #22c55e, #14b8a6); color: #fff; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
       </svg>
     </div>
     <h1>Grocery Tracker</h1>
@@ -84,7 +85,13 @@
   <!-- ═══════════ SIDEBAR ═══════════ -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <div class="brand-mark" aria-hidden="true">🛒</div>
+      <div class="brand-mark" aria-hidden="true" style="background: linear-gradient(135deg, #22c55e, #14b8a6); color: #fff; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      </div>
       <span class="brand-name">Grocery Tracker</span>
     </div>
 
@@ -142,7 +149,10 @@
       </button>
       <button class="tb" type="button"
               onclick="window.__householdLogout && window.__householdLogout('manual')">
-        <span>🚪</span><span class="tb-lbl">Logout</span>
+        <svg class="ti" viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+        <span class="tb-lbl">Logout</span>
       </button>
 
     </nav>
@@ -153,7 +163,16 @@
 
     <!-- ══ TOPBAR ══ -->
     <header class="topbar">
-      <h2 class="topbar-title" id="topbar-title">Grocery Dashboard</h2>
+      <!-- Add these lines -->
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" type="button">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <h2 class="topbar-title" id="topbar-title" style="margin-right: auto;">Grocery Dashboard</h2>
       <div class="topbar-actions">
         <button class="ib" id="btn-add-top" type="button">
           ➕ <span class="ib-lbl">Add</span>
@@ -2442,7 +2461,54 @@ function renderSettingsUI(){
 /* ═══════════════════════════════════════════════════════════════
    END OF PAGE SCRIPT
    ═══════════════════════════════════════════════════════════════ */
+/* ── MOBILE MENU TOGGLE ── */
+window.toggleMobileMenu = function() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('mobile-backdrop');
+  
+  if (sidebar && backdrop) {
+    sidebar.classList.toggle('mobile-open');
+    backdrop.classList.toggle('show');
+  }
+};
 
+document.addEventListener('DOMContentLoaded', () => {
+  const menuLinks = document.querySelectorAll('.side-nav .tb, .side-nav a');
+  
+  menuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 900) {
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.getElementById('mobile-backdrop');
+        
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+          sidebar.classList.remove('mobile-open');
+          backdrop.classList.remove('show');
+        }
+      }
+    });
+  });
+});
+// ── TRIGGER LOADING BAR ──
+const loader = document.getElementById('global-loader');
+if (loader) {
+  loader.classList.add('active');
+  loader.style.width = '20%';
+  setTimeout(() => { loader.style.width = '50%'; }, 300);
+  setTimeout(() => { loader.style.width = '80%'; }, 800);
+  
+  // Hide bar when Groceries finish loading
+  const checkGrocery = setInterval(() => {
+    if (hydrated()) { // 'hydrated()' is the function your app uses to check if groceries loaded
+      clearInterval(checkGrocery);
+      loader.style.width = '100%';
+      setTimeout(() => {
+        loader.classList.remove('active');
+        setTimeout(() => { loader.style.width = '0%'; }, 300);
+      }, 400);
+    }
+  }, 100);
+}
 </script>
 </body>
 </html>

@@ -314,10 +314,12 @@ export function pmBadge(mode){
   const m = mode.toLowerCase();
   const cls  = m.includes('upi')  ? 'pm-upi'
              : m.includes('cash') ? 'pm-cash'
+             : m.includes('card') ? 'pm-card'
              : m.includes('bank') ? 'pm-bank'
              : 'pm-none';
   const icon = m.includes('upi')  ? '📱'
              : m.includes('cash') ? '💵'
+             : m.includes('card') ? '💳'
              : m.includes('bank') ? '🏦'
              : '💳';
   return `<span class="pm-badge ${cls}">${icon} ${esc(mode)}</span>`;
@@ -1649,6 +1651,17 @@ export function initPage(opts){
     onReady   = null,
     skipLogin = false
   } = opts;
+
+  // Start the global loader simulation
+  const loader = document.getElementById('global-loader');
+  if (loader) {
+    loader.style.width = '0%';
+    loader.classList.add('active');
+    // Smoothly animate to 80% over 2 seconds
+    setTimeout(() => { loader.style.width = '20%'; }, 100);
+    setTimeout(() => { loader.style.width = '50%'; }, 600);
+    setTimeout(() => { loader.style.width = '80%'; }, 1200);
+  }
 
   // 1) Theme first (before paint)
   applyTheme();

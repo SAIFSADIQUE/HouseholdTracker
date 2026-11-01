@@ -319,11 +319,12 @@ button { font-family: inherit; }
   z-index: 90;
   background: var(--card);
   border-bottom: 1px solid var(--bdr);
-  padding: 14px 20px;
+  padding: 8px 20px; /* Reduced from 14px */
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 48px; /* Force a compact minimum height */
 }
 .topbar-title {
   font-family: var(--fontd);
@@ -349,15 +350,15 @@ button { font-family: inherit; }
   border-radius: var(--rs);
   color: #fff;
   cursor: pointer;
-  padding: 9px 16px;
-  font-size: .8rem;
+  padding: 6px 12px; /* Tighter padding */
+  font-size: .73rem; /* Smaller font size */
   font-weight: 600;
   transition: transform .15s var(--ease), background .15s;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(68,60,104,.22);
+  box-shadow: 0 2px 6px rgba(68,60,104,.2);
   font-family: inherit;
 }
 .ib:hover { background: var(--pd); }
@@ -365,7 +366,7 @@ button { font-family: inherit; }
 
 @media (max-width: 480px) {
   .topbar-title { font-size: 1.02rem; }
-  .ib { padding: 8px 12px; font-size: .75rem; }
+  .ib { padding: 6px 10px; font-size: .7rem; } /* Even tighter on mobile */
   .ib span.ib-lbl { display: none; }
 }
 
@@ -433,7 +434,7 @@ button { font-family: inherit; }
     padding: 9px 12px;
   }
   .tb .ti { width: 17px; height: 17px; }
-  .topbar { top: var(--header-h); }
+  .topbar { top: var(--header-h); min-height: 46px; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -945,11 +946,11 @@ select.fc2 {
 /* Make the first two tiles span 2 columns on desktop */
 @media (min-width: 900px) {
   .dash-tiles {
-    grid-template-columns: repeat(2, 1fr) !important; /* Force 2 columns */
+    grid-template-columns: repeat(3, 1fr) !important; /* Force 3 columns */
   }
-  .dash-tile:nth-child(1),
-  .dash-tile:nth-child(2) {
-    grid-column: span 1 !important; /* Reset the wide spanning */
+  /* Remove the spanning logic so they all stay the same size */
+  .dash-tile {
+    grid-column: span 1 !important;
   }
 }
 
@@ -960,15 +961,15 @@ select.fc2 {
 }
 .dash-tile {
   background: linear-gradient(145deg, color-mix(in srgb, var(--card) 90%, var(--bg)), var(--card));
-  border-radius: 28px; /* Massive rounded corners */
-  padding: 24px;
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.5);
+  border-radius: 12px; /* Matches the summary cards */
+  padding: 14px 16px; /* Tighter padding */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.5);
   border: 1px solid var(--bdr);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   position: relative;
   overflow: hidden;
   text-decoration: none;
@@ -1020,16 +1021,16 @@ select.fc2 {
 .dash-tile.t-groc::before  { background: var(--ok); }
 
 .dash-tile-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px; /* Squircle look */
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.1rem;
   flex-shrink: 0;
-  color: #fff; /* White icons */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -1064,17 +1065,17 @@ select.fc2 {
   justify-content: center;
 }
 .dash-tile-lbl {
-  font-size: .74rem;
+  font-size: .68rem;
   color: var(--muted);
-  font-weight: 600;
-  margin-bottom: 3px;
-  white-space: nowrap; /* Keeps title on one line */
+  font-weight: 700;
+  margin-bottom: 2px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .dash-tile-amt {
   font-family: var(--fontd);
-  font-size: clamp(1.1rem, 2vw, 1.5rem); /* Fluid size: shrinks on narrow cards */
+  font-size: 1.15rem; /* Matches the summary cards */
   font-weight: 800;
   background: linear-gradient(135deg, var(--txt), var(--p));
   -webkit-background-clip: text;
@@ -1082,23 +1083,22 @@ select.fc2 {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.5px;
   white-space: nowrap;
-  /* Removed overflow: hidden and text-overflow: ellipsis */
   width: 100%;
   display: block;
-  padding-bottom: 2px; /* Prevents descenders from clipping */
+  line-height: 1.2;
 }
 .dash-tile-sub {
-  font-size: .68rem;
+  font-size: .65rem; /* Slightly smaller */
   color: var(--muted);
-  margin-top: 4px;
-  line-height: 1.4;
+  margin-top: 3px;
+  line-height: 1.3;
 }
 .dash-tile-arrow {
   color: var(--muted);
-  font-size: 1.1rem;
+  font-size: 1rem;
   flex-shrink: 0;
   transition: transform .2s;
-  margin-left: 10px; /* Add space between text and arrow */
+  margin-left: 8px;
   opacity: 0.5;
 }
 .dash-tile:hover .dash-tile-arrow {
@@ -1449,11 +1449,13 @@ td.nc {
 }
 .pm-upi  { background: #E1EEFB; color: #1B5F8C; }
 .pm-cash { background: #DCFCE7; color: #15803D; }
+.pm-card { background: #FEF3C7; color: #92400E; }
 .pm-bank { background: #EDE9FE; color: #6D28D9; }
 .pm-none { background: var(--sec); color: var(--muted); }
 
 [data-theme="dark"] .pm-upi  { background: #152A42; color: #7DB6E8; }
 [data-theme="dark"] .pm-cash { background: #14321F; color: #6EE7A0; }
+[data-theme="dark"] .pm-card { background: #362E15; color: #E8C270; }
 [data-theme="dark"] .pm-bank { background: #2A2150; color: #BBA5F5; }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2216,9 +2218,18 @@ input[list]::-webkit-calendar-picker-indicator {
 .cat-add-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 0; /* Reduced from 18px since the card padding handles the bottom space */
   align-items: flex-end;
   flex-wrap: wrap;
+}
+
+.cat-add-row .fg2 {
+  margin-bottom: 0; /* Removes the extra gap below the input */
+}
+
+.cat-add-row .btn {
+  height: 41px; /* Matches the exact height of the input field */
+  padding: 0 24px;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2897,13 +2908,13 @@ input[type=checkbox] {
 
 /* 1. Upgrade the Summary Cards (.sc) */
 .sc {
-  border-radius: 24px !important; 
-  padding: 22px !important;
+  border-radius: 12px !important; /* Reduced from 24px */
+  padding: 12px 16px !important;  /* Reduced from 22px */
   border-top-width: 4px !important;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02) !important;
   transition: transform .25s cubic-bezier(0.25, 1, 0.5, 1), box-shadow .25s !important;
 }
 
@@ -2914,28 +2925,30 @@ input[type=checkbox] {
 
 /* 2. Upgrade the inner text (Labels, Numbers, Subtitles) */
 .sc .lbl {
-  font-size: .72rem !important;
+  font-size: .68rem !important; /* Slightly smaller */
   font-weight: 800 !important;
   letter-spacing: .05em !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 2px;
 }
 
 .sc .amt {
-  font-size: clamp(1.1rem, 2vw, 1.5rem) !important;
+  font-size: 1.15rem !important; /* Fixed readable size */
   font-weight: 800 !important;
   background: linear-gradient(135deg, var(--txt), var(--p));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.5px !important;
   white-space: nowrap;
+  line-height: 1.2;
 }
 
 .sc .sub {
-  font-size: .7rem !important;
-  line-height: 1.4 !important;
-  margin-top: 6px !important;
+  font-size: .65rem !important;
+  line-height: 1.3 !important;
+  margin-top: 4px !important;
 }
 
 /* 3. Force the 4-column Bento Grid on Desktop */
@@ -3018,13 +3031,13 @@ input[type=checkbox] {
   }
 }
 /* ═══════════════════════════════════════════════════════════
-   DASHBOARD COUNTERS (Perfectly Aligned)
+   DASHBOARD COUNTERS (Perfectly Aligned - 6 Columns)
    ═══════════════════════════════════════════════════════════ */
 
 .dash-counters {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 0;       
   margin-bottom: 16px; /* Matches the exact 16px gap of the Bento tiles */
   width: 100%;
@@ -3033,26 +3046,45 @@ input[type=checkbox] {
 .dc-pill {
   background: var(--card);
   border: 1px solid var(--bdr);
-  padding: 10px 14px;
+  padding: 10px 6px; /* Slightly tighter horizontal padding to fit 6 */
   border-radius: 20px;
-  font-size: .75rem;
+  font-size: .74rem; /* Slightly smaller font */
   font-weight: 600;
   color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.02);
   white-space: nowrap;
   width: 100%;
 }
 
-@media (max-width: 899px) {
-  .dash-counters { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1000px) {
+  .dash-counters {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important; /* Force 3 columns */
+    gap: 8px !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .dc-pill {
+    min-width: 0 !important; /* Remove the forced width */
+    font-size: 0.68rem !important; /* Slightly smaller text */
+    padding: 8px 4px !important; /* Tighter padding to fit */
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 @media (max-width: 600px) {
-  .dash-counters { display: none; }
+  .dash-counters {
+    display: grid !important; /* Ensure it stays grid on smallest screens */
+  }
 }
 /* ═══════════════════════════════════════════════════════════
    CLICKABLE CATEGORY STATS
@@ -3083,4 +3115,603 @@ input[type=checkbox] {
   z-index: 10;
   /* Adds a subtle shadow so you know there's content below */
   box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+}
+/* Milk Dashboard Tile */
+.dash-tile.t-milk::before { background: #14b8a6; } /* Teal color */
+.dash-tile.t-milk .dash-tile-icon  { background: linear-gradient(135deg, #14b8a6, #06b6d4); }
+
+/* ═══════════════════════════════════════════════════════════
+   TIGHTENED ANALYTICS FILTER PANELS
+   ═══════════════════════════════════════════════════════════ */
+/* Reduce padding of the boxes holding these filters */
+.fb, .catmon-setup, .cmp3-setup {
+  padding: 12px 16px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Reduce the space below the title inside the box */
+.fbt, .catmon-setup h3, .cmp3-setup h3 {
+  margin-bottom: 8px !important;
+}
+
+/* Reduce the gap between the label and the input */
+.fgrid .fg2, .catmon-controls .fg2 {
+  gap: 4px !important;
+}
+
+/* Make the labels a tiny bit smaller and tighter */
+.fgrid label, .catmon-controls label {
+  font-size: .68rem !important;
+}
+
+/* Ensure the Apply/Show/Refresh buttons don't stretch too tall */
+.fgrid .btn, .catmon-controls .btn {
+  height: 38px !important;
+  padding: 0 16px !important;
+  font-size: .8rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COLLAPSIBLE SECTIONS (Clean Left Alignment)
+   ═══════════════════════════════════════════════════════════ */
+details.fc summary {
+  list-style: none;
+  outline: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between; /* Keeps items on opposite sides */
+  gap: 10px;
+}
+
+details.fc summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The custom arrow */
+details.fc summary::before {
+  content: '▶';
+  font-size: 0.7rem;
+  color: var(--muted);
+  transition: transform 0.2s;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+details.fc[open] summary::before {
+  transform: rotate(90deg);
+}
+
+/* Force the text wrapper to stay left-aligned */
+details.fc summary > div:first-of-type {
+  margin-right: auto; 
+}
+/* ═══════════════════════════════════════════════════════════
+   MOBILE TABLE SCROLLING FIX
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Force the table to shrink to fit the screen */
+  .tw table {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  /* Standard table layout */
+  .tw thead { display: table-header-group !important; }
+  .tw tbody tr { display: table-row !important; }
+  .tw td { display: table-cell !important; padding: 10px 4px !important; }
+  .tw td::before { display: none !important; }
+
+  /* Aggressively hide the 4th column (Notes) */
+  #milk-tbody td:nth-child(4) { display: none !important; }
+  
+  /* Hide the Notes header. (Because Notes is the 4th 'th', we use nth-child(4)) */
+  table th:nth-child(4) { display: none !important; }
+  
+  /* Make text smaller and stop it from wrapping */
+  #milk-tbody td, table th {
+    font-size: 0.72rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Ensure the action buttons stay on one line */
+  #milk-tbody td .ab {
+    flex-wrap: nowrap !important;
+  }
+}
+/* Hide mobile layout on desktop */
+.mobile-only-cards { display: none; }
+
+/* Show mobile layout on mobile, hide desktop */
+@media (max-width: 600px) {
+  .desktop-only-table { display: none !important; }
+  .mobile-only-cards { display: block !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WATER FORM MOBILE LAYOUT FIX
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Target the 3rd child (Notes) inside the Water Form's grid */
+  #tab-water .fc .grid.g3 > .fg2:nth-child(3) {
+    grid-column: 1 / -1 !important; /* Force it to span the full width */
+  }
+}
+/* Hide mobile cards on desktop by default */
+.mobile-only-cards { display: none; }
+
+/* On mobile screens, hide desktop tables and show mobile cards */
+@media (max-width: 900px) {
+  .desktop-only-table { display: none !important; }
+  .mobile-only-cards { display: block !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ELECTRICITY TILES - 2x2 GRID ON MOBILE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Target the Summary Cards container inside the Electricity tab */
+  #tab-electricity .grid.mb {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   ELECTRICITY FORM - MOBILE LAYOUT FIX
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Target the 5th child (Paid On Date) and force it to span 2 columns on mobile */
+  #tab-electricity .fc .grid > .fg2:nth-child(5) {
+    grid-column: 1 / -1 !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   ROOM RENT TILES - 2x2 GRID ON MOBILE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Target the Summary Cards container inside the Room Rent tab */
+  #tab-rent .grid.mb {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   RECORDS FILTER GRID (Responsive)
+   ═══════════════════════════════════════════════════════════ */
+.responsive-filter-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.9fr 1.2fr 1.9fr; /* Desktop layout */
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .responsive-filter-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  /* Force the Category container to span full width */
+  .responsive-filter-grid > .fg2:last-child {
+    grid-column: 1 / -1;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   ALL RECORDS TABLE - MOBILE LAYOUT FIX
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Target the table inside the All Records tab */
+  #tab-records details .tw table {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Force standard table layout */
+  #tab-records details .tw table thead,
+  #tab-records details .tw table tbody,
+  #tab-records details .tw table tr,
+  #tab-records details .tw table th,
+  #tab-records details .tw table td {
+    display: table-header-group !important;
+  }
+  
+  #tab-records details .tw table tr { display: table-row !important; }
+  #tab-records details .tw table th, 
+  #tab-records details .tw table td { display: table-cell !important; }
+
+  /* Hide the "Paid Via" column (Column 6) */
+  #tab-records details .tw table th:nth-child(6), 
+  #tab-records details .tw table td:nth-child(6) {
+    display: none !important;
+  }
+
+  /* Hide the "Note" column (Column 7) */
+  #tab-records details .tw table th:nth-child(7), 
+  #tab-records details .tw table td:nth-child(7) {
+    display: none !important;
+  }
+
+  /* Tighten up the padding and text size to fit the remaining columns */
+  #tab-records details .tw table th, 
+  #tab-records details .tw table td {
+    padding: 8px 4px !important;
+    font-size: 0.7rem !important;
+    white-space: nowrap !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   DAILY EXPENSE TAB - RESPONSIVE FIXES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Restore the 2-column layout (Form + Table) on Desktop */
+@media (min-width: 901px) {
+  .dash-grid {
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr) !important;
+  }
+}
+
+/* Mobile Fixes for the Today's Entries Table */
+@media (max-width: 900px) {
+  /* Force the table to fit the screen width */
+  #today-entries-table {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Keep the table as a standard table */
+  #today-entries-table thead { display: table-header-group !important; }
+  #today-entries-table tbody { display: table-row-group !important; }
+  #today-entries-table tr { display: table-row !important; }
+  #today-entries-table th, 
+  #today-entries-table td { display: table-cell !important; }
+
+  /* Hide the "Note" column (which is the 6th column in this specific table) */
+  #today-entries-table th:nth-child(6), 
+  #today-entries-table td:nth-child(6) {
+    display: none !important;
+  }
+
+  /* Tighten up the padding and text to fit the remaining columns */
+  #today-entries-table th, 
+  #today-entries-table td {
+    padding: 10px 4px !important;
+    font-size: 0.7rem !important;
+    white-space: nowrap !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   DAILY EXPENSE FORM - COMPACT MOBILE VIEW
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Target the form container */
+  #tab-daily .fc .grid {
+    gap: 8px !important; /* Reduce the gap between inputs */
+  }
+
+  /* Reduce the margin below each label-input pair */
+  #tab-daily .fc .fg2 {
+    margin-bottom: 4px !important; 
+  }
+
+  /* Shrink the Note textarea height */
+  #tab-daily #f-note {
+    min-height: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Make the Date lock button and badge tighter */
+  #tab-daily .date-lock-pill {
+    padding: 2px 8px !important;
+    font-size: 0.65rem !important;
+  }
+  
+  #tab-daily .date-day-badge {
+    min-width: 40px !important;
+    padding: 0 6px !important;
+    font-size: 0.7rem !important;
+  }
+}
+@media (max-width: 900px) {
+  /* Make the action buttons a bit more compact */
+  #tab-daily .ba {
+    margin-top: 8px !important;
+    gap: 8px !important;
+  }
+  
+  #tab-daily .ba .btn {
+    padding: 8px 16px !important;
+    font-size: 0.8rem !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   DAILY EXPENSE FORM - 2 COLUMN MOBILE GRID
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Ensure the inputs don't overflow their columns */
+  #tab-daily .fc .grid > .fg2 {
+    min-width: 0; 
+  }
+  
+  /* Make the inputs slightly more compact to fit side-by-side */
+  #tab-daily .fc input.fc2, 
+  #tab-daily .fc select.fc2 {
+    padding: 8px 10px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  /* Shrink the day badge so it fits next to the date */
+  #tab-daily .date-day-badge {
+    min-width: 40px !important;
+    padding: 0 6px !important;
+    font-size: 0.7rem !important;
+  }
+}
+@media (min-width: 901px) {
+  /* Restore the single column layout on desktop */
+  #tab-daily .fc > .grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   DAILY EXPENSE FORM - MOBILE LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* 1. Define the 2-column grid */
+  #tab-daily .mobile-form-grid {
+    grid-template-columns: 1fr 1fr !important; 
+  }
+
+  /* 2. Make Date span full width (Row 1) */
+  #tab-daily .mobile-form-grid > .fg2:nth-child(1) {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* 3. Amount (Row 2) and Paid Via (Row 2) sit side-by-side */
+  #tab-daily .mobile-form-grid > .fg2:nth-child(2),
+  #tab-daily .mobile-form-grid > .fg2:nth-child(3) {
+    grid-column: span 1 !important;
+  }
+
+  /* 4. Category spans full width (Row 3) to fit long text */
+  #tab-daily .mobile-form-grid > .fg2:nth-child(4) {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* 5. Note spans full width (Row 4) */
+  #tab-daily .mobile-form-grid > .fg2:nth-child(5) {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (min-width: 901px) {
+  /* Restore single column on desktop */
+  #tab-daily .mobile-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   DAILY EXPENSE TILES - 2x2 GRID ON MOBILE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Target the Summary Cards container inside the Daily Expense tab */
+  #tab-daily .grid.mb {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD TILES - COMPACT GRID ON MOBILE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .dash-tiles {
+    display: grid !important;
+    grid-template-columns: 1fr !important; /* Force a single column stack */
+    gap: 10px !important; /* Tighter gap between tiles */
+    margin-bottom: 16px !important;
+  }
+  
+  .dash-tile {
+    padding: 10px 14px !important; /* Tighter padding */
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   ANALYTICS TABLES - MOBILE LAYOUT FIX
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Force all tables inside the Analytics tab to fit the screen */
+  #tab-analytics table {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  /* Ensure standard table layout on mobile */
+  #tab-analytics table thead { display: table-header-group !important; }
+  #tab-analytics table tbody { display: table-row-group !important; }
+  #tab-analytics table tr { display: table-row !important; }
+  #tab-analytics table th, 
+  #tab-analytics table td { 
+    display: table-cell !important; 
+    padding: 8px 4px !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Hide the "Records" column (which is the 3rd column in the Year-wise table) */
+  #yw-table table th:nth-child(3),
+  #yw-table table td:nth-child(3) {
+    display: none !important;
+  }
+
+  /* Hide the "Records" column in the Month-wise table (also 3rd column) */
+  #mw-table table th:nth-child(3),
+  #mw-table table td:nth-child(3) {
+    display: none !important;
+  }
+  
+  /* Adjust the Date Range details table (it has 5 columns) */
+  #tab-analytics #dr-tbody tr td:nth-child(4),
+  #tab-analytics #dr-tbody tr td:nth-child(5) {
+    /* Hide "Paid Via" and "Note" columns on mobile for Date Range */
+    display: none !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   ANALYTICS - DATE RANGE TABLE MOBILE FIX
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Target the specific table inside the Date Range panel */
+  #an-daterange table {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  #an-daterange table thead { display: table-header-group !important; }
+  #an-daterange table tbody { display: table-row-group !important; }
+  #an-daterange table tr { display: table-row !important; }
+  
+  #an-daterange table th, 
+  #an-daterange table td {
+    display: table-cell !important;
+    padding: 10px 4px !important;
+    font-size: 0.72rem !important;
+    white-space: normal !important; /* Allow category names to wrap if needed */
+  }
+
+  /* Hide "Paid Via" (Column 4) */
+  #an-daterange table th:nth-child(4),
+  #an-daterange table td:nth-child(4) {
+    display: none !important;
+  }
+
+  /* Hide "Note" (Column 5) */
+  #an-daterange table th:nth-child(5),
+  #an-daterange table td:nth-child(5) {
+    display: none !important;
+  }
+  
+  /* Make sure the Category badge doesn't stretch the table */
+  #an-daterange table td .cb {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   MOBILE SIDEBAR MENU (Absolute Final Fix)
+   ═══════════════════════════════════════════════════════════ */
+
+.mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--txt);
+  cursor: pointer;
+  padding: 4px;
+  margin-right: 10px;
+}
+
+.mobile-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 998; /* Layer 1: Dark background */
+}
+
+@media (max-width: 900px) {
+  /* 1. Show the button */
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* 2. Show the backdrop when open */
+  .mobile-backdrop.show {
+    display: block;
+  }
+
+  /* 3. Layer 2: The Menu Drawer */
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 999 !important; /* Must be higher than backdrop */
+    background: var(--card) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding-top: 20px !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+    overflow-y: auto !important;
+  }
+
+  /* 4. Slide it in */
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  /* 5. Layer 3: The Topbar (Highest so the button is always clickable) */
+  .topbar {
+    z-index: 1000 !important;
+    position: sticky !important;
+    top: var(--header-h) !important;
+  }
+
+  .sync-banner {
+    z-index: 1000 !important;
+  }
+
+  /* Reset inner menu styles for the drawer */
+  .sidebar-brand { display: flex !important; }
+  
+  .side-group-label {
+    display: block !important;
+    padding: 16px 20px 4px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .side-nav {
+    flex-direction: column !important;
+    padding: 10px !important;
+    gap: 4px !important;
+  }
+
+  .tb {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    font-size: 0.85rem !important;
+  }
+  
+  .tb span.tb-lbl {
+    display: inline !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL LOADING BAR (Final Design)
+   ═══════════════════════════════════════════════════════════ */
+.global-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: #A855F7; /* A bright, glowing purple */
+  width: 0%;
+  z-index: 999999;
+  transition: width 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  box-shadow: 0 0 12px #A855F7, 0 0 4px #A855F7; /* Makes it glow against dark backgrounds */
+}
+
+.global-loader.active {
+  opacity: 1;
+}
+/* Ensure the calendar grid shows up when the accordion opens */
+details[open] .cal-grid {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  gap: 4px;
 }
