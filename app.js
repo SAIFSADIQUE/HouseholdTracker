@@ -12,7 +12,8 @@ import {
   initializeFirestore, getFirestore,
   persistentLocalCache, persistentMultipleTabManager,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
-  onSnapshot, getDoc, getDocs, query, orderBy, writeBatch, limit
+  onSnapshot, getDoc, getDocs, query, orderBy, writeBatch, limit, getCountFromServer,
+  increment, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 export const firebaseConfig = {
@@ -284,16 +285,21 @@ export function fmtAgo(iso){
   if (!iso) return '—';
   const t = Date.parse(iso);
   if (isNaN(t)) return '—';
+  
+  // Calculate the difference
   const diff = Date.now() - t;
+  
+  // If the timestamp is somehow in the future (timezone mismatch), clamp it to 0
+  const safeDiff = Math.max(0, diff);
 
-  const mins = Math.floor(diff / 60000);
+  const mins = Math.floor(safeDiff / 60000);
   if (mins < 1) return 'just now';
   if (mins < 60) return mins + ' min ago';
 
-  const hrs = Math.floor(diff / 3600000);
+  const hrs = Math.floor(safeDiff / 3600000);
   if (hrs < 24) return hrs + (hrs === 1 ? ' hr ago' : ' hrs ago');
 
-  const days = Math.floor(diff / 86400000);
+  const days = Math.floor(safeDiff / 86400000);
   return days + (days === 1 ? ' day ago' : ' days ago');
 }
 
@@ -302,8 +308,16 @@ export function fmtAgo(iso){
 export function setHeaderLastActivity(iso){
   const el = $('last-activity');
   if (!el) return;
-  el.textContent = iso ? fmtAgo(iso) : '—';
-  el.title = iso ? new Date(iso).toLocaleString('en-IN') : 'No activity yet';
+  
+  // If no timestamp is provided, it means the data is still downloading
+  if (!iso) {
+    el.textContent = 'Syncing...';
+    el.title = 'Downloading latest records from Firebase';
+    return;
+  }
+
+  el.textContent = fmtAgo(iso);
+  el.title = new Date(iso).toLocaleString('en-IN');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -736,6 +750,11 @@ export async function attemptLogin(input){
     startHeartbeat();
     await upsertSessionDoc(DEFAULT_USER, pass, 'login');
     if (_onLoginCallback) _onLoginCallback({ name: DEFAULT_USER, role: DEFAULT_ROLE });
+    
+    // Track the login
+    const device = navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop';
+    trackUsage('logins', device);
+    
     return { ok: true, name: DEFAULT_USER, role: DEFAULT_ROLE };
   }
   return { ok: false, message: 'Incorrect password. Try again.' };
@@ -792,9 +811,10 @@ export function installSession(onLogin, onLogout){
     if (btn) btn.disabled = false;
 
     if (res.ok){
-      overlay.style.display = 'none';
+      overlay.classList.remove('show'); // Smooth fade out
       input.value = '';
       err.textContent = '';
+      setTimeout(() => { overlay.style.display = 'none'; }, 500); // Hide after fade
     } else {
       err.textContent = '❌ ' + res.message;
       input.value = '';
@@ -818,13 +838,17 @@ export function installSession(onLogin, onLogout){
 
   // Boot: if already logged in, skip login
   if (isLoggedIn()){
-    overlay.style.display = 'none';
+    overlay.style.display = 'none'; // Hide immediately
+    overlay.classList.remove('show');
     resetSessionTimer();
     startHeartbeat();
     if (onLogin) onLogin({ name: currentUser() || DEFAULT_USER, role: currentUserRole() });
   } else {
     overlay.style.display = 'flex';
-    setTimeout(() => input.focus(), 100);
+    setTimeout(() => {
+      overlay.classList.add('show'); // Smooth fade in
+      input.focus();
+    }, 50);
   }
 }
 
@@ -861,10 +885,6 @@ export function installHeader(opts){
         // Header pills removed — moved to main dashboard in index.html
     const pills = '';
 
-    const todayStr = new Date().toLocaleDateString('en-IN', {
-      weekday:'short', day:'2-digit', month:'short', year:'numeric'
-    });
-
         banner.innerHTML = `
       <div class="sg">
         <div class="si">
@@ -874,10 +894,12 @@ export function installHeader(opts){
         ${pills}
         <div class="si" title="Last activity on this page">
           🕐 <span style="opacity:.75">Last:</span>
-          <strong id="last-activity">—</strong>
+          <strong id="last-activity">Syncing...</strong>
         </div>
-                <!-- User chip removed for sole-user mode -->
-        <div class="si">📅 <strong id="hdr-date">${todayStr}</strong></div>
+        <button class="si" id="btn-sync-now" title="Force refresh from database" style="cursor:pointer; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.05); color:#fff; font-family:inherit;">
+          <span id="sync-icon" style="display:inline-block; transition: transform 0.5s;">🔄</span> Sync
+        </button>
+        <!-- Removed Calendar -->
       </div>
             <div class="sg sg-right"></div>
     `;
@@ -888,6 +910,20 @@ export function installHeader(opts){
         if (window.__householdLogout) window.__householdLogout('manual');
       };
     }
+	    const syncBtn = $('btn-sync-now');
+  if (syncBtn) {
+    syncBtn.onclick = async () => {
+      const icon = $('sync-icon');
+      if (icon) icon.style.transform = 'rotate(360deg)'; // Spin animation
+
+      // Clear the cache
+      localStorage.removeItem('cache_expenses');
+      localStorage.removeItem('cache_categories');
+
+      // Reload the page to force a fresh fetch
+      setTimeout(() => { window.location.reload(); }, 600);
+    };
+  }
   };
 
   render();
@@ -925,13 +961,11 @@ export function setSyncStatus(state){
     txt.textContent = 'Connecting…';
   }
 
-  /* Hide the "Last activity" pill entirely when live.
-     Show it (with the current text) when saving / error / connecting
-     so the user has a "last successful sync" reference. */
+  // Keep the "Last activity" pill visible at all times
   const lastPill = $('last-activity');
   if (lastPill){
     const wrap = lastPill.closest('.si');
-    if (wrap) wrap.style.display = (state === 'live') ? 'none' : '';
+    if (wrap) wrap.style.display = 'flex'; 
   }
 }
 
@@ -1005,6 +1039,12 @@ export function getLogoutButtonHTML(){
   return `<button class="tb" onclick="window.__householdLogout && window.__householdLogout('manual')">
     <span>🚪</span><span class="tb-lbl">Logout</span>
   </button>`;
+}
+
+// Helper to bump the database version timestamp
+export async function bumpDbVersion() {
+  const ref = doc(db, 'household_settings', 'version');
+  await setDoc(ref, { lastUpdated: Date.now() }, { merge: true });
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1666,6 +1706,16 @@ export function initPage(opts){
   // 1) Theme first (before paint)
   applyTheme();
 
+  // Track a page refresh (but only if they are logged in)
+  if (localStorage.getItem(SESSION_KEY)) {
+    const device = navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop';
+    trackUsage('refreshes', device);
+  }
+
+  // Reset the sync icon if the page was reloaded
+  const syncIcon = document.getElementById('sync-icon');
+  if (syncIcon) syncIcon.style.transform = 'none';
+
   // 2) Network listeners
   installNetworkListeners();
 
@@ -1698,9 +1748,15 @@ export function initPage(opts){
     },
     (reason) => {
       // Logged out / session expired
-      // Show login overlay again
+      // Show login overlay again with a smooth fade
       const overlay = $('login-overlay');
-      if (overlay) overlay.style.display = 'flex';
+      if (overlay) {
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('show'), 50);
+      }
+      if (typeof toast === 'function') {
+        toast(reason === 'timeout' ? 'Session expired. Please log in.' : 'Logged out successfully.', 'info');
+      }
     }
   );
 
@@ -1745,9 +1801,34 @@ window.dataDeleted = dataDeleted;
 window.closeMo = closeMo;
 window.openMo  = openMo;
 window.checkAutoClearHistory = checkAutoClearHistory;
+window.latestActivity = latestActivity;
+window.setHeaderLastActivity = setHeaderLastActivity;
 
 /* ═══════════════════════════════════════════════════════════════
    END OF app.js
    ═══════════════════════════════════════════════════════════════ */
 
 console.log('✅ Household Tracker shared module loaded');
+
+/* ═══════════════════════════════════════════════════════════════
+   SESSION USAGE TRACKER
+   ═══════════════════════════════════════════════════════════════ */
+export async function trackUsage(actionType, deviceName) {
+  try {
+    // Get the local date (IST) instead of UTC
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const ref = doc(db, 'usage_stats', todayStr);
+    
+    // We use a transaction or updateDoc to increment safely
+    await setDoc(ref, {
+      date: todayStr,
+      [actionType]: increment(1), // Will add +1 to 'logins', 'refreshes', or 'active_devices'
+      lastActive: new Date().toISOString(),
+      devices: arrayUnion(deviceName) // Keeps a unique list of devices
+    }, { merge: true });
+    
+  } catch (e) {
+    console.warn('Usage tracking failed:', e.message);
+  }
+}

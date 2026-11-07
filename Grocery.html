@@ -831,6 +831,7 @@ import {
   $, esc, escQ, fmt, fmtAmt, fmt0, fmtDate, monthLabel, mkey, mlabel,
   localDateStr, today, daysBetween, lastKeys,
   bars, download, printLetterhead, openPrintWindow,
+  latestActivity, setHeaderLastActivity, // <-- ADD THESE
   // UI
     toast, pill, showConfirm, ensureConfirmModal, closeMo, openMo,
   dataSaved, dataUpdated, dataDeleted,
@@ -1222,6 +1223,10 @@ function onData(){
   buildPcItems();
   buildYears();
   refreshAll();
+  
+  // FORCE HEADER UPDATE: Find the latest activity from purchases
+  const globalIso = latestActivity(DB.purchases, ['createdAt', 'updatedAt']);
+  setHeaderLastActivity(globalIso);
 }
 
 function refreshAll(){

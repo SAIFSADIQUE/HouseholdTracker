@@ -761,6 +761,7 @@ import {
   $, esc, escQ, fmt, fmtAmt, fmtDate, fmtFull, monthLabel,
   localDateStr, today, dayShort, daysBetween, bars,
   avatarHTML, initials, hue,
+  latestActivity, setHeaderLastActivity, // <-- ADD THESE
   // UI
    toast, pill, download, openPrintWindow, showConfirm, ensureConfirmModal, closeMo, openMo,
   dataSaved, dataUpdated, dataDeleted,
@@ -1009,11 +1010,15 @@ function startListeners(){
     PEOPLE = rows;
     READY.b = true;
     setCounter('people', rows.length);
-    setSyncStatus('live');                    // ← ADD THIS LINE
+    setSyncStatus('live');                    
     cachePeople();
     buildRelations();
     renderAll();
     runReminders();
+    
+    // FORCE HEADER UPDATE: Find the latest activity from birthdays
+    const globalIso = latestActivity(PEOPLE, ['lastWishedAt', 'createdAt', 'updatedAt']);
+    setHeaderLastActivity(globalIso);
   });
 
   // Birthday prefs (single doc)
