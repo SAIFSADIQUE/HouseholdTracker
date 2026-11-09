@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Household Tracker</title>
 
-<!-- ══════════ FAVICON ══════════ -->
+<!-- ══════════ FAVICON & PWA ══════════ -->
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6c63ff">
 
 <!-- ══════════ FONTS ══════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -239,7 +242,11 @@
       <h2 class="topbar-title" id="topbar-title" style="margin-right: auto;">Dashboard</h2>
       <div class="topbar-actions">
         <button class="ib" onclick="focusAdd()" type="button">
-          ➕ <span class="ib-lbl">Add Expense</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span class="ib-lbl">Add Expense</span>
         </button>
       </div>
     </header>
@@ -804,15 +811,35 @@
                 <label style="font-size: .68rem;">To</label>
                 <input type="date" id="dr-to" class="fc2" onchange="renderDateRange()" style="padding: 8px 10px; height: 38px; font-size: 0.8rem;"/>
               </div>
-              <div class="fg2" style="margin-bottom: 0; grid-column: 1 / -1; margin-top: 4px;">
-                <button class="btn bp" style="width:100%; justify-content:center; height: 38px; font-size: 0.8rem;"
-                        onclick="renderDateRange()" type="button">🔍 Show</button>
+              <div class="fg2" style="margin-bottom: 0; grid-column: 1 / -1; gap: 4px;">
+                <label style="font-size: .68rem;">Categories (optional)</label>
+                <div class="cdw" id="cdw-dr">
+                  <div class="csd" id="csd-dr" onclick="toggleDrop('dr')" style="min-height: 38px; padding: 8px 10px;">
+                    <span id="ct-dr" class="ph">All Categories</span>
+                    <span class="ca">▼</span>
+                  </div>
+                  <div class="cdp" id="cdp-dr">
+                    <div class="csb">
+                      <input class="csi" id="cs-dr" placeholder="🔎 Search…" oninput="filterOpts('dr')" autocomplete="off"/>
+                    </div>
+                    <div class="cdrop-col" id="cl-dr"></div>
+                  </div>
+                  <input type="hidden" id="dr-cat"/>
+                </div>
+              </div>
+              <div class="fg2" style="margin-bottom: 0; grid-column: 1 / -1; margin-top: 8px;">
+                <div style="display: flex; gap: 10px;">
+                  <button class="btn bp" style="flex: 1; justify-content:center; height: 36px; font-size: 0.8rem; padding: 0 10px;"
+                          onclick="renderDateRange()" type="button">🔍 Show</button>
+                  <button class="btn bo" style="flex: 1; justify-content:center; height: 36px; font-size: 0.8rem; padding: 0 10px;"
+                          onclick="resetDateRangeCategories()" type="button">✕ Reset</button>
+                </div>
               </div>
             </div>
           </div>
           <div class="grid g3 mb" id="dr-summary-cards"></div>
           <div class="ag grid g2">
-            <div class="ac"><h3>🏷️ By Category</h3><div id="dr-cat"></div></div>
+            <div class="ac"><h3>🏷️ By Category</h3><div id="dr-cat-breakdown"></div></div>
             <div class="ac"><h3>📆 By Day</h3><div id="dr-day"></div></div>
           </div>
           <div class="tc">
@@ -1733,14 +1760,14 @@
           <div class="grid g4 mb" id="usage-stats-container" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
             <div class="sc"><div class="lbl">Logins</div><div class="amt" id="stat-logins">0</div></div>
             <div class="sc"><div class="lbl">Refreshes</div><div class="amt" id="stat-refreshes">0</div></div>
-            <div class="sc"><div class="lbl">Active Devices</div><div class="amt" id="stat-devices">0</div></div>
-            <div class="sc"><div class="lbl">Last Active</div><div class="amt" id="stat-last" style="font-size:1rem; margin-top:8px;">—</div></div>
-            <div class="sc" style="border-top-color: var(--warn);">
+            <div class="sc t"><div class="lbl">Active Devices</div><div class="amt" id="stat-devices">0</div></div>
+            <div class="sc y"><div class="lbl">Last Active</div><div class="amt" id="stat-last" style="font-size:1rem; margin-top:8px;">—</div></div>
+            <div class="sc m">
               <div class="lbl">New Entries</div>
               <div class="amt" id="stat-backup-count" style="color: var(--warn);">0 / 5</div>
               <div class="sub">Backup threshold</div>
             </div>
-            <div class="sc" style="border-top-color: var(--ok);">
+            <div class="sc a">
               <div class="lbl">Last Backup</div>
               <div class="amt" id="stat-last-backup" style="font-size: .9rem; margin-top: 8px;">Never</div>
               <div class="sub" id="stat-last-backup-time">No backup yet</div>
@@ -1773,6 +1800,21 @@
             <label>Theme — pick a palette (12 options)</label>
           </div>
           <div class="palette-gallery" id="palette-gallery"></div>
+
+          <hr style="border:none; border-top:1px dashed var(--bdr); margin: 20px 0;"/>
+
+          <div class="fg2" style="margin-bottom:12px">
+            <label>Tile Style (Dashboard & Summary Cards)</label>
+            <div class="theme-row" id="tile-style-selector" style="flex-wrap: wrap;">
+              <div class="theme-opt" onclick="setTileStyle('glass')" id="tile-glass">🪟 Glass</div>
+              <div class="theme-opt" onclick="setTileStyle('vivid')" id="tile-vivid">🎨 Vivid</div>
+              <div class="theme-opt" onclick="setTileStyle('outline')" id="tile-outline">🔲 Outline</div>
+              <div class="theme-opt" onclick="setTileStyle('pattern')" id="tile-pattern">🎛️ Pattern</div>
+              <div class="theme-opt" onclick="setTileStyle('gradient')" id="tile-gradient">🌈 Gradient</div>
+              <div class="theme-opt" onclick="setTileStyle('3d')" id="tile-3d">📦 3D</div>
+              <div class="theme-opt" onclick="setTileStyle('stripe')" id="tile-stripe">🎗️ Stripe</div>
+            </div>
+          </div>
         </div>
 
         <!-- ══ SESSION TIMEOUT ══ -->
@@ -2151,6 +2193,31 @@
     <button class="btn bg2" style="width: 100%; justify-content: center; font-size: 0.8rem;" onclick="closeMo('force-backup-mo')" id="btn-skip-backup" disabled>
       Skip (Available after download)
     </button>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════════════
+     GROUP CATEGORY BREAKDOWN MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="mo" id="group-cat-mo" onclick="closeMo('group-cat-mo', event)">
+  <div class="md wide">
+    <div class="mt" id="group-cat-title">Group Categories</div>
+    
+    <div class="tw" style="max-height: 60vh; overflow-y: auto;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:8px 10px;">Category</th>
+            <th style="text-align:right; padding:8px 10px;">Records</th>
+            <th style="text-align:right; padding:8px 10px;">Total Amount</th>
+          </tr>
+        </thead>
+        <tbody id="group-cat-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="mf">
+      <button class="btn bg2" onclick="closeMo('group-cat-mo')" type="button">Close</button>
+    </div>
   </div>
 </div>
 <!-- Toast container -->

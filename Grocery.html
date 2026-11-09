@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Grocery Tracker</title>
 
-<!-- ══════════ FAVICON ══════════ -->
+<!-- ══════════ FAVICON & PWA ══════════ -->
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6c63ff">
 
 <!-- ══════════ FONTS ══════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,10 +45,12 @@
     </div>
     <h1>Grocery Tracker</h1>
     <p>Enter your password to continue.</p>
-    <input type="password" id="login-pass" class="fc2"
-           placeholder="••••" maxlength="20" inputmode="numeric"
-           autocomplete="off"/>
-    <button class="btn bp" type="button">Unlock</button>
+    <div class="login-input-wrapper">
+      <input type="password" id="login-pass" class="login-input"
+             placeholder="••••" maxlength="20" inputmode="numeric"
+             autocomplete="off"/>
+    </div>
+    <button class="btn bp login-btn" type="button">Unlock Dashboard</button>
     <div class="login-err" id="login-err"></div>
   </div>
 </div>
@@ -175,7 +180,11 @@
       <h2 class="topbar-title" id="topbar-title" style="margin-right: auto;">Grocery Dashboard</h2>
       <div class="topbar-actions">
         <button class="ib" id="btn-add-top" type="button">
-          ➕ <span class="ib-lbl">Add</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span class="ib-lbl">Add</span>
         </button>
       </div>
     </header>

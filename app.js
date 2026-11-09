@@ -1317,6 +1317,14 @@ export async function addRecord(collectionName, data, opts){
     const ref = await addDoc(collection(db, collectionName), Object.assign({}, data, {
       createdAt: new Date().toISOString()
     }));
+
+    // ── INCREMENT BACKUP COUNTER FOR ANY NEW RECORD ──
+    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
+    localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
+    
+    // Update the UI if the function exists (Settings/Export pages)
+    if (typeof window.updateBackupStatusUI === 'function') window.updateBackupStatusUI();
+
     if (pillMsg) pill(pillMsg, pillIcon);
     if (historyAction) await logHistory(historyAction, historyData || data);
     setSyncStatus('live');

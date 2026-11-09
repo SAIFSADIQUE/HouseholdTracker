@@ -560,7 +560,7 @@ button { font-family: inherit; }
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 32px;
-  padding: 48px 40px;
+  padding: 36px 32px 32px 32px; /* Top, Right, Bottom, Left */
   max-width: 380px;
   width: 100%;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 1);
@@ -570,52 +570,52 @@ button { font-family: inherit; }
 }
 
 .login-mark {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
   background: linear-gradient(135deg, #6c63ff, #3b82f6);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: -80px auto 20px; /* Pops out of the card */
-  box-shadow: 0 10px 25px rgba(108, 99, 255, 0.5);
-  border: 4px solid #fff;
+  margin: -60px auto 16px; /* Reduced pop-out */
+  border: 3px solid #fff;
+  box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
 }
 
 .login-box h1 {
   font-family: var(--fontd);
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #1a1a2e;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   letter-spacing: -0.5px;
 }
 
 .login-box p {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #666;
-  margin-bottom: 28px;
-  line-height: 1.5;
+  margin-bottom: 20px;
+  line-height: 1.4;
 }
 
 /* Input Wrapper */
 .login-input-wrapper {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .login-input {
   width: 100%;
   text-align: center;
-  font-size: 1.6rem;
-  letter-spacing: 12px;
+  font-size: 1.3rem;
+  letter-spacing: 10px;
   font-family: var(--fontd);
   font-weight: 700;
   color: #1a1a2e;
-  padding: 16px;
+  padding: 12px;
   border: 2px solid #e2e8f0;
-  border-radius: 16px;
+  border-radius: 14px;
   background: #f8fafc;
   outline: none;
   transition: all 0.2s;
@@ -636,11 +636,9 @@ button { font-family: inherit; }
 .login-btn {
   width: 100%;
   justify-content: center;
-  padding: 16px;
-  font-size: 1rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #6c63ff, #3b82f6);
-  box-shadow: 0 8px 20px rgba(108, 99, 255, 0.3);
+  padding: 12px;
+  font-size: 0.95rem;
+  border-radius: 14px;
 }
 
 .login-btn:hover {
@@ -1490,6 +1488,8 @@ td.nc {
   overflow-y: auto;
   flex: 1;
   padding: 3px 0;
+  /* Add a maximum height so it doesn't stretch the page */
+  max-height: 250px;
 }
 .co {
   padding: 8px 13px;
@@ -3242,12 +3242,16 @@ input[type=checkbox] {
 /* ═══════════════════════════════════════════════════════════
    COLLAPSIBLE SECTIONS (Clean Left Alignment)
    ═══════════════════════════════════════════════════════════ */
+details.fc {
+  overflow: visible !important; /* Allow dropdowns to spill out */
+}
+
 details.fc summary {
   list-style: none;
   outline: none;
   display: flex !important;
   align-items: center;
-  justify-content: space-between; /* Keeps items on opposite sides */
+  justify-content: space-between; 
   gap: 10px;
 }
 
@@ -3914,3 +3918,141 @@ details[open] .cal-grid {
   background: rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   TILE THEME ENGINE (7 DESIGNS)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1. GLASS THEME (The Original) ── */
+body[data-tile-style="glass"] .sc {
+  background: linear-gradient(145deg, var(--card) 0%, color-mix(in srgb, var(--card) 90%, var(--bg)) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 15px rgba(0,0,0,0.03) !important;
+  border: 1px solid var(--bdr) !important; border-top: none !important; border-left: 4px solid var(--p) !important;
+}
+body[data-tile-style="glass"] .sc.t { border-left-color: var(--ok) !important; background: linear-gradient(145deg, var(--card) 0%, color-mix(in srgb, var(--ok) 5%, var(--card)) 100%) !important; }
+body[data-tile-style="glass"] .sc.m { border-left-color: var(--warn) !important; background: linear-gradient(145deg, var(--card) 0%, color-mix(in srgb, var(--warn) 5%, var(--card)) 100%) !important; }
+body[data-tile-style="glass"] .sc.y, body[data-tile-style="glass"] .sc.a { border-left-color: var(--acc) !important; background: linear-gradient(145deg, var(--card) 0%, color-mix(in srgb, var(--acc) 5%, var(--card)) 100%) !important; }
+body[data-tile-style="glass"] .sc .amt { background: linear-gradient(135deg, var(--txt), var(--p)) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+
+/* ── 2. VIVID THEME ── */
+body[data-tile-style="vivid"] .sc {
+  border: none !important; color: #fff !important; box-shadow: 0 8px 20px -5px rgba(0,0,0,0.15) !important;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--p) 85%, #fff), var(--p)) !important;
+}
+body[data-tile-style="vivid"] .sc.t { background: linear-gradient(135deg, color-mix(in srgb, var(--ok) 80%, #fff), var(--ok)) !important; }
+body[data-tile-style="vivid"] .sc.m { background: linear-gradient(135deg, color-mix(in srgb, var(--warn) 85%, #fff), var(--warn)) !important; }
+body[data-tile-style="vivid"] .sc.y { background: linear-gradient(135deg, color-mix(in srgb, var(--acc) 80%, #fff), var(--acc)) !important; }
+body[data-tile-style="vivid"] .sc.a { background: linear-gradient(135deg, color-mix(in srgb, var(--p) 80%, #fff), var(--pd)) !important; }
+body[data-tile-style="vivid"] .sc .lbl { color: rgba(255,255,255,0.85) !important; }
+body[data-tile-style="vivid"] .sc .sub { color: rgba(255,255,255,0.75) !important; }
+body[data-tile-style="vivid"] .sc .amt { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+
+/* ── 3. OUTLINE THEME (Sleek & Sharp) ── */
+body[data-tile-style="outline"] .sc {
+  background: transparent !important; 
+  border: 2px solid var(--bdr) !important;
+  border-top: 2px solid var(--bdr) !important;
+  box-shadow: none !important;
+}
+body[data-tile-style="outline"] .sc.t { border-color: var(--ok) !important; }
+body[data-tile-style="outline"] .sc.m { border-color: var(--warn) !important; }
+body[data-tile-style="outline"] .sc.y, body[data-tile-style="outline"] .sc.a { border-color: var(--acc) !important; }
+body[data-tile-style="outline"] .sc .amt { background: none !important; -webkit-text-fill-color: var(--txt) !important; color: var(--txt) !important; }
+
+/* ── 4. PATTERN THEME (Stripes & Shapes) ── */
+body[data-tile-style="pattern"] .sc {
+  background-color: var(--card) !important;
+  border: 1px solid var(--bdr) !important;
+  border-top: none !important;
+  border-left: 4px solid var(--p) !important;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Diagonal Stripes Background */
+body[data-tile-style="pattern"] .sc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    color-mix(in srgb, var(--p) 4%, transparent) 10px,
+    color-mix(in srgb, var(--p) 4%, transparent) 20px
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Colored circles in the background based on theme */
+body[data-tile-style="pattern"] .sc::after {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--p) 8%, transparent);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Specific colors for the pattern */
+body[data-tile-style="pattern"] .sc.t { border-left-color: var(--ok) !important; }
+body[data-tile-style="pattern"] .sc.t::before { background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, color-mix(in srgb, var(--ok) 5%, transparent) 10px, color-mix(in srgb, var(--ok) 5%, transparent) 20px); }
+body[data-tile-style="pattern"] .sc.t::after { background: color-mix(in srgb, var(--ok) 10%, transparent); }
+
+body[data-tile-style="pattern"] .sc.m { border-left-color: var(--warn) !important; }
+body[data-tile-style="pattern"] .sc.m::before { background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, color-mix(in srgb, var(--warn) 5%, transparent) 10px, color-mix(in srgb, var(--warn) 5%, transparent) 20px); }
+body[data-tile-style="pattern"] .sc.m::after { background: color-mix(in srgb, var(--warn) 10%, transparent); }
+
+body[data-tile-style="pattern"] .sc.y, body[data-tile-style="pattern"] .sc.a { border-left-color: var(--acc) !important; }
+body[data-tile-style="pattern"] .sc.y::before, body[data-tile-style="pattern"] .sc.a::before { background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, color-mix(in srgb, var(--acc) 5%, transparent) 10px, color-mix(in srgb, var(--acc) 5%, transparent) 20px); }
+body[data-tile-style="pattern"] .sc.y::after, body[data-tile-style="pattern"] .sc.a::after { background: color-mix(in srgb, var(--acc) 10%, transparent); }
+
+/* Keep text readable over the pattern */
+body[data-tile-style="pattern"] .sc .amt {
+  background: none !important;
+  -webkit-text-fill-color: var(--txt) !important;
+  color: var(--txt) !important;
+  position: relative;
+  z-index: 2;
+}
+body[data-tile-style="pattern"] .sc .lbl { position: relative; z-index: 2; }
+body[data-tile-style="pattern"] .sc .sub { position: relative; z-index: 2; }
+
+/* ── 5. GRADIENT THEME (Full Rainbow Background) ── */
+body[data-tile-style="gradient"] .sc {
+  background: linear-gradient(135deg, var(--card), var(--pl)) !important;
+  border: none !important;
+  box-shadow: 0 10px 20px -10px color-mix(in srgb, var(--p) 40%, transparent) !important;
+}
+body[data-tile-style="gradient"] .sc.t { background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--ok) 20%, var(--card))) !important; box-shadow: 0 10px 20px -10px color-mix(in srgb, var(--ok) 40%, transparent) !important; }
+body[data-tile-style="gradient"] .sc.m { background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--warn) 20%, var(--card))) !important; box-shadow: 0 10px 20px -10px color-mix(in srgb, var(--warn) 40%, transparent) !important; }
+body[data-tile-style="gradient"] .sc.y, body[data-tile-style="gradient"] .sc.a { background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--acc) 20%, var(--card))) !important; box-shadow: 0 10px 20px -10px color-mix(in srgb, var(--acc) 40%, transparent) !important; }
+
+/* ── 6. 3D THEME (Soft Emboss) ── */
+body[data-tile-style="3d"] .sc {
+  background: var(--bg) !important;
+  border: 1px solid rgba(255,255,255,0.5) !important;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.05), -5px -5px 15px rgba(255,255,255,0.8) !important;
+}
+body[data-tile-style="3d"] .sc.t { box-shadow: 5px 5px 15px color-mix(in srgb, var(--ok) 15%, transparent), -5px -5px 15px rgba(255,255,255,0.8) !important; }
+body[data-tile-style="3d"] .sc.m { box-shadow: 5px 5px 15px color-mix(in srgb, var(--warn) 15%, transparent), -5px -5px 15px rgba(255,255,255,0.8) !important; }
+body[data-tile-style="3d"] .sc.y, body[data-tile-style="3d"] .sc.a { box-shadow: 5px 5px 15px color-mix(in srgb, var(--acc) 15%, transparent), -5px -5px 15px rgba(255,255,255,0.8) !important; }
+[data-theme="dark"] body[data-tile-style="3d"] .sc { box-shadow: 5px 5px 15px rgba(0,0,0,0.4), -2px -2px 10px rgba(255,255,255,0.05) !important; border: none !important; }
+
+/* ── 7. STRIPE THEME (Accent Bar) ── */
+body[data-tile-style="stripe"] .sc {
+  background: var(--card) !important;
+  border: 1px solid var(--bdr) !important;
+  border-top: none !important;
+  position: relative; overflow: hidden;
+}
+body[data-tile-style="stripe"] .sc::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 6px; background: var(--p);
+}
+body[data-tile-style="stripe"] .sc.t::before { background: var(--ok); }
+body[data-tile-style="stripe"] .sc.m::before { background: var(--warn); }
+body[data-tile-style="stripe"] .sc.y::before, body[data-tile-style="stripe"] .sc.a::before { background: var(--acc); }

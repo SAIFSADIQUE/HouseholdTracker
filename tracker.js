@@ -55,6 +55,7 @@ let rentPayments    = [];
 
 // Filter / sort / pagination
 let filtered  = [];
+let calFilterDate = '';
 let curPage   = 1;
 const PG      = 25;
 let sField    = 'date';
@@ -64,7 +65,7 @@ const HPG     = 20;
 let curAnTab  = 'overview';
 
 // Category picker values
-let catVals = { add:'', edit:'', filter:'', catmon:'' };
+let catVals = { add:'', edit:'', filter:[], catmon:'', dr:[] };
 
 // Multi-select for bulk delete
 let selectedIds = new Set();
@@ -660,14 +661,24 @@ function applyFilters(){
   const yr  = $('r-year')?.value || '';
   const mon = $('r-month')?.value || '';
   const day = $('r-day')?.value || '';
-  const cat = $('r-cat')?.value || '';
+  const selectedCats = catVals.filter || [];
+
+  // If the user types in search or uses other UI filters, cancel the calendar filter
+  if (q || yr || mon || day || selectedCats.length > 0) {
+    calFilterDate = '';
+  }
 
   filtered = expenses.filter(e => {
     const d = new Date(e.date + 'T00:00:00');
     if (yr && d.getFullYear() !== parseInt(yr)) return false;
     if (mon && d.getMonth()+1 !== parseInt(mon)) return false;
+    
     if (day && e.date !== day) return false;
-    if (cat && e.category !== cat) return false;
+    if (calFilterDate && e.date !== calFilterDate) return false;
+
+    // MULTI-SELECT LOGIC: Check if the record's category is in the selected array
+    if (selectedCats.length > 0 && !selectedCats.includes(e.category)) return false;
+
     if (q){
       const hay = `${e.date} ${e.category} ${e.amount} ${e.note || ''} ${e.paymentMode || ''}`.toLowerCase();
       if (!hay.includes(q)) return false;
@@ -780,7 +791,10 @@ window.doSort = function(field){
 
 window.clearFilters = function(){
   ['r-search','r-day','r-year','r-month'].forEach(id => { const el = $(id); if (el) el.value = ''; });
-  setCat('filter', '');
+  catVals.filter = []; // Clear the array
+  const txt = $('ct-filter');
+  if (txt) { txt.textContent = 'All Categories'; txt.classList.add('ph'); }
+  calFilterDate = '';
   applyFilters();
   pill('Filters reset', '↺');
 };
@@ -895,11 +909,16 @@ window.jumpCalToday = function(){
 
 window.calDayClick = function(dateStr){
   if (dateStr > localDateStr()) return;
-  switchTab('records', document.querySelector('[data-tab="records"]'));
-  const s = $('r-search'); if (s) s.value = '';
-  const d = $('r-day');    if (d) d.value = dateStr;
   
-  // Force the All Records accordion to open
+  // Set the hidden calendar filter
+  calFilterDate = dateStr; 
+  
+  // Clear the UI date filter just in case it was used
+  const d = $('r-day'); if (d) d.value = '';
+  
+  // Switch to records tab, open the accordion, and apply filters
+  switchTab('records', document.querySelector('[data-tab="records"]'));
+  
   const details = document.getElementById('all-records-details');
   if (details) details.setAttribute('open', '');
   
@@ -952,11 +971,21 @@ window.clearForm = function(){
   ['f-amount','f-note'].forEach(id => { const el = $(id); if (el) el.value = ''; });
   
   setCat('add', '');
+  
+  // FORCE RE-ENABLE THE FIELDS AND RESET TO UPI
+  const amtField = $('f-amount');
+  const payField = $('f-pay');
+  if (amtField) amtField.disabled = false;
+  if (payField) {
+    payField.disabled = false;
+    payField.value = 'UPI'; // <-- Force UPI to be selected
+  }
+
   if (!dateLocked){
     const d = $('f-date');
     if (d) d.value = localDateStr();
   }
-    updateDateDayLabel('f-date','f-date-day');
+  updateDateDayLabel('f-date','f-date-day');
   if (window.updateAddDateCount) window.updateAddDateCount();
   setTimeout(() => $('f-amount')?.focus(), 50);
 };
@@ -1050,12 +1079,6 @@ window.saveExp = async function(force){
 
     // 4. Clear the form
     clearForm(); 
-
-    // Increment backup counter
-    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-    localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
-    
-    if (typeof updateBackupStatusUI === 'function') updateBackupStatusUI();
   }
 };
 
@@ -1182,9 +1205,6 @@ window.deleteExp = function(id){
         renderDashRecent();
         renderDashboardTiles();
 
-        // 4. Increment backup counter
-        let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-        localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
       }
     },
     'bd'
@@ -1313,10 +1333,6 @@ window.executeBulkDelete = async function(){
     populateYearSelectors();
 
     // 6. Increment backup counter
-    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-    localStorage.setItem('backup_entry_count', (currentCount + ids.length).toString());
-    if (typeof updateBackupStatusUI === 'function') updateBackupStatusUI();
-
     pill(`${ids.length} record(s) deleted`, '🗑️');
 
   } catch (err){
@@ -1449,51 +1465,78 @@ window.executeBulkReassign = async function(){
    ═══════════════════════════════════════════════════════════════ */
 let _catCounts = {};
 function buildAllDropdowns(){
-  // Pre-calculate counts ONCE so we don't loop 5,000 expenses 54 times
   _catCounts = {};
   expenses.forEach(e => {
     _catCounts[e.category] = (_catCounts[e.category] || 0) + 1;
   });
   
-  ['add','edit','filter','catmon'].forEach(ctx => buildOpts(ctx));
+  ['add','edit','filter','catmon','dr'].forEach(ctx => buildOpts(ctx));
 }
 
 function buildOpts(ctx, q){
   const el = $('cl-' + ctx);
   if (!el) return;
   const ql  = (q || '').toLowerCase().trim();
-  const src = ql ? categories.filter(c => c.name.toLowerCase().includes(ql)) : [...categories];
+  
+  // 1. Determine the source list
+  let baseCats = [...categories];
+
+  // If this is the Date Range dropdown, only show categories that exist in that date range
+  if (ctx === 'dr') {
+    const from = $('dr-from')?.value || '';
+    const to = $('dr-to')?.value || '';
+    
+    if (from && to) {
+      const rangeData = expenses.filter(e => e.date >= from && e.date <= to);
+      const uniqueCatsInRange = new Set(rangeData.map(e => e.category));
+      baseCats = categories.filter(c => uniqueCatsInRange.has(c.name));
+    }
+  }
+
+  const src = ql ? baseCats.filter(c => c.name.toLowerCase().includes(ql)) : baseCats;
 
   let html = '';
-  if (ctx === 'filter' || ctx === 'catmon'){
-    html += `<div class="co ${catVals[ctx] === '' ? 'sel' : ''}" onclick="selectCat('${ctx}','','All Categories')">All Categories <span class="cob">${expenses.length}</span></div>`;
+  if (ctx === 'filter' || ctx === 'catmon' || ctx === 'dr'){
+    const isAllSelected = (ctx === 'filter' || ctx === 'dr') ? catVals[ctx].length === 0 : catVals[ctx] === '';
+    // For Date Range, show the count of records in the range. Otherwise show total.
+    let countToDisplay = expenses.length;
+    if (ctx === 'dr') {
+       const from = $('dr-from')?.value || '';
+       const to = $('dr-to')?.value || '';
+       if (from && to) countToDisplay = expenses.filter(e => e.date >= from && e.date <= to).length;
+    }
+    html += `<div class="co ${isAllSelected ? 'sel' : ''}" onclick="selectCat('${ctx}','','All Categories')">All Categories <span class="cob">${countToDisplay}</span></div>`;
   }
+  
   if (!src.length){
     el.innerHTML = html + '<div class="co nr">No results</div>';
     return;
   }
 
   if (ql){
-        src.forEach(cat => {
+    src.forEach(cat => {
       const cnt = _catCounts[cat.name] || 0;
-      html += `<div class="co ${catVals[ctx] === cat.name ? 'sel' : ''}" onclick="selectCat('${ctx}','${escQ(cat.name)}','${escQ(cat.name)}')">${esc(cat.name)}${cnt > 0 ? `<span class="cob">${cnt}</span>` : ''}</div>`;
+      const isSel = (ctx === 'filter' || ctx === 'dr') ? catVals[ctx].includes(cat.name) : catVals[ctx] === cat.name;
+      html += `<div class="co ${isSel ? 'sel' : ''}" onclick="selectCat('${ctx}','${escQ(cat.name)}','${escQ(cat.name)}')">${esc(cat.name)}${cnt > 0 ? `<span class="cob">${cnt}</span>` : ''}</div>`;
     });
   } else {
     CAT_GROUPS.forEach(grp => {
       const grpCats = src.filter(c => grp.prefixes.some(p => c.name.startsWith(p)));
       if (!grpCats.length) return;
       html += `<div class="co-grp-hdr" style="border-left:3px solid ${grp.color}">${grp.label}</div>`;
-            grpCats.forEach(cat => {
+      grpCats.forEach(cat => {
         const cnt = _catCounts[cat.name] || 0;
-        html += `<div class="co co-grp ${catVals[ctx] === cat.name ? 'sel' : ''}" onclick="selectCat('${ctx}','${escQ(cat.name)}','${escQ(cat.name)}')">${esc(cat.name)}${cnt > 0 ? `<span class="cob">${cnt}</span>` : ''}</div>`;
+        const isSel = (ctx === 'filter' || ctx === 'dr') ? catVals[ctx].includes(cat.name) : catVals[ctx] === cat.name;
+        html += `<div class="co co-grp ${isSel ? 'sel' : ''}" onclick="selectCat('${ctx}','${escQ(cat.name)}','${escQ(cat.name)}')">${esc(cat.name)}${cnt > 0 ? `<span class="cob">${cnt}</span>` : ''}</div>`;
       });
     });
     const ungrouped = src.filter(c => !CAT_GROUPS.some(g => g.prefixes.some(p => c.name.startsWith(p))));
     if (ungrouped.length){
       html += `<div class="co-grp-hdr" style="border-left:3px solid #94a3b8">🏷️ Other</div>`;
-            ungrouped.forEach(cat => {
+      ungrouped.forEach(cat => {
         const cnt = _catCounts[cat.name] || 0;
-        html += `<div class="co co-grp ${catVals[ctx] === cat.name ? 'sel' : ''}" onclick="selectCat('${ctx}','${escQ(cat.name)}','${escQ(cat.name)}')">${esc(cat.name)}${cnt > 0 ? `<span class="cob">${cnt}</span>` : ''}</div>`;
+        const isSel = (ctx === 'filter' || ctx === 'dr') ? catVals[ctx].includes(cat.name) : catVals[ctx] === cat.name;
+        html += `<div class="co co-grp ${isSel ? 'sel' : ''}" onclick="selectCat('${ctx}','${escQ(cat.name)}','${escQ(cat.name)}')">${esc(cat.name)}${cnt > 0 ? `<span class="cob">${cnt}</span>` : ''}</div>`;
       });
     }
   }
@@ -1510,7 +1553,7 @@ window.toggleDrop = function(ctx){
   const disp  = $('csd-' + ctx);
   if (!panel || !disp) return;
   const isOpen = panel.classList.contains('open');
-  ['add','edit','filter','catmon'].forEach(c => {
+  ['add','edit','filter','catmon','dr'].forEach(c => {
     const p = $('cdp-' + c), d = $('csd-' + c);
     if (p) p.classList.remove('open');
     if (d) d.classList.remove('open');
@@ -1525,6 +1568,38 @@ window.toggleDrop = function(ctx){
 };
 
 window.selectCat = function(ctx, val, label){
+  
+  // ── MULTI-SELECT LOGIC FOR FILTER / DATE RANGE ──
+  if (ctx === 'filter' || ctx === 'dr') {
+    if (!val) {
+      catVals[ctx] = []; // "All Categories" resets the array
+    } else {
+      if (catVals[ctx].includes(val)) {
+        catVals[ctx] = catVals[ctx].filter(c => c !== val); // Uncheck
+      } else {
+        catVals[ctx].push(val); // Check
+      }
+    }
+    
+    const txt = $('ct-' + ctx);
+    if (txt) {
+      if (catVals[ctx].length === 0) {
+        txt.textContent = 'All Categories';
+        txt.classList.add('ph');
+      } else {
+        txt.textContent = `${catVals[ctx].length} Categories Selected`;
+        txt.classList.remove('ph');
+      }
+    }
+    
+    // Redraw the dropdown options so checkmarks update, but keep it open
+    buildOpts(ctx, $('cs-' + ctx)?.value || '');
+    if (ctx === 'filter') applyFilters();
+    if (ctx === 'dr') renderDateRange();
+    return; 
+  }
+
+  // ── SINGLE-SELECT LOGIC FOR ADD / EDIT ──
   catVals[ctx] = val;
   const txt = $('ct-' + ctx);
   if (txt){
@@ -1535,13 +1610,12 @@ window.selectCat = function(ctx, val, label){
   const hid = $(hidId);
   if (hid) hid.value = val;
 
-  ['add','edit','filter','catmon'].forEach(c => {
+  ['add','edit','filter','catmon','dr'].forEach(c => {
     const p = $('cdp-' + c), d = $('csd-' + c);
     if (p) p.classList.remove('open');
     if (d) d.classList.remove('open');
   });
 
-  // Disable "Paid Via" and "Amount" if "No Expense" is selected
   if (ctx === 'add' || ctx === 'edit') {
     const isNoExp = val === 'No Expense';
     const payField = $(ctx === 'add' ? 'f-pay' : 'm-pay');
@@ -1550,12 +1624,18 @@ window.selectCat = function(ctx, val, label){
     if (payField) {
       payField.disabled = isNoExp;
       if (isNoExp) payField.value = ''; 
-      else if (!payField.value) payField.value = 'UPI'; 
+      else if (!payField.value || payField.value === '') payField.value = 'UPI'; 
     }
     
     if (amtField) {
       amtField.disabled = isNoExp;
-      if (isNoExp) amtField.value = '0.00';
+      if (isNoExp) {
+        amtField.value = '0.00';
+      } else {
+        if (amtField.value === '0.00' || amtField.value === '0') {
+          amtField.value = ''; 
+        }
+      }
     }
   }
 
@@ -1718,7 +1798,31 @@ function renderHistory(){
 
     let detail = '', diff = '';
     if (h.action === 'create'){
-      detail = `${fmtDate(d.date||'')} | <strong>${esc(d.category||'')}</strong> | ₹${fmtAmt(d.amount)}${d.paymentMode ? ` | ${esc(d.paymentMode)}` : ''}`;
+      // 1. Daily Expense Creation
+      if (d.category) {
+        detail = `${fmtDate(d.date||'')} | <strong>${esc(d.category)}</strong> | ₹${fmtAmt(d.amount)}${d.paymentMode ? ` | ${esc(d.paymentMode)}` : ''}`;
+      } 
+      // 2. Milk Creation
+      else if (d.unit !== undefined) {
+        const qty = d.unit === 'extra' ? 'Other' : +d.unit === 0 ? 'Absent' : d.unit + ' KG';
+        detail = `<strong>Milk Record</strong> | ${fmtDate(d.date||'')} | ${qty} | ₹${fmtAmt(d.amount)}${d.note ? ` | ${esc(d.note)}` : ''}`;
+      }
+      // 3. Water Creation
+      else if (d.expenseType || (d.amount && d.date && !d.month && !d.reading && !d.unit)) {
+        detail = `<strong>Water Jar</strong> | ${fmtDate(d.date||'')} | ₹${fmtAmt(d.amount)}${d.note ? ` | ${esc(d.note)}` : ''}`;
+      }
+      // 4. Rent Creation
+      else if (d.month && !d.reading) {
+        detail = `<strong>Room Rent</strong> | ${monthLabel(d.month)} | ₹${fmtAmt(d.amount)}${d.paymentMode ? ` | ${esc(d.paymentMode)}` : ''}`;
+      }
+      // 5. Electricity Creation
+      else if (d.month && d.reading) {
+        detail = `<strong>Electricity Reading</strong> | ${monthLabel(d.month)} | Reading: ${d.reading}`;
+      }
+      // Fallback
+      else {
+        detail = `${fmtDate(d.date||'')} | ₹${fmtAmt(d.amount)}`;
+      }
         } else if (h.action === 'update'){
       if (d.bulk && d.action === 'reassign'){
         const fromList = Object.entries(d.from || {})
@@ -1743,11 +1847,12 @@ function renderHistory(){
     } else if (h.action === 'cat_add')    detail = `New: <strong>${esc(d.name||'')}</strong>`;
     else if (h.action === 'cat_edit')     detail = `<strong>${esc(d.from||'')}</strong> → <strong>${esc(d.to||'')}</strong>`;
     else if (h.action === 'cat_delete')   detail = `Deleted: <strong>${esc(d.name||'')}</strong>`;
+    else if (h.action === 'backup') {
+      detail = d.message || 'Master Backup downloaded';
+    }
     else if (h.action === 'export'){
       if (d.kind === 'daily_csv'){
         detail = `Daily Expense CSV exported — <strong>${d.expenses || d.count || 0}</strong> record(s)`;
-      } else if (d.kind === 'master_json' || d.kind === 'master_csv') {
-        detail = d.message || 'Master Backup downloaded';
       } else {
         detail = `Exported ${d.expenses || 0} expense(s)`;
       }
@@ -1937,7 +2042,7 @@ window.renderDateRange = function(){
 
   if (!from || !to){
     $('dr-summary-cards').innerHTML = '';
-    $('dr-cat').innerHTML = '<p style="color:var(--muted);font-size:.82rem">Select both dates.</p>';
+    $('dr-cat-breakdown').innerHTML = '<p style="color:var(--muted);font-size:.82rem">Select both dates.</p>';
     $('dr-day').innerHTML = '<p style="color:var(--muted);font-size:.82rem">Select both dates.</p>';
     $('dr-tbody').innerHTML = `<tr><td colspan="5"><div class="es"><div class="ei">🗓️</div><p>Pick a From and To date.</p></div></td></tr>`;
     if (badge) badge.textContent = '0 records';
@@ -1945,8 +2050,14 @@ window.renderDateRange = function(){
   }
   if (from > to){ const t = from; from = to; to = t; }
 
-  const data = expenses.filter(e => e.date >= from && e.date <= to)
-                       .sort((a,b) => String(a.date).localeCompare(String(b.date)));
+  const selectedCats = (catVals && Array.isArray(catVals.dr)) ? catVals.dr : [];
+
+  const data = expenses.filter(e => {
+    if (e.date < from || e.date > to) return false;
+    if (selectedCats.length > 0 && !selectedCats.includes(e.category)) return false;
+    return true;
+  }).sort((a,b) => String(a.date).localeCompare(String(b.date)));
+
   const total = data.reduce((s,e) => s + (+e.amount || 0), 0);
   const dayCount = Math.round((new Date(to + 'T00:00:00') - new Date(from + 'T00:00:00')) / 86400000) + 1;
   const avgPerDay = dayCount > 0 ? total / dayCount : 0;
@@ -1957,28 +2068,62 @@ window.renderDateRange = function(){
     <div class="sc m"><div class="lbl">Average / Day</div><div class="amt">₹${fmtAmt(avgPerDay)}</div><div class="sub">over the selected range</div></div>`;
   if (badge) badge.textContent = `${data.length} record(s)`;
 
-  const bld = (map, id, cls, fmtLabel) => {
-    const sorted = Object.entries(map).sort((a,b) => b[1] - a[1]);
-    const mx = sorted[0]?.[1] || 1;
-    $(id).innerHTML = sorted.length
-      ? sorted.map(([k, v]) => {
-          const label = fmtLabel ? fmtLabel(k) : k;
-          return `<div class="br">
-            <span class="bl">${esc(label)}</span>
-            <div class="bt"><div class="bf ${cls}" style="width:${(v/mx*100).toFixed(1)}%"></div></div>
-            <span class="bamt">₹${fmtAmt(v)}</span></div>`;
-        }).join('')
-      : '<p style="color:var(--muted);font-size:.82rem">No data.</p>';
-  };
+  // Rebuild the category dropdown options to match the new date range
+  if (typeof buildOpts === 'function') buildOpts('dr', '');
 
-  const cm = {}, dm = {};
+  // ═══════════════════════════════════════════════════════════════
+  // CATEGORY CHART (Using the new ID)
+  // ═══════════════════════════════════════════════════════════════
+  const cm = {};
   data.forEach(e => {
     cm[e.category] = (cm[e.category] || 0) + (+e.amount || 0);
+  });
+  
+  const catSorted = Object.entries(cm).sort((a,b) => b[1] - a[1]);
+  const catMax = catSorted[0]?.[1] || 1;
+  const catEl = $('dr-cat-breakdown'); // <--- USING NEW ID
+  
+  if (catEl) {
+    if (!catSorted.length) {
+      catEl.innerHTML = '<p style="color:var(--muted);font-size:.82rem">No data.</p>';
+    } else {
+      catEl.innerHTML = catSorted.map(([catName, amt]) => `
+        <div class="br">
+          <span class="bl">${esc(catName)}</span>
+          <div class="bt"><div class="bf bf-p" style="width:${(amt/catMax*100).toFixed(1)}%"></div></div>
+          <span class="bamt">₹${fmtAmt(amt)}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // DAY CHART
+  // ═══════════════════════════════════════════════════════════════
+  const dm = {};
+  data.forEach(e => {
     dm[e.date] = (dm[e.date] || 0) + (+e.amount || 0);
   });
-  bld(cm, 'dr-cat', 'bf-p');
-  bld(dm, 'dr-day', 'bf-w', d => `${fmtDateShort(d)} (${dayShort(d)})`);
+  
+  const daySorted = Object.entries(dm).sort((a,b) => b[1] - a[1]);
+  const dayMax = daySorted[0]?.[1] || 1;
+  const dayEl = $('dr-day');
 
+  if (dayEl) {
+    if (!daySorted.length) {
+      dayEl.innerHTML = '<p style="color:var(--muted);font-size:.82rem">No data.</p>';
+    } else {
+      dayEl.innerHTML = daySorted.map(([dateStr, amt]) => `
+        <div class="br">
+          <span class="bl">${fmtDateShort(dateStr)} (${dayShort(dateStr)})</span>
+          <div class="bt"><div class="bf bf-w" style="width:${(amt/dayMax*100).toFixed(1)}%"></div></div>
+          <span class="bamt">₹${fmtAmt(amt)}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Render Table
   $('dr-tbody').innerHTML = data.length
     ? data.map(e => `<tr>
         <td class="dc">${fmtDate(e.date)} <span style="color:var(--muted);font-size:.7rem">(${dayShort(e.date)})</span></td>
@@ -2830,12 +2975,7 @@ window.saveRentPayment = async function(){
       historyAction: ACT.CREATE,
       historyData: { amount, month, paidOnDate, paymentMode } });
 
-  if (res.ok) {
-    clearRentForm();
-    // Increment backup counter
-    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-    localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
-  }
+  if (res.ok) clearRentForm();
 };
 
 window.clearRentForm = function(){
@@ -3157,12 +3297,7 @@ window.saveElecReading = async function(){
     { pillMsg: 'Electricity reading saved', pillIcon: '⚡',
       historyAction: ACT.CREATE, historyData: { month, reading, amount: (reading - prevReading) * ELEC_RATE } });
 
-  if (res.ok) {
-    clearElecForm();
-    // Increment backup counter
-    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-    localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
-  }
+  if (res.ok) clearElecForm();
 };
 
 window.clearElecForm = function(){
@@ -3502,12 +3637,7 @@ window.saveWaterExp = async function(){
     { pillMsg: 'Water purchase saved', pillIcon: '💧',
       historyAction: ACT.CREATE, historyData: { date, amount, note } });
 
-  if (res.ok) {
-    clearWaterForm();
-    // Increment backup counter
-    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-    localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
-  }
+  if (res.ok) clearWaterForm();
 };
 
 window.clearWaterForm = function(){
@@ -4006,6 +4136,7 @@ function renderSettingsUI(){
   }
 
   renderThemeGallery('palette-gallery', renderSettingsUI);
+  updateTileStyleUI(); // <-- Add this to highlight the active tile button
 
   const sm = $('set-session-min');
   if (sm) sm.value = HOUSEHOLD_SETTINGS.sessionMin || 15;
@@ -4571,13 +4702,9 @@ window.saveMilk = async function() {
       historyAction: ACT.CREATE, historyData: { date, unit, amount, note } }
   );
 
-  if (res.ok) {
-    clearMilkForm();
-    // Increment backup counter
-    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-    localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
-  }
+  if (res.ok) clearMilkForm();
 };
+
 
 window.clearMilkForm = function() {
   $('milk-date').value = localDateStr();
@@ -5080,8 +5207,9 @@ window.renderGroupAnalytics = function() {
         <div class="sc clickable-cstat" 
              data-prefix="${g.prefix}" 
              data-glabel="${escQ(g.label)}" 
+             data-action="breakdown"
              style="border-top-color: ${g.color}" 
-             title="Click to see top expenses">
+             title="Click to see category breakdown">
           <div class="lbl">${g.label}</div>
           <div class="amt">₹${fmtAmt(g.amount)}</div>
           <div class="sub">${g.count} records · ${((g.amount / grandTotal) * 100).toFixed(1)}% of total</div>
@@ -5110,7 +5238,13 @@ document.addEventListener('click', (e) => {
   if (card) {
     const prefix = card.dataset.prefix;
     const label = card.dataset.glabel;
-    openTopExpensesModal(prefix, label);
+    const action = card.dataset.action;
+    
+    if (action === 'breakdown') {
+      openGroupCategoryModal(prefix, label);
+    } else {
+      openTopExpensesModal(prefix, label);
+    }
   }
 });
 window.openTopExpensesModal = function(prefix, groupLabel) {
@@ -5570,7 +5704,7 @@ window.exportFullSystemCSV = function() {
    MASTER BACKUP (HOUSEHOLD + BIRTHDAY + GROCERY)
    ═══════════════════════════════════════════════════════════════ */
 
-window.exportMasterBackup = async function() {
+window.exportMasterBackup = async function(isAuto = false) {
   const loader = document.getElementById('global-loader');
   if (loader) {
     loader.classList.add('active');
@@ -5635,7 +5769,12 @@ window.exportMasterBackup = async function() {
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1500);
     
-    logHistory(ACT.EXPORT, { 
+    // Dynamic label based on how it was triggered
+    const backupAction = isAuto 
+      ? { key: 'backup', icon: '☁️', label: 'Auto Backup', badge: 'hb-cat' }
+      : { key: 'backup', icon: '💾', label: 'Manual Export', badge: 'hb-cat' };
+
+    logHistory(backupAction, { 
       kind: 'master_json', 
       expenses: expenses.length,
       birthdays: birthdays.length,
@@ -5662,7 +5801,7 @@ window.exportMasterBackup = async function() {
    MASTER CSV EXPORT (ALL 3 MODULES)
    ═══════════════════════════════════════════════════════════════ */
 
-window.exportMasterCSV = async function() {
+window.exportMasterCSV = async function(isAuto = false) {
   const loader = document.getElementById('global-loader');
   if (loader) { loader.classList.add('active'); loader.style.width = '30%'; }
 
@@ -5754,7 +5893,12 @@ window.exportMasterCSV = async function() {
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 1500);
     
-    logHistory(ACT.EXPORT, { 
+    // Dynamic label based on how it was triggered
+    const backupAction = isAuto 
+      ? { key: 'backup', icon: '☁️', label: 'Auto Backup', badge: 'hb-cat' }
+      : { key: 'backup', icon: '💾', label: 'Manual Export', badge: 'hb-cat' };
+
+    logHistory(backupAction, { 
       kind: 'master_csv',
       expenses: expenses.length,
       message: `Master CSV Backup: ${expenses.length} expenses, ${birthdays.length} birthdays, ${groceryPurchases.length} groceries.`
@@ -5883,15 +6027,14 @@ window.downloadForcedBoth = async function() {
     loader.style.width = '20%';
   }
 
-  // 2. Trigger the JSON download
-  await window.exportMasterBackup();
+  // 2. Trigger the JSON download (Pass 'true' for Auto Backup)
+  await window.exportMasterBackup(true);
   
   if (loader) loader.style.width = '60%';
 
-  // 3. Wait 1.5 seconds, then trigger the CSV download
-  // (The delay prevents the browser from blocking the second download)
+  // 3. Wait 1.5 seconds, then trigger the CSV download (Pass 'true' for Auto Backup)
   setTimeout(async () => {
-    await window.exportMasterCSV();
+    await window.exportMasterCSV(true);
     
     if (loader) {
       loader.style.width = '100%';
@@ -5907,3 +6050,171 @@ window.downloadForcedBoth = async function() {
     }
   }, 1500);
 };
+window.resetDateRangeCategories = function() {
+  // 1. Clear the array of selected categories
+  catVals.dr = [];
+
+  // 2. Reset the dropdown UI text
+  const txt = $('ct-dr');
+  if (txt) {
+    txt.textContent = 'All Categories';
+    txt.classList.add('ph');
+  }
+
+  // 3. Re-render the report
+  renderDateRange();
+  
+  // 4. Rebuild the dropdown options in case dates changed
+  if (typeof buildOpts === 'function') buildOpts('dr', '');
+
+  if (typeof toast === 'function') {
+    toast('Category filter reset', '↺');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   GROUP CATEGORY BREAKDOWN MODAL
+   ═══════════════════════════════════════════════════════════════ */
+
+window.openGroupCategoryModal = function(prefix, groupLabel) {
+  const yr = $('grp-year')?.value || '';
+  const mon = $('grp-month')?.value || '';
+
+  // 1. Filter expenses by the same date range used in the Group tab
+  const data = expenses.filter(e => {
+    if (e.category === 'No Expense') return false;
+    if (!e.category.startsWith(prefix)) return false;
+    
+    const d = new Date(e.date + 'T00:00:00');
+    if (yr && d.getFullYear() !== parseInt(yr)) return false;
+    if (mon && d.getMonth() + 1 !== parseInt(mon)) return false;
+    
+    return true;
+  });
+
+  // 2. Group by individual category inside this prefix
+  const catMap = {};
+  data.forEach(e => {
+    if (!catMap[e.category]) catMap[e.category] = { amount: 0, count: 0, records: [] };
+    catMap[e.category].amount += (+e.amount || 0);
+    catMap[e.category].count++;
+    catMap[e.category].records.push(e);
+  });
+
+  // 3. Sort by highest spend
+  const sortedCats = Object.entries(catMap).sort((a, b) => b[1].amount - a[1].amount);
+
+  // 4. Update the Modal UI
+  const periodStr = (mon ? MS[parseInt(mon)] + ' ' : '') + (yr || 'All Time');
+  $('group-cat-title').textContent = `${groupLabel} — Category Breakdown`;
+  
+  const tbody = $('group-cat-tbody');
+  if (!sortedCats.length) {
+    tbody.innerHTML = `<tr><td colspan="3" class="es">No records found for this group in this period.</td></tr>`;
+  } else {
+    let html = '';
+    
+    sortedCats.forEach(([catName, stat], index) => {
+      const rowId = `gcr-${index}`;
+      
+      // Sort records by date descending
+      const sortedRecords = stat.records.sort((a,b) => String(b.date).localeCompare(String(a.date)));
+      
+      // Generate the child rows (The actual records)
+      let childRowsHTML = sortedRecords.map(r => `
+        <tr>
+          <td style="padding:8px 10px; color:var(--muted); font-size:.75rem; width:120px;">${fmtDate(r.date)}</td>
+          <td style="padding:8px 10px; font-weight:700; color:var(--err); font-size:.78rem; width:100px;">₹${fmtAmt(r.amount)}</td>
+          <td style="padding:8px 10px; color:var(--muted); font-size:.75rem;">${esc(r.note || '—')}</td>
+        </tr>
+      `).join('');
+      
+      // The main category row
+      html += `
+        <tr style="border-bottom:1px solid var(--bdr); background:var(--card); cursor:pointer;" onclick="toggleGroupCatRow('${rowId}', this)">
+          <td style="padding:12px 10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span id="icon-${rowId}" style="display:inline-block; transition:transform .2s; width:14px; text-align:center; font-weight:bold; color:var(--p);">▶</span>
+              <span class="cb" style="font-size:0.8rem;">${esc(catName)}</span>
+            </div>
+          </td>
+          <td style="padding:12px 10px; text-align:right; font-weight:600;">${stat.count}</td>
+          <td style="padding:12px 10px; text-align:right; font-weight:800; color:var(--err);">₹${fmtAmt(stat.amount)}</td>
+        </tr>
+        
+        <!-- The hidden child container -->
+        <tr id="wrapper-${rowId}" style="display:none; background:var(--sec);">
+          <td colspan="3" style="padding:0;">
+            <table style="width:100%; margin:0; background:transparent;">
+              <tbody>${childRowsHTML}</tbody>
+            </table>
+          </td>
+        </tr>
+      `;
+    });
+    
+    tbody.innerHTML = html;
+  }
+
+  // 5. Show the modal
+  $('group-cat-mo').classList.add('open');
+};
+
+window.toggleGroupCatRow = function(rowId, trElement) {
+  const wrapper = document.getElementById('wrapper-' + rowId);
+  const icon = document.getElementById('icon-' + rowId);
+  
+  if (wrapper.style.display === 'none') {
+    wrapper.style.display = 'table-row';
+    icon.style.transform = 'rotate(90deg)'; // Point down
+    trElement.style.background = 'var(--pl)'; // Highlight active
+  } else {
+    wrapper.style.display = 'none';
+    icon.style.transform = 'rotate(0deg)'; // Point right
+    trElement.style.background = 'var(--card)'; // Reset background
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   TILE THEME ENGINE
+   ═══════════════════════════════════════════════════════════════ */
+window.setTileStyle = function(style) {
+  // 1. Apply the style to the body tag
+  document.body.setAttribute('data-tile-style', style);
+  
+  // 2. Save to local storage
+  localStorage.setItem('hh_tile_style', style);
+  
+  // 3. Update the UI buttons
+  updateTileStyleUI();
+  
+  toast('Tile style updated', '🎨');
+};
+
+function updateTileStyleUI() {
+  const currentStyle = localStorage.getItem('hh_tile_style') || 'glass';
+  const styles = ['glass', 'vivid', 'outline', 'pattern', 'gradient', '3d', 'stripe'];
+  
+  styles.forEach(s => {
+    const btn = document.getElementById('tile-' + s);
+    if (btn) {
+      if (s === currentStyle) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    }
+  });
+}
+
+// Initialize the theme on page load
+(function initTileStyle() {
+  const savedStyle = localStorage.getItem('hh_tile_style') || 'glass';
+  document.body.setAttribute('data-tile-style', savedStyle);
+  
+  // Wait for DOM to load before updating the UI buttons
+  document.addEventListener('DOMContentLoaded', updateTileStyleUI);
+  
+  // Fallback if DOMContentLoaded already fired
+  setTimeout(updateTileStyleUI, 500);
+})();
