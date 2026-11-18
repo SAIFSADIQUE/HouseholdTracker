@@ -1318,12 +1318,16 @@ export async function addRecord(collectionName, data, opts){
       createdAt: new Date().toISOString()
     }));
 
-    // ── INCREMENT BACKUP COUNTER FOR ANY NEW RECORD ──
-    let currentCount = parseInt(localStorage.getItem('backup_entry_count') || '0');
-    localStorage.setItem('backup_entry_count', (currentCount + 1).toString());
-    
-    // Update the UI if the function exists (Settings/Export pages)
-    if (typeof window.updateBackupStatusUI === 'function') window.updateBackupStatusUI();
+    // ── INCREMENT BACKUP COUNTER IN FIRESTORE ──
+    try {
+      const counterRef = doc(db, 'household_settings', 'backup_counter');
+      await setDoc(counterRef, {
+        count: increment(1),
+        lastUpdated: new Date().toISOString()
+      }, { merge: true });
+    } catch (err) {
+      console.warn('Failed to update backup counter in DB:', err);
+    }
 
     if (pillMsg) pill(pillMsg, pillIcon);
     if (historyAction) await logHistory(historyAction, historyData || data);

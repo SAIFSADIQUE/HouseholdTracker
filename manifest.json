@@ -1,0 +1,35 @@
+{
+  "name": "Household Tracker",
+  "short_name": "Household",
+  "description": "Multi-app household tracker for expenses, birthdays, and groceries.",
+  "start_url": "./index.html",
+  "id": "/index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F6F5FA",
+  "theme_color": "#6c63ff",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

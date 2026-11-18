@@ -195,6 +195,10 @@ async function loadExpenses() {
       renderDashboardTiles();
       populateYearSelectors();
       if (loader) loader.classList.remove('active');
+      
+      // After data loads, check if we need a backup
+      if (typeof checkForcedBackup === 'function') checkForcedBackup();
+      
       return; // Done! 0 reads used.
     } catch (e) {
       localStorage.removeItem('cache_expenses');
@@ -222,6 +226,10 @@ async function loadExpenses() {
         renderDashboardTiles();
         populateYearSelectors();
         if (loader) loader.classList.remove('active');
+        
+        // After data loads, check if we need a backup
+        if (typeof checkForcedBackup === 'function') checkForcedBackup();
+        
         return; // Done! 0 reads used.
       }
     } catch (e) {
@@ -257,6 +265,9 @@ async function loadExpenses() {
     renderDashRecent();
     renderDashboardTiles();
     populateYearSelectors();
+    
+    // After data loads, check if we need a backup
+    if (typeof checkForcedBackup === 'function') checkForcedBackup();
   } catch (e) {
     console.error('Failed to load expenses:', e);
     window._expensesLoaded = true;
@@ -5920,27 +5931,51 @@ window.exportMasterCSV = async function(isAuto = false) {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   FORCED BACKUP SYSTEM (FINAL)
+   FORCED BACKUP SYSTEM (FIRESTORE COUNTER - FINAL)
    ═══════════════════════════════════════════════════════════════ */
 
-setTimeout(() => {
-  if (typeof isLoggedIn === 'function' && isLoggedIn()) {
-    const count = parseInt(localStorage.getItem('backup_entry_count') || '0');
+// 1. Check for backup (runs once on load, and after data loads)
+async function checkForcedBackup() {
+  // If we already showed it this session, don't show it again
+  if (sessionStorage.getItem('backup_popup_shown') === 'true') return;
+
+  try {
+    // Fetch the LIVE counter from Firestore
+    const snap = await getDoc(doc(db, 'household_settings', 'backup_counter'));
+    if (!snap.exists()) return;
+
+    const dbCount = snap.data().count || 0;
     
-    if (count >= 5) {
+    // Update the UI to reflect the DB count
+    if (typeof window.updateBackupStatusUI === 'function') window.updateBackupStatusUI(dbCount);
+
+    // Show popup if >= 5
+    if (dbCount >= 5) {
       const modal = document.getElementById('force-backup-mo');
       if (modal) {
         const countEl = document.getElementById('force-backup-count');
-        if (countEl) countEl.textContent = count;
+        if (countEl) countEl.textContent = dbCount;
+        
         modal.classList.add('open');
         modal.onclick = (e) => { e.stopPropagation(); };
+        
+        sessionStorage.setItem('backup_popup_shown', 'true');
       }
     }
-    
-    if (typeof updateBackupStatusUI === 'function') updateBackupStatusUI();
+  } catch (e) {
+    console.warn('Failed to check backup counter:', e);
+  }
+}
+
+// Run the check 2 seconds after page load
+setTimeout(() => {
+  if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+    checkForcedBackup();
   }
 }, 2000);
 
+
+// 2. Download Handlers
 window.downloadForcedBackup = async function() {
   await window.exportMasterBackup(); 
   markBackupComplete();
@@ -5951,9 +5986,46 @@ window.downloadForcedCSV = async function() {
   markBackupComplete();
 };
 
-function markBackupComplete() {
-  localStorage.setItem('backup_entry_count', '0');
+window.downloadForcedBoth = async function() {
+  const loader = document.getElementById('global-loader');
+  if (loader) {
+    loader.classList.add('active');
+    loader.style.width = '20%';
+  }
+
+  await window.exportMasterBackup(true);
+  
+  if (loader) loader.style.width = '60%';
+
+  setTimeout(async () => {
+    await window.exportMasterCSV(true);
+    
+    if (loader) {
+      loader.style.width = '100%';
+      setTimeout(() => {
+        loader.classList.remove('active');
+        setTimeout(() => { loader.style.width = '0%'; }, 300);
+      }, 400);
+    }
+
+    if (typeof markBackupComplete === 'function') {
+      markBackupComplete();
+    }
+  }, 1500);
+};
+
+
+// 3. Mark Backup Complete (Resets DB Counter)
+async function markBackupComplete() {
+  try {
+    const counterRef = doc(db, 'household_settings', 'backup_counter');
+    await setDoc(counterRef, { count: 0, lastUpdated: new Date().toISOString() }, { merge: true });
+  } catch (e) {
+    console.warn('Failed to reset DB counter:', e);
+  }
+
   localStorage.setItem('last_backup_time', Date.now().toString());
+  sessionStorage.removeItem('backup_popup_shown');
 
   const skipBtn = document.getElementById('btn-skip-backup');
   if (skipBtn) {
@@ -5963,11 +6035,13 @@ function markBackupComplete() {
     skipBtn.classList.add('bo');
   }
 
-  updateBackupStatusUI();
+  updateBackupStatusUI(0); 
   toast('Backup saved successfully!', 'success');
 }
 
-window.updateBackupStatusUI = function() {
+
+// 4. Update UI
+window.updateBackupStatusUI = async function(dbCountOverride = null) {
   const dateEl = document.getElementById('last-backup-date');
   const countEl = document.getElementById('backup-counter');
   const barEl = document.getElementById('backup-progress-bar');
@@ -5983,9 +6057,19 @@ window.updateBackupStatusUI = function() {
     dateEl.textContent = 'Never';
   }
 
-  const count = parseInt(localStorage.getItem('backup_entry_count') || '0');
-  countEl.textContent = `${count} / 5`;
+  let count = dbCountOverride;
   
+  if (count === null) {
+    try {
+      const snap = await getDoc(doc(db, 'household_settings', 'backup_counter'));
+      if (snap.exists()) count = snap.data().count || 0;
+      else count = 0;
+    } catch(e) {
+      count = 0;
+    }
+  }
+
+  countEl.textContent = `${count} / 5`;
   const pct = Math.min((count / 5) * 100, 100);
   barEl.style.width = pct + '%';
   
@@ -5997,7 +6081,6 @@ window.updateBackupStatusUI = function() {
     barEl.style.background = 'var(--warn)';
   }
 
-  // Update the Settings tab tiles
   const settingsCountEl = document.getElementById('stat-backup-count');
   if (settingsCountEl) {
     settingsCountEl.textContent = `${count} / 5`;
@@ -6019,57 +6102,18 @@ window.updateBackupStatusUI = function() {
   }
 };
 
-window.downloadForcedBoth = async function() {
-  // 1. Start the loader
-  const loader = document.getElementById('global-loader');
-  if (loader) {
-    loader.classList.add('active');
-    loader.style.width = '20%';
-  }
 
-  // 2. Trigger the JSON download (Pass 'true' for Auto Backup)
-  await window.exportMasterBackup(true);
-  
-  if (loader) loader.style.width = '60%';
-
-  // 3. Wait 1.5 seconds, then trigger the CSV download (Pass 'true' for Auto Backup)
-  setTimeout(async () => {
-    await window.exportMasterCSV(true);
-    
-    if (loader) {
-      loader.style.width = '100%';
-      setTimeout(() => {
-        loader.classList.remove('active');
-        setTimeout(() => { loader.style.width = '0%'; }, 300);
-      }, 400);
-    }
-
-    // 4. Mark the backup as complete and unlock the Skip button
-    if (typeof markBackupComplete === 'function') {
-      markBackupComplete();
-    }
-  }, 1500);
-};
+// 5. Reset Date Range Categories
 window.resetDateRangeCategories = function() {
-  // 1. Clear the array of selected categories
   catVals.dr = [];
-
-  // 2. Reset the dropdown UI text
   const txt = $('ct-dr');
   if (txt) {
     txt.textContent = 'All Categories';
     txt.classList.add('ph');
   }
-
-  // 3. Re-render the report
   renderDateRange();
-  
-  // 4. Rebuild the dropdown options in case dates changed
   if (typeof buildOpts === 'function') buildOpts('dr', '');
-
-  if (typeof toast === 'function') {
-    toast('Category filter reset', '↺');
-  }
+  if (typeof toast === 'function') toast('Category filter reset', '↺');
 };
 
 /* ═══════════════════════════════════════════════════════════════
