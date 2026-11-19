@@ -1078,6 +1078,9 @@ export const ACT = {
 export async function logHistory(act, data){
   if (!act || !act.key) return;
   try {
+    // NEW: Automatically protect deletion logs from the auto-cleaner
+    const isDeletion = ['delete', 'delete_all', 'cat_delete', 'bday_del', 'groc_del'].includes(act.key);
+    
     await addDoc(collection(db, COL.HISTORY), {
       action:    act.key,
       icon:      act.icon,
@@ -1085,7 +1088,8 @@ export async function logHistory(act, data){
       badge:     act.badge,
       user:      currentUser() || DEFAULT_USER,
       data:      data || {},
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      isProtected: isDeletion // <-- The Shield
     });
   } catch (e) {
     console.warn('History log failed:', e && e.message);
@@ -1230,7 +1234,7 @@ export async function checkAutoClearHistory(){
 
   /* Policy: keep only the newest MAX_ENTRIES entries AND only those within
      MAX_AGE_DAYS days. Everything else is deleted. */
-  const MAX_ENTRIES = 100;
+  const MAX_ENTRIES = 250;
   const MAX_AGE_DAYS = 7;
   const cutoffMs = Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
 
@@ -1244,20 +1248,31 @@ export async function checkAutoClearHistory(){
 
     const toDelete = [];
 
-    snap.docs.forEach((d, i) => {
+    let unprotectedCount = 0; // NEW: Counter for non-protected logs
+
+    snap.docs.forEach((d) => {
       const data = d.data();
 
-      /* Rule 1: any doc beyond position MAX_ENTRIES is over the entry cap */
-      if (i >= MAX_ENTRIES){
+      // NEW: If the record is protected (a deletion), NEVER auto-delete it.
+      // Just increment the counter and skip it.
+      if (data.isProtected) {
+        unprotectedCount++; 
+        return; 
+      }
+
+      /* Rule 1: any UNPROTECTED doc beyond position MAX_ENTRIES is over the entry cap */
+      if (unprotectedCount >= MAX_ENTRIES){
         toDelete.push(d.id);
         return;
       }
 
-      /* Rule 2: any doc older than MAX_AGE_DAYS is beyond the age cap */
+      /* Rule 2: any UNPROTECTED doc older than MAX_AGE_DAYS is beyond the age cap */
       if (data.timestamp){
         const t = new Date(data.timestamp).getTime();
         if (!isNaN(t) && t < cutoffMs) toDelete.push(d.id);
       }
+      
+      unprotectedCount++; // Increment for the next loop
     });
 
     if (!toDelete.length) return;

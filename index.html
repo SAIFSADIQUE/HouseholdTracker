@@ -265,14 +265,26 @@
       <section id="tab-dashboard" class="tp active">
 
         <!-- NEW DASHBOARD COUNTERS -->
-        <div id="dashboard-counters" class="dash-counters">
-          <div class="dc-pill"><span>📊</span> <strong id="dc-rec">0</strong> Records</div>
-          <div class="dc-pill"><span>📂</span> <strong id="dc-cat">0</strong> Categories</div>
-          <div class="dc-pill"><span>🏠</span> <strong id="dc-rent">0</strong> Rent</div>
-          <div class="dc-pill"><span>⚡</span> <strong id="dc-elec">0</strong> Electricity</div>
-      <div class="dc-pill"><span>💧</span> <strong id="dc-water">0</strong> Water</div>
-      <div class="dc-pill"><span>🥛</span> <strong id="dc-milk">0</strong> Milk</div>
-        </div>
+<div id="dashboard-counters" class="dash-counters">
+  <a class="dc-pill" href="#" onclick="switchTab('records',document.querySelector('[data-tab=\'records\']'));return false">
+    <span>📊</span> <strong id="dc-rec">0</strong> Records
+  </a>
+  <a class="dc-pill" href="#" onclick="switchTab('categories',document.querySelector('[data-tab=\'categories\']'));return false">
+    <span>📂</span> <strong id="dc-cat">0</strong> Categories
+  </a>
+  <a class="dc-pill" href="#" onclick="switchTab('rent',document.querySelector('[data-tab=\'rent\']'));return false">
+    <span>🏠</span> <strong id="dc-rent">0</strong> Rent
+  </a>
+  <a class="dc-pill" href="#" onclick="switchTab('electricity',document.querySelector('[data-tab=\'electricity\']'));return false">
+    <span>⚡</span> <strong id="dc-elec">0</strong> Electricity
+  </a>
+  <a class="dc-pill" href="#" onclick="switchTab('water',document.querySelector('[data-tab=\'water\']'));return false">
+    <span>💧</span> <strong id="dc-water">0</strong> Water
+  </a>
+  <a class="dc-pill" href="#" onclick="switchTab('milk',document.querySelector('[data-tab=\'milk\']'));return false">
+    <span>🥛</span> <strong id="dc-milk">0</strong> Milk
+  </a>
+</div>
 
         <!-- ══ TILES (navigate to each module) ══ -->
         <div class="dash-tiles" id="dash-tiles">
@@ -426,19 +438,23 @@
               <div class="grid mobile-form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
                 
                 <div class="fg2" style="margin-bottom:4px; gap:4px;">
-                  <label style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                    <span>Date</span>
-                    <button type="button" id="date-lock-btn" class="date-lock-pill"
-                            onclick="toggleDateLock()"
-                            title="Lock date to add multiple records for the same day">
-                      🔓 Lock date
-                    </button>
-                  </label>
+                  <label>Date</label>
                   <div style="display:flex;gap:4px;align-items:center">
                     <input type="date" id="f-date" class="fc2"
-       oninput="updateDateDayLabel('f-date','f-date-day'); updateAddDateCount();"
-       style="flex:1; height: 38px; padding: 6px 10px;"/>
+                           onchange="window.onAddDateChange()"
+                           style="flex:1; height: 38px; padding: 6px 10px; min-width: 0;"/>
+                    
                     <span class="date-day-badge" id="f-date-day" style="height: 38px; min-width: 45px; font-size:0.75rem; padding:0 8px;"></span>
+                    
+                    <!-- Today Button -->
+                    <button type="button" class="btn bo icon-square-btn" onclick="jumpToToday()" title="Jump to Today's date">
+                      📍
+                    </button>
+
+                    <!-- Lock Button -->
+                    <button type="button" id="date-lock-btn" class="date-lock-pill icon-square-btn" onclick="toggleDateLock()" title="Lock date to add multiple records for the same day">
+                      🔓
+                    </button>
                   </div>
                   <div class="date-lock-hint" id="date-lock-hint"></div>
                 </div>
@@ -493,13 +509,19 @@
 
             <!-- ══ RECENT EXPENSES (today's) ══ -->
             <div class="tc" id="today-entries-card">
-              <div class="th2">
-                <h3>🕐 Today's Entries</h3>
+              <div class="th2" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <h3 id="dash-table-title" style="margin-right: 4px;">🕐 Daily Entries</h3>
+                  <div class="seg" style="padding:2px; gap: 2px;">
+                    <button class="active" onclick="switchDailyView('today', this)" type="button" style="padding:4px 8px; font-size:0.68rem;">Selected Date</button>
+                    <button onclick="switchDailyView('recent', this)" type="button" style="padding:4px 8px; font-size:0.68rem;">Recently Added</button>
+                  </div>
+                </div>
                 <span class="rb" id="rec-badge">0 of 0</span>
               </div>
-              <div class="tw">
+              <div class="tw" style="max-height: 480px; overflow-y: auto;">
                 <table id="today-entries-table">
-                  <thead>
+                  <thead style="position: sticky; top: 0; z-index: 10; background: var(--sec);">
                     <tr>
                       <th>#</th>
                       <th>Date</th>
@@ -592,6 +614,7 @@
           <div class="ff" style="margin-top: 14px;">
             <button class="btn bp bsm" onclick="applyFilters()" type="button">Apply</button>
             <button class="btn bg2 bsm" onclick="clearFilters()" type="button">✕ Clear</button>
+            <button class="btn bo bsm" id="btn-no-exp" onclick="filterNoExpense()" type="button">🚫 Show No Expense Days</button>
             <span class="fs2" id="f-summary"></span>
           </div>
         </div>
@@ -1055,8 +1078,20 @@
         <div class="fc">
           <div class="fct" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
             <span>🕓 Modification History</span>
-            <div style="display:flex;align-items:center;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
               <span class="fs2" id="hist-count-lbl"></span>
+              
+              <!-- NEW: Filter Dropdown -->
+              <select id="hist-filter" class="fc2" style="width:auto; padding:6px 30px 6px 12px; font-size:.75rem; height:32px;" onchange="renderHistory()">
+                <option value="all">All Actions</option>
+                <option value="create">➕ Created</option>
+                <option value="update">✏️ Updated</option>
+                <option value="delete">🗑️ Deleted</option>
+                <option value="export">🗂️ Exported / Backups</option>
+                <option value="import">📥 Imported</option>
+                <option value="category">🏷️ Category Changes</option>
+              </select>
+
               <button class="btn bd bsm" onclick="clearHistory()" type="button">🗑️ Clear All</button>
             </div>
           </div>
@@ -1424,7 +1459,10 @@
             <section id="tab-water" class="tp">
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
-          <div class="hint">🕐 Last activity: <strong id="last-water">—</strong></div>
+          <div class="hint" style="display:flex; gap:16px; align-items:center;">
+            <span>🕐 Last activity: <strong id="last-water">—</strong></span>
+            <span>📋 Total Records: <strong id="water-rec-count" style="color:var(--p)">0</strong></span>
+          </div>
           <button class="btn bo bxs" onclick="toggleAllWaterDetails()" type="button" id="btn-toggle-water">⬇️ Expand All</button>
         </div>
 
@@ -1515,20 +1553,6 @@
           <div class="mobile-only-cards" id="water-mobile-list" style="padding: 10px;"></div>
         </details>
 
-        <!-- ══ MONTHLY PAYMENT MODE (Collapsible) ══ -->
-        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
-          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; border-bottom: 1px solid var(--bdr); margin: 0;">
-            <div style="margin-right: auto;">💳 Monthly Payment Mode</div>
-          </summary>
-          <div style="padding: 16px;">
-            <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">
-              Record how the water bill was settled for each month — this is what gets printed
-              on the report. Only months with purchases are shown.
-            </p>
-            <div id="water-pay-list"></div>
-          </div>
-        </details>
-
         <!-- ══ WATER CALENDAR VIEW (Collapsible) ══ -->
         <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
           <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
@@ -1577,6 +1601,22 @@
             <div id="water-report-body-mobile" class="mobile-only-cards"></div>
           </div>
         </details>
+		
+		   <!-- ══ MONTHLY PAYMENT MODE (Collapsible) - MOVED HERE ══ -->
+        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 20px;">
+          <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; border-bottom: 1px solid var(--bdr); margin: 0;">
+            <div style="margin-right: auto;">💳 Monthly Payment Mode</div>
+          </summary>
+          <div style="padding: 16px;">
+            <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">
+              Record how the water bill was settled for each month — this is what gets printed
+              on the report. Only months with purchases are shown.
+            </p>
+            <div id="water-pay-list"></div>
+          </div>
+        </details>
+		
+		
 
       </section>
 
@@ -1623,7 +1663,7 @@
             </div>
             <div class="fg2">
               <label>Quantity</label>
-              <select id="milk-unit" class="fc2">
+              <select id="milk-unit" class="fc2" onchange="handleMilkQtyChange(this.value)">
                 <option value="0.25">250 gm</option>
                 <option value="0.5" selected>500 gm</option>
                 <option value="0.75">750 gm</option>

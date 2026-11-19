@@ -56,6 +56,7 @@ let rentPayments    = [];
 // Filter / sort / pagination
 let filtered  = [];
 let calFilterDate = '';
+let showNoExpenseOnly = false; // <-- ADD THIS LINE
 let curPage   = 1;
 const PG      = 25;
 let sField    = 'date';
@@ -80,6 +81,9 @@ let calYear, calMonth;
 
 // Date lock flag
 let dateLocked = false;
+
+// NEW: Daily table view state ('today' or 'recent')
+let dailyViewMode = 'today'; 
 
 // Default categories seeded on first install
 const DEFAULT_CATS = [
@@ -604,12 +608,62 @@ function renderDashRecent(){
 /* ═══════════════════════════════════════════════════════════════
    DAILY EXPENSE TAB
    ═══════════════════════════════════════════════════════════════ */
+window.switchDailyView = function(mode, btn) {
+  dailyViewMode = mode;
+  
+  // Update active button styling
+  const container = btn.parentElement;
+  container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Title will be handled by renderDaily() based on the selected date
+  
+  // Re-render the table
+  renderDaily();
+};
+
+function updateLockHint(dateStr) {
+  const hint = $('date-lock-hint');
+  if (!hint) return;
+  const d = new Date(dateStr + 'T00:00:00');
+  hint.textContent = `📌 Locked to ${d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}`;
+}
+
+window.onAddDateChange = function() {
+  // 1. Update the day badge (Thu, Fri, etc.)
+  updateDateDayLabel('f-date', 'f-date-day');
+  
+  // 2. Update the "X records on this day" badge
+  if (window.updateAddDateCount) window.updateAddDateCount();
+  
+  // 3. If the date is locked, update the hint text to match the new date
+  if (dateLocked) {
+    const currentDate = $('f-date').value;
+    if (currentDate) updateLockHint(currentDate);
+  }
+  
+  // 4. Refresh the table to show the new date's records
+  renderDaily();
+};
+
+window.jumpToToday = function() {
+  const dateInput = $('f-date');
+  if (!dateInput) return;
+  
+  // 1. Set the input to today's date
+  dateInput.value = localDateStr();
+  
+  // 2. Trigger the update logic we just built
+  window.onAddDateChange();
+};
+
 function renderDaily(){
   const todayStr = localDateStr();
   const now = new Date();
   const tm  = now.getMonth() + 1;
   const ty  = now.getFullYear();
 
+  // Summary Cards logic (Always based on actual dates)
   const real = expenses.filter(e => e.category !== 'No Expense');
   const sum  = arr => arr.reduce((s,e) => s + (+e.amount || 0), 0);
 
@@ -629,11 +683,28 @@ function renderDaily(){
   $('s-year-c').textContent  = `${yE.length} entries`;
   $('s-total-c').textContent = `${real.length} entries`;
 
-  // Today's entries (in the Daily tab, not the dashboard)
-  const recent = [...real]
-    .sort((a,b) => String(b.date).localeCompare(String(a.date)))
-    .slice(0, 10);
-    $('rec-badge').textContent = `${recent.length} of ${real.length}`;
+  // Table logic (Toggles between Selected Date and Recently Added)
+  let recent = [];
+  const selectedDate = $('f-date')?.value || todayStr;
+  
+  if (dailyViewMode === 'today') {
+    // Show ALL records for the SELECTED date
+    recent = real
+      .filter(e => e.date === selectedDate)
+      .sort((a,b) => String(b.date).localeCompare(String(a.date)));
+      
+  } else {
+    // Show the last 25 entries added to the system, regardless of date
+    recent = [...real]
+      .sort((a,b) => {
+        const dateA = a.createdAt || a.updatedAt || '';
+        const dateB = b.createdAt || b.updatedAt || '';
+        return String(dateB).localeCompare(String(dateA));
+      })
+      .slice(0, 25);
+  }
+
+  $('rec-badge').textContent = `${recent.length} of ${real.length}`;
   renderRecordsTable('rec-tbody', recent, 0);
   
   if (window.updateAddDateCount) window.updateAddDateCount();
@@ -680,6 +751,9 @@ function applyFilters(){
   }
 
   filtered = expenses.filter(e => {
+    // 1. NEW: Check if the "No Expense Only" filter is active
+    if (showNoExpenseOnly && e.category !== 'No Expense') return false;
+
     const d = new Date(e.date + 'T00:00:00');
     if (yr && d.getFullYear() !== parseInt(yr)) return false;
     if (mon && d.getMonth()+1 !== parseInt(mon)) return false;
@@ -800,7 +874,37 @@ window.doSort = function(field){
   applyFilters();
 };
 
+window.filterNoExpense = function(){
+  // Toggle the state
+  showNoExpenseOnly = !showNoExpenseOnly;
+  
+  const btn = $('btn-no-exp');
+  if (showNoExpenseOnly) {
+    // When active: Highlight button, clear other filters to prevent conflicts
+    btn.classList.remove('bo');
+    btn.classList.add('bp'); // Switch to primary color
+    
+    ['r-search','r-day','r-year','r-month'].forEach(id => { const el = $(id); if (el) el.value = ''; });
+    catVals.filter = []; 
+    const txt = $('ct-filter');
+    if (txt) { txt.textContent = 'All Categories'; txt.classList.add('ph'); }
+    calFilterDate = '';
+    
+    toast('Showing only "No Expense" records', '🚫');
+  } else {
+    // When deactivated: Restore normal button style
+    btn.classList.remove('bp');
+    btn.classList.add('bo');
+  }
+  
+  applyFilters();
+};
+
 window.clearFilters = function(){
+  showNoExpenseOnly = false; // <-- ADD THIS
+  const btn = $('btn-no-exp');
+  if (btn) { btn.classList.remove('bp'); btn.classList.add('bo'); } // <-- ADD THIS
+  
   ['r-search','r-day','r-year','r-month'].forEach(id => { const el = $(id); if (el) el.value = ''; });
   catVals.filter = []; // Clear the array
   const txt = $('ct-filter');
@@ -949,14 +1053,14 @@ window.toggleDateLock = function(){
   if (!btn || !input) return;
 
   if (dateLocked){
-    btn.textContent = '🔒 Date locked';
+    btn.innerHTML = '🔒';
     btn.classList.add('locked');
     const locked = input.value || localDateStr();
     input.value = locked;
-    const d = new Date(locked + 'T00:00:00');
-    hint.textContent = `📌 Locked to ${d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}`;
+    // Call our new helper function
+    updateLockHint(locked);
     } else {
-    btn.textContent = '🔓 Lock date';
+    btn.innerHTML = '🔓';
     btn.classList.remove('locked');
     hint.textContent = '';
     // Removed input.value = localDateStr(); so the date stays where you left it
@@ -1786,12 +1890,34 @@ window.promptDeleteCat = function(id, name){
    HISTORY TAB
    ═══════════════════════════════════════════════════════════════ */
 function renderHistory(){
-  const total = history.length;
+  const filter = $('hist-filter')?.value || 'all';
+  
+  // 1. Filter the data
+  let displayHistory = [...history];
+  
+  if (filter === 'create') {
+    displayHistory = displayHistory.filter(h => h.action === 'create' || h.action === 'cat_add' || h.action === 'bday_add' || h.action === 'groc_add');
+  } else if (filter === 'update') {
+    displayHistory = displayHistory.filter(h => h.action === 'update' || h.action === 'cat_edit' || h.action === 'bday_edit' || h.action === 'groc_edit');
+  } else if (filter === 'delete') {
+    displayHistory = displayHistory.filter(h => h.action === 'delete' || h.action === 'delete_all' || h.action === 'cat_delete' || h.action === 'bday_del' || h.action === 'groc_del');
+  } else if (filter === 'export') {
+    displayHistory = displayHistory.filter(h => h.action === 'export' || h.action === 'backup');
+  } else if (filter === 'import') {
+    displayHistory = displayHistory.filter(h => h.action === 'import');
+  } else if (filter === 'category') {
+    displayHistory = displayHistory.filter(h => h.action.includes('cat_'));
+  }
+
+  // 2. Calculate pagination based on the filtered list
+  const total = displayHistory.length;
   const tp = Math.ceil(total / HPG) || 1;
   if (histPage > tp) histPage = 1;
-  const items = history.slice((histPage - 1) * HPG, histPage * HPG);
+  
+  const items = displayHistory.slice((histPage - 1) * HPG, histPage * HPG);
+  
   const lbl = $('hist-count-lbl');
-  if (lbl) lbl.textContent = `${total} entries`;
+  if (lbl) lbl.textContent = `${total} entries`; // Updates to reflect the filtered count
 
   const host = $('hist-list');
   if (!host) return;
@@ -1884,13 +2010,28 @@ function renderHistory(){
     else if (h.action === 'logout')       detail = d.reason === 'timeout' ? `Session expired` : `User logged out`;
     else                                  detail = '';
 
+    // Show shield if protected OR if it's a deletion action (for older logs)
+    const isDeletion = ['delete', 'delete_all', 'cat_delete', 'bday_del', 'groc_del'].includes(h.action);
+    const shield = (h.isProtected || isDeletion) ? '<span title="Protected: Will not auto-delete" style="margin-left:5px;opacity:0.8;">🛡️</span>' : '';
+
+    // Add a manual delete button only for protected records
+    const deleteBtn = (h.isProtected || isDeletion) 
+      ? `<button class="btn bd bxs" style="margin-left:8px; padding:2px 6px;" onclick="deleteHistoryLog('${h.id}')" title="Delete this log permanently">🗑️</button>` 
+      : '';
+
     return `<div class="hist-item ${h.action || ''}">
       <div class="hico">${h.icon || '•'}</div>
       <div class="hbody">
-        <div class="hact"><span class="hbadge ${h.badge || 'hb-cat'}">${esc(h.label || h.action || '')}</span></div>
+        <div class="hact">
+          <span class="hbadge ${h.badge || 'hb-cat'}">${esc(h.label || h.action || '')}</span>
+          ${shield}
+        </div>
         <div class="hdet">${detail}</div>${diff}
       </div>
-      <div class="htime">${timeStr}</div>
+      <div class="htime" style="display:flex; align-items:center;">
+        ${timeStr}
+        ${deleteBtn}
+      </div>
     </div>`;
   }).join('');
 
@@ -1922,6 +2063,26 @@ function renderHistPag(tp, total){
     if (p >= 1 && p <= tp){ histPage = p; renderHistory(); }
   });
 }
+
+window.deleteHistoryLog = async function(id) {
+  showConfirm(
+    '🗑️ Delete History Log',
+    `<div class="ibx warnb">Are you sure you want to permanently delete this log entry?<br><br>This action cannot be undone.</div>`,
+    'Delete Log',
+    async () => {
+      try {
+        // We use the raw Firestore delete directly to avoid creating a new history log 
+        // for deleting a history log! (Which would be an infinite loop)
+        const { deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js");
+        await deleteDoc(doc(db, COL.HISTORY, id));
+        pill('Log entry deleted', '🗑️');
+      } catch (e) {
+        toast('❌ Failed to delete log', 'error');
+      }
+    },
+    'bd'
+  );
+};
 
 window.clearHistory = async function(){
   if (!confirm('Clear all history from Firebase?')) return;
@@ -3658,11 +3819,37 @@ window.clearWaterForm = function(){
 };
 
 window.deleteWaterExp = function(id){
-  if (!confirm('Delete this water purchase entry?')) return;
-  deleteRecord(COL.WATER, id, {
-    pillMsg: 'Purchase deleted', pillIcon: '🗑️',
-    historyAction: ACT.DELETE, historyData: { id }
-  });
+  const rec = waterPurchases.find(x => x.id === id);
+  if (!rec) return;
+
+  showConfirm(
+    '🗑️ Delete Water Entry',
+    `<div class="confirm-box"><div class="impact">
+       ${fmtDate(rec.date)} — ₹${fmtAmt(rec.amount)}
+     </div></div>
+     <div class="fg2" style="margin-top:12px">
+       <label>Reason for deletion <span style="color:var(--muted);font-weight:400">(required)</span></label>
+       <textarea id="del-reason-water" class="fc2" rows="2" placeholder="e.g. Entered by mistake…" maxlength="300"></textarea>
+     </div>`,
+    'Delete',
+    async () => {
+      const reason = ($('del-reason-water')?.value || '').trim();
+      if (!reason){ toast('❌ Please enter a reason.', 'error'); return; }
+      
+      const res = await deleteRecord(COL.WATER, id, {
+        pillMsg: 'Purchase deleted', pillIcon: '🗑️',
+        historyAction: ACT.DELETE, 
+        historyData: { date: rec.date, amount: rec.amount, category: 'Water Bill', reason: reason }
+      });
+      
+      if (res.ok) {
+        // Instantly update the local array and UI if needed (though the listener usually handles this)
+        waterPurchases = waterPurchases.filter(x => x.id !== id);
+      }
+    },
+    'bd'
+  );
+  setTimeout(() => $('del-reason-water')?.focus(), 150);
 };
 
 window.openWaterEdit = function(id){
@@ -4671,8 +4858,14 @@ window.openMilkEdit = function(id) {
   $('milk-e-unit').value = m.unit;
   $('milk-e-note').value = m.note || '';
   
-  // Just set the amount normally, no locks or math needed
-  $('milk-e-amount').value = m.amount;
+  // Set the amount
+  const amtInput = $('milk-e-amount');
+  amtInput.value = m.amount;
+
+  // Lock amount if editing an absent day (unit == 0)
+  const isAbsent = (+m.unit === 0);
+  amtInput.readOnly = isAbsent;
+  amtInput.style.opacity = isAbsent ? '0.6' : '1';
 
   $('milk-edit-mo').classList.add('open');
 };
@@ -4695,6 +4888,27 @@ window.updateMilk = async function() {
   );
 
   if (res.ok) closeMo('milk-edit-mo');
+};
+
+window.handleMilkQtyChange = function(val) {
+  const amtInput = $('milk-amount');
+  if (!amtInput) return;
+
+  if (val === '0') {
+    // If Absent is selected, force 0 and lock the field
+    amtInput.value = '0';
+    amtInput.readOnly = true;
+    amtInput.style.opacity = '0.6';
+  } else {
+    // If they switch back to a real quantity, unlock it
+    amtInput.readOnly = false;
+    amtInput.style.opacity = '1';
+    
+    // If they switch back and the field is stuck on '0', clear it so they can type
+    if (amtInput.value === '0') {
+      amtInput.value = '';
+    }
+  }
 };
 
 window.saveMilk = async function() {
@@ -4721,22 +4935,46 @@ window.clearMilkForm = function() {
   $('milk-date').value = localDateStr();
   $('milk-unit').value = '0.5'; // Resets to 500 gm
   $('milk-note').value = '';
-  $('milk-amount').value = '';
-  $('milk-amount').readOnly = false; // FORCE it to be editable
+  
+  const amtInput = $('milk-amount');
+  amtInput.value = '';
+  amtInput.readOnly = false;
+  amtInput.style.opacity = '1'; // Restore full opacity
 };
 
 window.deleteMilk = function(id) {
   const r = milkRecords.find(x => x.id === id);
   if (!r) return;
-  showConfirm('🗑️ Delete Milk Record',
-    `<div class="ibx warnb">${fmtDate(r.date)} — ${r.unit} KG — ₹${fmtAmt(r.amount)}</div>`,
+  
+  const qtyLabel = r.unit === 'extra' ? 'Other' : +r.unit === 0 ? 'Absent' : r.unit + ' KG';
+
+  showConfirm(
+    '🗑️ Delete Milk Record',
+    `<div class="confirm-box"><div class="impact">
+       ${fmtDate(r.date)} — ${qtyLabel} — ₹${fmtAmt(r.amount)}
+     </div></div>
+     <div class="fg2" style="margin-top:12px">
+       <label>Reason for deletion <span style="color:var(--muted);font-weight:400">(required)</span></label>
+       <textarea id="del-reason-milk" class="fc2" rows="2" placeholder="e.g. Duplicate entry…" maxlength="300"></textarea>
+     </div>`,
     'Delete',
     async () => {
-      await deleteRecord('milk_records', id, {
+      const reason = ($('del-reason-milk')?.value || '').trim();
+      if (!reason){ toast('❌ Please enter a reason.', 'error'); return; }
+      
+      const res = await deleteRecord('milk_records', id, {
         pillMsg: 'Record deleted', pillIcon: '🗑️',
-        historyAction: ACT.DELETE, historyData: { id }
+        historyAction: ACT.DELETE, 
+        historyData: { date: r.date, amount: r.amount, category: 'Milk Bill', reason: reason }
       });
-    }, 'bd');
+      
+      if (res.ok) {
+        milkRecords = milkRecords.filter(x => x.id !== id);
+      }
+    }, 
+    'bd'
+  );
+  setTimeout(() => $('del-reason-milk')?.focus(), 150);
 };
 
 window.filterMilkTable = function() {
@@ -5628,27 +5866,6 @@ setInterval(() => {
   }
 }, 60000);
 
-/* ═══════════════════════════════════════════════════════════════
-   EXPOSE FUNCTIONS TO THE GLOBAL WINDOW (For HTML onclicks)
-   ═══════════════════════════════════════════════════════════════ */
-window.switchTab = switchTab;
-window.saveExp = saveExp;
-window.clearForm = clearForm;
-window.openEditMo = openEditMo;
-window.updateExp = updateExp;
-window.deleteExp = deleteExp;
-window.applyFilters = applyFilters;
-window.clearFilters = clearFilters;
-window.doSort = doSort;
-window.renderOverview = renderOverview;
-window.renderMonthWise = renderMonthWise;
-window.renderDateRange = renderDateRange;
-window.renderCompare3 = renderCompare3;
-window.renderCatMon = renderCatMon;
-window.renderGroupAnalytics = renderGroupAnalytics;
-window.openUnusedModal = openUnusedModal;
-window.toggleMobileMenu = toggleMobileMenu;
-window.toggleAllRecordsDetails = toggleAllRecordsDetails;
 
 // Expose theme functions so the inline onclick in index.html works
 window.setThemeMode = setThemeMode;
@@ -6262,3 +6479,27 @@ function updateTileStyleUI() {
   // Fallback if DOMContentLoaded already fired
   setTimeout(updateTileStyleUI, 500);
 })();
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPOSE FUNCTIONS TO THE GLOBAL WINDOW (For HTML onclicks)
+   ═══════════════════════════════════════════════════════════════ */
+window.switchTab = switchTab;
+window.saveExp = saveExp;
+window.clearForm = clearForm;
+window.openEditMo = openEditMo;
+window.updateExp = updateExp;
+window.deleteExp = deleteExp;
+window.applyFilters = applyFilters;
+window.clearFilters = clearFilters;
+window.doSort = doSort;
+window.renderOverview = renderOverview;
+window.renderMonthWise = renderMonthWise;
+window.renderDateRange = renderDateRange;
+window.renderCompare3 = renderCompare3;
+window.renderCatMon = renderCatMon;
+window.renderGroupAnalytics = renderGroupAnalytics;
+window.openUnusedModal = openUnusedModal;
+window.toggleMobileMenu = toggleMobileMenu;
+window.toggleAllRecordsDetails = toggleAllRecordsDetails;
+window.renderHistory = renderHistory;
+window.filterNoExpense = filterNoExpense;

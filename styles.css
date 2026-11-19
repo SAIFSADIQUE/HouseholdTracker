@@ -4056,3 +4056,41 @@ body[data-tile-style="stripe"] .sc::before {
 body[data-tile-style="stripe"] .sc.t::before { background: var(--ok); }
 body[data-tile-style="stripe"] .sc.m::before { background: var(--warn); }
 body[data-tile-style="stripe"] .sc.y::before, body[data-tile-style="stripe"] .sc.a::before { background: var(--acc); }
+
+/* Make the dashboard counter pills clickable without looking like links */
+a.dc-pill {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+a.dc-pill:hover {
+  transform: translateY(-2px);
+  border-color: var(--p);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background: var(--pl);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SQUARE ICON BUTTONS (LOCK & TODAY)
+   ═══════════════════════════════════════════════════════════ */
+.icon-square-btn {
+  padding: 0 !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.05rem !important; /* Makes the emoji pop */
+  border-radius: 8px !important;
+}
+
+/* Ensure the day badge matches the height perfectly */
+.date-day-badge {
+  height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
