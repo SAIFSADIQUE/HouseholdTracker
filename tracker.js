@@ -170,7 +170,7 @@ updateDateDayLabel('water-date','water-date-day');
 
 // Needed imports that aren't in our main import list
 import {
-  collection, doc, getDoc, getDocs, writeBatch,
+  collection, doc, getDoc, getDocs, writeBatch, setDoc,
   getDocsFromCache // <-- Add this
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
@@ -6214,6 +6214,7 @@ window.downloadForcedBoth = async function() {
   
   if (loader) loader.style.width = '60%';
 
+  // Wait 1.5 seconds before firing the second download to avoid browser blocking
   setTimeout(async () => {
     await window.exportMasterCSV(true);
     
@@ -6225,9 +6226,13 @@ window.downloadForcedBoth = async function() {
       }, 400);
     }
 
-    if (typeof markBackupComplete === 'function') {
-      markBackupComplete();
-    }
+    // Wait an extra 1 second after the last download starts before resetting the DB
+    setTimeout(async () => {
+      if (typeof markBackupComplete === 'function') {
+        await markBackupComplete();
+      }
+    }, 1000);
+    
   }, 1500);
 };
 
@@ -6235,15 +6240,19 @@ window.downloadForcedBoth = async function() {
 // 3. Mark Backup Complete (Resets DB Counter)
 async function markBackupComplete() {
   try {
+    // 1. Force the reset in Firestore
     const counterRef = doc(db, 'household_settings', 'backup_counter');
     await setDoc(counterRef, { count: 0, lastUpdated: new Date().toISOString() }, { merge: true });
   } catch (e) {
     console.warn('Failed to reset DB counter:', e);
+    toast('⚠️ Could not reset counter in DB. Please check internet.', 'warning');
   }
 
+  // 2. Update Local Storage
   localStorage.setItem('last_backup_time', Date.now().toString());
   sessionStorage.removeItem('backup_popup_shown');
 
+  // 3. Update the UI Buttons
   const skipBtn = document.getElementById('btn-skip-backup');
   if (skipBtn) {
     skipBtn.disabled = false;
@@ -6252,8 +6261,14 @@ async function markBackupComplete() {
     skipBtn.classList.add('bo');
   }
 
+  // 4. Immediately reset the UI counts
   updateBackupStatusUI(0); 
-  toast('Backup saved successfully!', 'success');
+  
+  // 5. Close the modal automatically after a short delay so the user sees it worked
+  setTimeout(() => {
+    closeMo('force-backup-mo');
+    toast('✅ Backup saved successfully! Counter reset to 0.', 'success');
+  }, 1000); 
 }
 
 
