@@ -4094,3 +4094,70 @@ a.dc-pill:hover {
   align-items: center !important;
   justify-content: center !important;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE SIDEBAR ALIGNMENT & SPACING FIX
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  
+  /* 1. Align the Section Titles (OVERVIEW, UTILITIES, etc.) to the left */
+  .side-group-label {
+    text-align: left !important;
+    padding: 16px 16px 6px 16px !important; /* Tighter padding */
+    margin: 0 !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  /* The first label doesn't need a large top gap */
+  .side-group-label:first-of-type {
+    padding-top: 4px !important; 
+  }
+
+  /* 2. Tighten the menu items */
+  .tb {
+    padding: 10px 16px !important; /* Tighter vertical padding */
+    margin-bottom: 2px !important; /* Small gap between items */
+  }
+
+  /* 3. Reduce the gap between the main menu and "Other Apps" */
+  .side-group-label[style*="margin-top"] {
+    margin-top: 12px !important; /* Reduced from 24px */
+    padding-top: 12px !important;
+    border-top: 1px dashed var(--bdr); /* Add a subtle separator line */
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE SIDEBAR LEFT ALIGNMENT
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Force the navigation container to align left */
+  .side-nav {
+    align-items: flex-start !important;
+    padding-top: 4px !important; /* Remove extra top space */
+  }
+
+  /* Force the titles (OVERVIEW, UTILITIES) to the left */
+  .side-group-label {
+    text-align: left !important;
+    margin: 16px 0 4px 16px !important; /* No right margin, perfect left alignment */
+    padding: 0 !important;
+    width: auto !important;
+    align-self: flex-start !important;
+  }
+
+  /* Keep the menu buttons full width even though the container is left-aligned */
+  .tb {
+    width: 100% !important;
+  }
+
+  /* Adjust the separation line for Other Apps */
+  .side-group-label[style*="margin-top"] {
+    margin-top: 16px !important;
+    padding-top: 12px !important;
+    border-top: 1px dashed var(--bdr);
+    width: calc(100% - 32px) !important; /* Account for the left margin */
+    margin-left: 16px !important;
+  }
+}

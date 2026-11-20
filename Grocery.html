@@ -88,6 +88,7 @@
 <div class="app-shell">
 
   <!-- ═══════════ SIDEBAR ═══════════ -->
+    <!-- ═══════════ SIDEBAR ═══════════ -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="brand-mark" aria-hidden="true" style="background: linear-gradient(135deg, #22c55e, #14b8a6); color: #fff; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
@@ -102,28 +103,12 @@
 
     <nav class="side-nav" id="side-nav">
 
-      <!-- ══ Cross-links ══ -->
-      <div class="side-group-label">Apps</div>
-      <a class="tb" href="index.html">
-        <span>🏠</span>
-        <span class="tb-lbl">Household Tracker</span>
-      </a>
-      <a class="tb" href="Birthday.html">
-        <span>🎂</span>
-        <span class="tb-lbl">Birthday Tracker</span>
-      </a>
-      <a class="tb active" href="Grocery.html">
-        <span>🛒</span>
-        <span class="tb-lbl">Grocery Tracker</span>
-      </a>
-
-      <!-- ══ Overview ══ -->
+      <!-- ══ Grocery Internal Tabs ══ -->
       <div class="side-group-label">Overview</div>
       <button class="tb" data-tab="dashboard" data-title="Grocery Dashboard" type="button">
         <span>📊</span><span class="tb-lbl">Dashboard</span>
       </button>
 
-      <!-- ══ Entry ══ -->
       <div class="side-group-label">Entry</div>
       <button class="tb" data-tab="add" data-title="Add Purchase" type="button">
         <span>➕</span><span class="tb-lbl">Add Purchase</span>
@@ -135,7 +120,6 @@
         <span>✅</span><span class="tb-lbl">Shopping List</span>
       </button>
 
-      <!-- ══ Analysis ══ -->
       <div class="side-group-label">Analysis</div>
       <button class="tb" data-tab="price" data-title="Price Compare" type="button">
         <span>📈</span><span class="tb-lbl">Price Compare</span>
@@ -147,13 +131,23 @@
         <span>🧺</span><span class="tb-lbl">Item Insights</span>
       </button>
 
+      <!-- ══ Other Apps (Moved to bottom) ══ -->
+      <div class="side-group-label" style="margin-top: 24px;">Other Apps</div>
+      <a class="tb" href="index.html">
+        <span>🏠</span>
+        <span class="tb-lbl">Household Tracker</span>
+      </a>
+      <a class="tb" href="Birthday.html">
+        <span>🎂</span>
+        <span class="tb-lbl">Birthday Tracker</span>
+      </a>
+
       <!-- ══ Account ══ -->
       <div class="side-group-label">Account</div>
       <button class="tb" data-tab="settings" data-title="Settings" type="button">
         <span>⚙️</span><span class="tb-lbl">Settings</span>
       </button>
-      <button class="tb" type="button"
-              onclick="window.__householdLogout && window.__householdLogout('manual')">
+      <button class="tb" type="button" onclick="window.__householdLogout && window.__householdLogout('manual')">
         <svg class="ti" viewBox="0 0 24 24">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
         </svg>

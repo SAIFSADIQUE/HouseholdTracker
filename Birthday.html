@@ -90,6 +90,7 @@
 <div class="app-shell">
 
   <!-- ═══════════ SIDEBAR ═══════════ -->
+    <!-- ═══════════ SIDEBAR ═══════════ -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="brand-mark" aria-hidden="true" style="background: linear-gradient(135deg, #ff6584, #ec4899); color: #fff; box-shadow: 0 4px 12px rgba(255, 101, 132, 0.3);">
@@ -104,22 +105,7 @@
 
     <nav class="side-nav" id="side-nav">
 
-      <!-- ══ Cross-links ══ -->
-      <div class="side-group-label">Apps</div>
-      <a class="tb" href="index.html">
-        <span>🏠</span>
-        <span class="tb-lbl">Household Tracker</span>
-      </a>
-      <a class="tb active" href="Birthday.html">
-        <span>🎂</span>
-        <span class="tb-lbl">Birthday Tracker</span>
-      </a>
-      <a class="tb" href="Grocery.html">
-        <span>🛒</span>
-        <span class="tb-lbl">Grocery Tracker</span>
-      </a>
-
-      <!-- ══ Birthday sections ══ -->
+      <!-- ══ Birthday Internal Tabs ══ -->
       <div class="side-group-label">Birthdays</div>
       <button class="tb" data-tab="dashboard" data-title="Birthday Dashboard" type="button">
         <span>📊</span><span class="tb-lbl">Dashboard</span>
@@ -140,14 +126,24 @@
       <button class="tb" data-tab="insights" data-title="Insights & Fun Facts" type="button">
         <span>✨</span><span class="tb-lbl">Insights</span>
       </button>
+
+      <!-- ══ Other Apps (Moved to bottom) ══ -->
+      <div class="side-group-label" style="margin-top: 24px;">Other Apps</div>
+      <a class="tb" href="index.html">
+        <span>🏠</span>
+        <span class="tb-lbl">Household Tracker</span>
+      </a>
+      <a class="tb" href="Grocery.html">
+        <span>🛒</span>
+        <span class="tb-lbl">Grocery Tracker</span>
+      </a>
+
+      <!-- ══ Account ══ -->
+      <div class="side-group-label">Account</div>
       <button class="tb" data-tab="settings" data-title="Reminders & Settings" type="button">
         <span>⚙️</span><span class="tb-lbl">Settings</span>
       </button>
-
-      <!-- ══ Logout ══ -->
-      <div class="side-group-label">Account</div>
-      <button class="tb" type="button"
-              onclick="window.__householdLogout && window.__householdLogout('manual')">
+      <button class="tb" type="button" onclick="window.__householdLogout && window.__householdLogout('manual')">
         <svg class="ti" viewBox="0 0 24 24">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
         </svg>

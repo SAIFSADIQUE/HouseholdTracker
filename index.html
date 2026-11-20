@@ -107,15 +107,63 @@
       </div>
       <span class="brand-name">Household Tracker</span>
     </div>
-
     <nav class="side-nav" id="side-nav">
 
-      <!-- ══ Cross-links (top-level apps) ══ -->
-      <div class="side-group-label">Apps</div>
-      <a class="tb active" href="index.html">
-        <span>🏠</span>
-        <span class="tb-lbl">Household Tracker</span>
-      </a>
+      <!-- ══ 1. Overview (Active App) ══ -->
+      <div class="side-group-label">Overview</div>
+      <button class="tb active" data-tab="dashboard" data-title="Dashboard">
+        <svg class="ti" viewBox="0 0 24 24"><rect x="3" y="11" width="4" height="10" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+        <span class="tb-lbl">Dashboard</span>
+      </button>
+      <button class="tb" data-tab="daily" data-title="Daily Expense">
+        <svg class="ti" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        <span class="tb-lbl">Daily Expense</span>
+      </button>
+      <button class="tb" data-tab="records" data-title="Records">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span class="tb-lbl">Records</span>
+      </button>
+      <button class="tb" data-tab="analytics" data-title="Analytics">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg>
+        <span class="tb-lbl">Analytics</span>
+      </button>
+
+      <!-- ══ 2. Utilities (Active App) ══ -->
+      <div class="side-group-label">Utilities</div>
+      <button class="tb" data-tab="rent" data-title="Room Rent">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/></svg>
+        <span class="tb-lbl">Room Rent</span>
+      </button>
+      <button class="tb" data-tab="electricity" data-title="Electricity Bill">
+        <svg class="ti" viewBox="0 0 24 24" style="stroke-linejoin:round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
+        <span class="tb-lbl">Electricity Bill</span>
+      </button>
+      <button class="tb" data-tab="water" data-title="Water Bill">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M12 3s7 7.4 7 12.1A7 7 0 0 1 5 15.1C5 10.4 12 3 12 3Z"/></svg>
+        <span class="tb-lbl">Water Bill</span>
+      </button>
+      <button class="tb" data-tab="milk" data-title="Milk Bill">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M8 2h8M9 2v3l-2 4v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9l-2-4V2M7 9h10"/></svg>
+        <span class="tb-lbl">Milk Bill</span>
+      </button>
+
+      <!-- ══ 3. Manage (Active App) ══ -->
+      <div class="side-group-label">Manage</div>
+      <button class="tb" data-tab="categories" data-title="Categories">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M11 3h6a2 2 0 0 1 2 2v6l-9 9-8-8 8-9Z"/><circle cx="15.6" cy="7.5" r="1.15" style="fill:currentColor"/></svg>
+        <span class="tb-lbl">Categories</span>
+      </button>
+      <button class="tb" data-tab="history" data-title="History">
+        <svg class="ti" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3"/><path d="M12 7.4V12l3.1 1.9"/></svg>
+        <span class="tb-lbl">History</span>
+      </button>
+      <button class="tb" data-tab="export" data-title="Export">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M12 3v12M7.5 10.5 12 15l4.5-4.5"/><path d="M4 18h16"/></svg>
+        <span class="tb-lbl">Export</span>
+      </button>
+
+      <!-- ══ 4. OTHER APPS (Moved to bottom) ══ -->
+      <div class="side-group-label" style="margin-top: 24px;">Other Apps</div>
       <a class="tb" href="Birthday.html">
         <span>🎂</span>
         <span class="tb-lbl">Birthday Tracker</span>
@@ -125,106 +173,19 @@
         <span class="tb-lbl">Grocery Tracker</span>
       </a>
 
-      <!-- ══ Overview ══ -->
-      <div class="side-group-label">Overview</div>
-      <button class="tb" data-tab="dashboard" data-title="Dashboard">
-        <svg class="ti" viewBox="0 0 24 24">
-          <rect x="3" y="11" width="4" height="10" rx="1"/>
-          <rect x="10" y="6" width="4" height="15" rx="1"/>
-          <rect x="17" y="3" width="4" height="18" rx="1"/>
-        </svg>
-        <span class="tb-lbl">Dashboard</span>
-      </button>
-      <button class="tb" data-tab="daily" data-title="Daily Expense">
-        <svg class="ti" viewBox="0 0 24 24">
-          <rect x="3" y="5" width="18" height="16" rx="2"/>
-          <path d="M3 10h18M8 3v4M16 3v4"/>
-        </svg>
-        <span class="tb-lbl">Daily Expense</span>
-      </button>
-      <button class="tb" data-tab="records" data-title="Records">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M4 6h16M4 12h16M4 18h10"/>
-        </svg>
-        <span class="tb-lbl">Records</span>
-      </button>
-      <button class="tb" data-tab="analytics" data-title="Analytics">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M4 17l5-5 4 4 7-8"/>
-          <path d="M15 8h5v5"/>
-        </svg>
-        <span class="tb-lbl">Analytics</span>
-      </button>
-
-      <!-- ══ Utilities ══ -->
-      <div class="side-group-label">Utilities</div>
-      <button class="tb" data-tab="rent" data-title="Room Rent">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/>
-        </svg>
-        <span class="tb-lbl">Room Rent</span>
-      </button>
-      <button class="tb" data-tab="electricity" data-title="Electricity Bill">
-        <svg class="ti" viewBox="0 0 24 24" style="stroke-linejoin:round">
-          <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>
-        </svg>
-        <span class="tb-lbl">Electricity Bill</span>
-      </button>
-      <button class="tb" data-tab="water" data-title="Water Bill">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M12 3s7 7.4 7 12.1A7 7 0 0 1 5 15.1C5 10.4 12 3 12 3Z"/>
-        </svg>
-        <span class="tb-lbl">Water Bill</span>
-      </button>
-      <button class="tb" data-tab="milk" data-title="Milk Bill">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M8 2h8M9 2v3l-2 4v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9l-2-4V2M7 9h10"/>
-        </svg>
-        <span class="tb-lbl">Milk Bill</span>
-      </button>
-
-      <!-- ══ Manage ══ -->
-      <div class="side-group-label">Manage</div>
-      <button class="tb" data-tab="categories" data-title="Categories">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M11 3h6a2 2 0 0 1 2 2v6l-9 9-8-8 8-9Z"/>
-          <circle cx="15.6" cy="7.5" r="1.15" style="fill:currentColor"/>
-        </svg>
-        <span class="tb-lbl">Categories</span>
-      </button>
-      <button class="tb" data-tab="history" data-title="History">
-        <svg class="ti" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="8.3"/>
-          <path d="M12 7.4V12l3.1 1.9"/>
-        </svg>
-        <span class="tb-lbl">History</span>
-      </button>
-      <button class="tb" data-tab="export" data-title="Export">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M12 3v12M7.5 10.5 12 15l4.5-4.5"/>
-          <path d="M4 18h16"/>
-        </svg>
-        <span class="tb-lbl">Export</span>
-      </button>
-
-      <!-- ══ Account ══ -->
+      <!-- ══ 5. Account (Always at the bottom) ══ -->
       <div class="side-group-label">Account</div>
       <button class="tb" data-tab="settings" data-title="Settings">
-        <svg class="ti" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l1.9-1.5-2-3.4-2.2.8a7.6 7.6 0 0 0-2.6-1.5L14 2h-4l-.5 2.4a7.6 7.6 0 0 0-2.6 1.5l-2.2-.8-2 3.4 1.9 1.5a7.6 7.6 0 0 0 0 3l-1.9 1.5 2 3.4 2.2-.8a7.6 7.6 0 0 0 2.6 1.5L10 22h4l.5-2.4a7.6 7.6 0 0 0 2.6-1.5l2.2.8 2-3.4Z"/>
-        </svg>
+        <svg class="ti" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l1.9-1.5-2-3.4-2.2.8a7.6 7.6 0 0 0-2.6-1.5L14 2h-4l-.5 2.4a7.6 7.6 0 0 0-2.6 1.5l-2.2-.8-2 3.4 1.9 1.5a7.6 7.6 0 0 0 0 3l-1.9 1.5 2 3.4 2.2-.8a7.6 7.6 0 0 0 2.6 1.5L10 22h4l.5-2.4a7.6 7.6 0 0 0 2.6-1.5l2.2.8 2-3.4Z"/></svg>
         <span class="tb-lbl">Settings</span>
       </button>
-      <button class="tb" type="button"
-              onclick="window.__householdLogout && window.__householdLogout('manual')">
-        <svg class="ti" viewBox="0 0 24 24">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
-        </svg>
+      <button class="tb" type="button" onclick="window.__householdLogout && window.__householdLogout('manual')">
+        <svg class="ti" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
         <span class="tb-lbl">Logout</span>
       </button>
 
     </nav>
+
   </aside>
 
   <!-- ═══════════ APP CONTENT ═══════════ -->
