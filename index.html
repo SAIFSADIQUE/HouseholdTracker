@@ -295,13 +295,19 @@
             <div class="dash-tile-arrow">→</div>
           </a>
         </div>
-
         <!-- ══ COMBINED REPORT (Rent + Electricity + Water) ══ -->
-        <div class="fc">
-          <div class="fct" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-			<span>📄 Combined Report (Rent + Electricity + Water + Milk)</span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <select id="combo-month" class="fc2" style="width:auto;padding:6px 10px;font-size:.78rem">
+        <div class="fc" style="padding: 16px !important;">
+          
+          <!-- Top Control Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 12px;">
+            <!-- Title on the left -->
+            <div style="font-family:var(--fontd); font-size:1.05rem; font-weight:800; color:var(--txt);">
+              📄 Combined Report
+            </div>
+            
+            <!-- Dropdowns on the right -->
+            <div style="display:flex; gap:8px; align-items:center;">
+              <select id="combo-month" class="fc2" style="width:auto;padding:5px 8px;font-size:.75rem; height: 34px;">
                 <option value="">Whole Year</option>
                 <option value="1">January</option>
                 <option value="2">February</option>
@@ -316,11 +322,12 @@
                 <option value="11">November</option>
                 <option value="12">December</option>
               </select>
-              <select id="combo-year" class="fc2" style="width:auto;padding:6px 10px;font-size:.78rem"></select>
-              <button class="btn bp bsm" onclick="renderCombinedReport()" type="button">🔄 Refresh</button>
-              <button class="btn bo bsm" onclick="printCombinedReport()" type="button">🖨️ Print / PDF</button>
+              <select id="combo-year" class="fc2" style="width:auto;padding:5px 8px;font-size:.75rem; height: 34px;"></select>
+              <button class="btn bo bsm" style="height: 34px; padding: 0 12px;" onclick="printCombinedReport()" type="button">🖨️ Print / PDF</button>
             </div>
           </div>
+
+          <!-- Report Body -->
           <div id="combo-report-body-desktop" class="desktop-only-table"></div>
           <div id="combo-report-body-mobile" class="mobile-only-cards"></div>
         </div>
@@ -401,18 +408,18 @@
                 <div class="fg2" style="margin-bottom:4px; gap:4px;">
                   <label>Date</label>
                   <div style="display:flex;gap:4px;align-items:center">
-                    <input type="date" id="f-date" class="fc2"
-                           onchange="window.onAddDateChange()"
-                           style="flex:1; height: 38px; padding: 6px 10px; min-width: 0;"/>
                     
-                    <span class="date-day-badge" id="f-date-day" style="height: 38px; min-width: 45px; font-size:0.75rem; padding:0 8px;"></span>
-                    
-                    <!-- Today Button -->
+                    <!-- Inline Date Wrapper -->
+                    <div class="date-inline-wrapper" style="flex: 1;">
+                      <button type="button" class="date-arrow-btn" onclick="changeAddDate(-1, 'f-date')" title="Previous Day">‹</button>
+                      <input type="date" id="f-date" onchange="window.onAddDateChange()"/>
+                      <button type="button" class="date-arrow-btn" onclick="changeAddDate(1, 'f-date')" title="Next Day">›</button>
+                      <span class="inline-day-text" id="f-date-day"></span>
+                    </div>
+
                     <button type="button" class="btn bo icon-square-btn" onclick="jumpToToday()" title="Jump to Today's date">
                       📍
                     </button>
-
-                    <!-- Lock Button -->
                     <button type="button" id="date-lock-btn" class="date-lock-pill icon-square-btn" onclick="toggleDateLock()" title="Lock date to add multiple records for the same day">
                       🔓
                     </button>
@@ -1453,11 +1460,11 @@
           <div class="grid g3">
             <div class="fg2">
               <label>Date</label>
-              <div style="display:flex;gap:4px;align-items:center">
-                <input type="date" id="water-date" class="fc2"
-                       oninput="updateDateDayLabel('water-date','water-date-day')"
-                       style="flex:1; padding-left:10px; padding-right:4px;"/>
-                <span class="date-day-badge" id="water-date-day" style="min-width:45px; padding:0 8px; font-size:.72rem;"></span>
+              <div class="date-inline-wrapper">
+                <button type="button" class="date-arrow-btn" onclick="changeAddDate(-1, 'water-date')" title="Previous Day">‹</button>
+                <input type="date" id="water-date" oninput="updateDateDayLabel('water-date','water-date-day')"/>
+                <button type="button" class="date-arrow-btn" onclick="changeAddDate(1, 'water-date')" title="Next Day">›</button>
+                <span class="inline-day-text" id="water-date-day"></span>
               </div>
             </div>
             
@@ -1480,7 +1487,7 @@
         </div>
 
         <!-- ══ RECENT PURCHASES (Refactored & Collapsible) ══ -->
-        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 16px;">
+        <details class="fc" open style="cursor:pointer; padding: 0; overflow: hidden; margin-bottom: 16px;">
           <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
             <div style="display: flex; align-items: center; gap: 8px; margin-right: auto;">
               🕐 Recent Purchases
@@ -1620,7 +1627,12 @@
           <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
             <div class="fg2">
               <label>Date</label>
-              <input type="date" id="milk-date" class="fc2" oninput="updateDateDayLabel('milk-date','milk-date-day')"/>
+              <div class="date-inline-wrapper">
+                <button type="button" class="date-arrow-btn" onclick="changeAddDate(-1, 'milk-date')" title="Previous Day">‹</button>
+                <input type="date" id="milk-date" oninput="updateDateDayLabel('milk-date','milk-date-day')"/>
+                <button type="button" class="date-arrow-btn" onclick="changeAddDate(1, 'milk-date')" title="Next Day">›</button>
+                <span class="inline-day-text" id="milk-date-day"></span>
+              </div>
             </div>
             <div class="fg2">
               <label>Quantity</label>
@@ -1649,7 +1661,7 @@
         </div>
 
         <!-- 3. Recent Records Table (Refactored & Collapsible) -->
-        <details class="fc" style="cursor:pointer; padding: 0; overflow: hidden;">
+        <details class="fc" open style="cursor:pointer; padding: 0; overflow: hidden;">
           <summary style="padding: 16px 18px; font-weight: 800; font-size: .9rem; color: var(--txt); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--bdr); margin: 0;">
             <div style="display: flex; align-items: center; gap: 8px;">
               🕐 Recent Milk Records
@@ -2180,18 +2192,21 @@
      FORCED BACKUP MODAL
      ═══════════════════════════════════════════════════════════════ -->
 <div class="mo" id="force-backup-mo" style="z-index: 9999;">
-  <div class="md" style="text-align: center;">
-    <div style="font-size: 2.5rem; margin-bottom: 10px;">☁️</div>
-    <div class="mt" style="justify-content: center; margin-bottom: 12px; font-size: 1.2rem;">Backup Required</div>
-    <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 24px;">
-      You have added <strong id="force-backup-count">5</strong> new records since your last backup. Please download a safe copy of your data now.
+  <div class="md" style="text-align: center; padding: 20px 16px; max-width: 320px; margin: 0 auto;">
+    <div class="mt" style="margin: 10px 0 8px 0; font-size: 1.05rem; font-weight: 700;">Backup Required</div>
+    
+    <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 16px; line-height: 1.4;">
+      You have added <strong id="force-backup-count" style="color: var(--err);">5</strong> new records since your last backup. Please download a safe copy of your data now.
     </p>
     
-    <button class="btn bp" style="width: 100%; justify-content: center; padding: 14px; font-size: 1.05rem; margin-bottom: 12px;" onclick="downloadForcedBoth()">
-      📦 Download Complete Backup (JSON + CSV)
+    <!-- Main Download Button -->
+    <button class="btn bp" style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 8px; margin-bottom: 10px; line-height: 1.2; white-space: normal; font-size: 0.85rem;" onclick="downloadForcedBoth()">
+      <span style="font-weight: 700;">📦 Download Complete Backup</span>
+      <span style="font-size: 0.7rem; opacity: 0.85; margin-top: 2px;">(JSON + CSV)</span>
     </button>
     
-    <button class="btn bg2" style="width: 100%; justify-content: center; font-size: 0.8rem;" onclick="closeMo('force-backup-mo')" id="btn-skip-backup" disabled>
+    <!-- Skip Button -->
+    <button class="btn bg2" style="width: 100%; justify-content: center; font-size: 0.72rem; padding: 8px; white-space: normal;" onclick="closeMo('force-backup-mo')" id="btn-skip-backup" disabled>
       Skip (Available after download)
     </button>
   </div>

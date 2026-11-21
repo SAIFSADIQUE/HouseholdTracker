@@ -4161,3 +4161,154 @@ a.dc-pill:hover {
     margin-left: 16px !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   DATE INPUT ARROWS
+   ═══════════════════════════════════════════════════════════ */
+.date-arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s;
+  z-index: 10;
+}
+
+.date-arrow-btn:hover {
+  color: var(--p);
+  background: var(--sec);
+}
+
+.date-arrow-prev {
+  left: 2px;
+  border-radius: var(--rs) 0 0 var(--rs);
+}
+
+.date-arrow-next {
+  right: 2px;
+  border-radius: 0 var(--rs) var(--rs) 0;
+}
+
+/* Ensure ALL date inputs have padding for the arrows */
+#f-date, #water-date, #milk-date {
+  padding-left: 28px !important; 
+  padding-right: 28px !important;
+  text-align: center;
+}
+
+/* Hide native calendar icons for all three inputs */
+#f-date::-webkit-calendar-picker-indicator,
+#water-date::-webkit-calendar-picker-indicator,
+#milk-date::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INLINE DAY BADGE DESIGN
+   ═══════════════════════════════════════════════════════════ */
+.date-inline-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1.5px solid var(--bdr);
+  border-radius: var(--rs);
+  height: 41px;
+  padding: 0 6px;
+  width: 100%;
+  transition: border-color .18s, box-shadow .18s;
+}
+
+.date-inline-wrapper:focus-within {
+  border-color: var(--p);
+  box-shadow: 0 0 0 3px var(--pl);
+}
+
+.date-inline-wrapper input[type="date"] {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: var(--font) !important;
+  font-weight: 500 !important; /* Changed from 600 to 500 to match inputs */
+  font-size: 0.87rem !important; /* Changed to match .fc2 inputs */
+  color: var(--txt);
+  text-align: center;
+  flex: 1 1 0% !important;
+  min-width: 0 !important; 
+  width: 0 !important;     
+  outline: none;
+  padding: 0;
+  height: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+}
+
+/* Center the native date text */
+.date-inline-wrapper input[type="date"]::-webkit-datetime-edit {
+  display: flex !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* ── THE MOBILE FIX ── */
+@media (max-width: 900px) {
+  /* Hide the native text completely on mobile */
+  .date-inline-wrapper input[type="date"]::-webkit-datetime-edit {
+    opacity: 0 !important; 
+  }
+
+  /* Inject our own perfectly formatted date text */
+  /* Inject our own perfectly formatted date text */
+  .date-inline-wrapper input[type="date"]::before {
+    content: attr(data-formatted-date);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: var(--font);
+    font-weight: 500;
+    font-size: 0.87rem; /* Matches the .fc2 size */
+    color: var(--txt);
+    pointer-events: none;
+    background: var(--bg); /* Hides any native text bleeding through */
+    border-radius: var(--rs);
+  }
+}
+
+.inline-day-text {
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: var(--p);
+  background: var(--pl);
+  padding: 4px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  margin-left: 2px; /* small gap from the arrow */
+}
+
+.date-inline-wrapper .date-arrow-btn {
+  position: static;
+  transform: none;
+  height: 100%;
+  padding: 0 6px;
+  border-radius: 6px;
+}

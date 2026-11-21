@@ -141,6 +141,11 @@ function hydrateUI(){
 ['f-date','rent-paid-date','elec-date','elec-paid-date','water-date']
   .forEach(id => fillToday(id));
 
+// Force custom text for the f-date input on load
+  if ($('f-date') && $('f-date').value) {
+    $('f-date').setAttribute('data-formatted-date', fmtDate($('f-date').value));
+  }
+
 // Populate day-of-week badges on first load
 updateDateDayLabel('f-date','f-date-day');
 updateDateDayLabel('elec-date','elec-date-day');
@@ -644,6 +649,31 @@ window.onAddDateChange = function() {
   
   // 4. Refresh the table to show the new date's records
   renderDaily();
+};
+
+window.changeAddDate = function(days, inputId) {
+  const input = $(inputId);
+  if (!input || !input.value) return;
+  
+  const current = new Date(input.value + 'T00:00:00');
+  current.setDate(current.getDate() + days);
+  
+  const y = current.getFullYear();
+  const m = String(current.getMonth() + 1).padStart(2, '0');
+  const d = String(current.getDate()).padStart(2, '0');
+  
+  input.value = `${y}-${m}-${d}`;
+  
+  // Update our custom formatted text for mobile
+  input.setAttribute('data-formatted-date', `${d}-${m}-${y}`);
+  
+  if (inputId === 'f-date') {
+    window.onAddDateChange();
+  } else if (inputId === 'water-date') {
+    updateDateDayLabel('water-date', 'water-date-day');
+  } else if (inputId === 'milk-date') {
+    updateDateDayLabel('milk-date', 'milk-date-day');
+  }
 };
 
 window.jumpToToday = function() {
@@ -2684,11 +2714,7 @@ window.renderCombinedReport = function(){
   /* ═══════════════════════════════════════════════════════════════
      1. BUILD DESKTOP TABLE HTML
      ═══════════════════════════════════════════════════════════════ */
-  let desktopHtml = `<div>
-    <div style="text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--bdr)">
-      <div style="font-family:var(--fontd);font-size:1.15rem;font-weight:800;color:var(--p)">📄 Combined Report</div>
-      <div style="font-size:.82rem;color:var(--muted);margin-top:4px">${periodLabel} · Room Rent + Electricity + Water + Milk</div>
-    </div>`;
+  let desktopHtml = `<div style="margin-top: 6px;">`;
 
   // Rent Table
   desktopHtml += `<div style="margin-bottom:22px">
@@ -3750,6 +3776,10 @@ window.filterWaterTable = function() {
 function renderWaterTab(){
   const dEl = $('water-date');
   if (dEl && !dEl.value) dEl.value = localDateStr();
+  
+  // Force the custom text to appear on load for mobile
+  $('water-date').setAttribute('data-formatted-date', fmtDate($('water-date').value));
+  
   updateDateDayLabel('water-date','water-date-day');
 
   // Populate Filter Dropdowns
@@ -3814,7 +3844,13 @@ window.saveWaterExp = async function(){
 
 window.clearWaterForm = function(){
   $('water-amount').value = '';
+  $('water-note').value = ''; // <-- ADD THIS LINE
+  
   $('water-date').value = localDateStr();
+  
+  // Ensure the custom mobile date text updates on clear
+  $('water-date').setAttribute('data-formatted-date', fmtDate($('water-date').value));
+  
   updateDateDayLabel('water-date','water-date-day');
 };
 
@@ -5018,6 +5054,11 @@ window.filterMilkTable = function() {
 
 function renderMilkTab() {
   if (!$('milk-date').value) $('milk-date').value = localDateStr();
+  
+  // FORCE the day badge and custom text to appear on load
+  $('milk-date').setAttribute('data-formatted-date', fmtDate($('milk-date').value));
+  updateDateDayLabel('milk-date', 'milk-date-day');
+
   // recalcMilk(); // Disabled
 
   // 1. Update Stat Cards
@@ -5181,7 +5222,11 @@ window.renderMilkReport = function() {
   const totalAmt = rows.reduce((s,x) => s + (+x.amount || 0), 0);
   const totalQty = rows.reduce((s,x) => s + (+x.unit || 0), 0);
 
-  if (!months.length) { body.innerHTML = `<div class="es"><div class="ei">🥛</div><p>No milk records for ${y}.</p></div>`; return; }
+  if (!months.length) { 
+    const desktopEl = $('milk-report-body-desktop');
+    if (desktopEl) desktopEl.innerHTML = `<div class="es"><div class="ei">🥛</div><p>No milk records for ${y}.</p></div>`; 
+    return; 
+  }
 
   // --- DESKTOP TABLE ---
   const desktopEl = $('milk-report-body-desktop');
